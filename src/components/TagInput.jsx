@@ -15,6 +15,7 @@ export default function TagInput({ tags, onChange }) {
   const remove = (tag) => onChange(tags.filter(t => t !== tag))
 
   const onKeyDown = (e) => {
+    if (e.isComposing) return
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault()
       add()

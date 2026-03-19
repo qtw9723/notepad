@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Eye, EyeOff, Save, FileText, Code, FileCode2 } from 'lucide-react'
+import { Eye, EyeOff, FileText, Code, FileCode2 } from 'lucide-react'
 import TagInput from './TagInput'
 import { api } from '../lib/api'
 
 const CONTENT_TYPES = [
-  { id: 'markdown', label: 'Markdown', icon: FileText },
-  { id: 'html', label: 'HTML', icon: FileCode2 },
-  { id: 'text', label: 'Text', icon: Code },
+  { id: 'markdown', label: 'Markdown', Icon: FileText },
+  { id: 'html', label: 'HTML', Icon: FileCode2 },
+  { id: 'text', label: 'Text', Icon: Code },
 ]
 
 export default function Editor({ noteId, onUpdate }) {
@@ -20,8 +20,6 @@ export default function Editor({ noteId, onUpdate }) {
 
   useEffect(() => {
     if (!noteId) return
-    setNote(null)
-    setPreview(false)
     api.getNote(noteId).then(data => setNote(data))
   }, [noteId])
 
@@ -74,18 +72,18 @@ export default function Editor({ noteId, onUpdate }) {
       <div className="flex items-center gap-3 px-5 py-3 border-b border-[#242428] bg-[#161618] shrink-0">
         {/* 컨텐츠 타입 */}
         <div className="flex bg-[#1e1e28] rounded-lg p-0.5 gap-0.5">
-          {CONTENT_TYPES.map(({ id, label, icon: Icon }) => (
+          {CONTENT_TYPES.map((ct) => (
             <button
-              key={id}
-              onClick={() => change('content_type', id)}
+              key={ct.id}
+              onClick={() => change('content_type', ct.id)}
               className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md transition-colors ${
-                note.content_type === id
+                note.content_type === ct.id
                   ? 'bg-[#7c6af5] text-white'
                   : 'text-[#606070] hover:text-[#9090b0]'
               }`}
             >
-              <Icon size={12} />
-              {label}
+              <ct.Icon size={12} />
+              {ct.label}
             </button>
           ))}
         </div>

@@ -37,6 +37,7 @@ export default function App() {
           </div>
         ) : (
           <Editor
+            key={selectedId}
             noteId={selectedId}
             onUpdate={handleUpdate}
           />

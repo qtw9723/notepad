@@ -6,9 +6,14 @@ export function useNotes() {
   const [loading, setLoading] = useState(true)
 
   const fetchNotes = useCallback(async () => {
-    const data = await api.getNotes()
-    setNotes(data || [])
-    setLoading(false)
+    try {
+      const data = await api.getNotes()
+      setNotes(data || [])
+    } catch (e) {
+      console.error('Failed to load notes:', e)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {
