@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Eye, EyeOff, Save, FileText, Code, FileCode2 } from 'lucide-react'
 import TagInput from './TagInput'
-import { supabase } from '../lib/supabase'
+import { api } from '../lib/api'
 
 const CONTENT_TYPES = [
   { id: 'markdown', label: 'Markdown', icon: FileText },
@@ -22,29 +22,18 @@ export default function Editor({ noteId, onUpdate }) {
     if (!noteId) return
     setNote(null)
     setPreview(false)
-    supabase
-      .from('notes')
-      .select('*')
-      .eq('id', noteId)
-      .single()
-      .then(({ data }) => setNote(data))
+    api.getNote(noteId).then(data => setNote(data))
   }, [noteId])
 
   const save = useCallback(async (updated) => {
     if (!updated?.id) return
     setSaving(true)
-    const { data } = await supabase
-      .from('notes')
-      .update({
-        title: updated.title,
-        content: updated.content,
-        content_type: updated.content_type,
-        tags: updated.tags,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', updated.id)
-      .select()
-      .single()
+    const data = await api.updateNote(updated.id, {
+      title: updated.title,
+      content: updated.content,
+      content_type: updated.content_type,
+      tags: updated.tags,
+    })
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 1500)

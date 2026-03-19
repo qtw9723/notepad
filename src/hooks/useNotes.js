@@ -1,16 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
+import { api } from '../lib/api'
 
 export function useNotes() {
   const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(true)
 
   const fetchNotes = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('notes')
-      .select('id, title, content_type, tags, created_at, updated_at')
-      .order('updated_at', { ascending: false })
-    if (!error) setNotes(data || [])
+    const data = await api.getNotes()
+    setNotes(data || [])
     setLoading(false)
   }, [])
 
@@ -19,33 +16,19 @@ export function useNotes() {
   }, [fetchNotes])
 
   const createNote = async () => {
-    const { data, error } = await supabase
-      .from('notes')
-      .insert({ title: '새 메모', content: '', content_type: 'markdown', tags: [] })
-      .select()
-      .single()
-    if (!error) {
-      setNotes(prev => [data, ...prev])
-      return data
-    }
-    return null
+    const note = await api.createNote({ title: '새 메모', content: '', content_type: 'markdown', tags: [] })
+    if (note) setNotes(prev => [note, ...prev])
+    return note
   }
 
   const updateNote = async (id, changes) => {
-    const { data, error } = await supabase
-      .from('notes')
-      .update({ ...changes, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single()
-    if (!error) {
-      setNotes(prev => prev.map(n => n.id === id ? { ...n, ...data } : n))
-    }
+    const note = await api.updateNote(id, changes)
+    if (note) setNotes(prev => prev.map(n => n.id === id ? { ...n, ...note } : n))
   }
 
   const deleteNote = async (id) => {
-    const { error } = await supabase.from('notes').delete().eq('id', id)
-    if (!error) setNotes(prev => prev.filter(n => n.id !== id))
+    await api.deleteNote(id)
+    setNotes(prev => prev.filter(n => n.id !== id))
   }
 
   return { notes, loading, fetchNotes, createNote, updateNote, deleteNote }
