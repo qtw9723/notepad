@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Plus, Search, Tag, FileText, Trash2, X, LogOut } from 'lucide-react'
 
-export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelete, onSignOut, userEmail }) {
+export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelete, onSignOut, userEmail, onShowLogin }) {
   const [search, setSearch] = useState('')
   const [activeTag, setActiveTag] = useState(null)
 
@@ -127,16 +127,27 @@ export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelet
       </div>
       {/* 하단 유저 정보 + 로그아웃 */}
       <div className="mx-3 border-t border-[#1f1f24] mt-1" />
-      <div className="px-3 py-3 flex items-center justify-between gap-2">
-        <span className="text-[11px] text-[#505068] truncate">{userEmail}</span>
-        <button
-          onClick={onSignOut}
-          title="로그아웃"
-          className="shrink-0 w-6 h-6 flex items-center justify-center rounded-md text-[#606070] hover:text-red-400 hover:bg-red-400/10 transition-all duration-150"
-        >
-          <LogOut size={13} />
-        </button>
-      </div>
+      {userEmail ? (
+        <div className="px-3 py-3 flex items-center justify-between gap-2">
+          <span className="text-[11px] text-[#505068] truncate">{userEmail}</span>
+          <button
+            onClick={onSignOut}
+            title="로그아웃"
+            className="shrink-0 w-6 h-6 flex items-center justify-center rounded-md text-[#606070] hover:text-red-400 hover:bg-red-400/10 transition-all duration-150"
+          >
+            <LogOut size={13} />
+          </button>
+        </div>
+      ) : (
+        <div className="px-3 py-3">
+          <button
+            onClick={onShowLogin}
+            className="w-full py-1.5 text-[12px] text-[#7c6af5] border border-[#7c6af5]/30 rounded-md hover:bg-[#7c6af5]/10 transition-all duration-150"
+          >
+            개인 메모 확인
+          </button>
+        </div>
+      )}
     </aside>
   )
 }

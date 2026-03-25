@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../lib/api'
 
-export function useNotes() {
+export function useNotes(user) {
   const [notes, setNotes] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const fetchNotes = useCallback(async () => {
+    setLoading(true)
     try {
       const data = await api.getNotes()
       setNotes(data || [])
@@ -17,8 +18,13 @@ export function useNotes() {
   }, [])
 
   useEffect(() => {
-    fetchNotes()
-  }, [fetchNotes])
+    if (user) {
+      fetchNotes()
+    } else {
+      setNotes([])
+      setLoading(false)
+    }
+  }, [user, fetchNotes])
 
   const createNote = async () => {
     const note = await api.createNote({ title: '새 메모', content: '', content_type: 'markdown', tags: [] })

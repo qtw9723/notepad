@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { X } from 'lucide-react'
 
-export default function LoginPage({ onSignIn, onSignUp }) {
+export default function LoginPage({ onSignIn, onSignUp, onClose }) {
   const [mode, setMode] = useState('login') // 'login' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -28,13 +29,20 @@ export default function LoginPage({ onSignIn, onSignUp }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0f0f10]">
-      <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-semibold text-[#e2e2e2] text-center mb-8">
-          Notepad
-        </h1>
+    <div className="w-full max-w-sm">
+      <h1 className="text-2xl font-semibold text-[#e2e2e2] text-center mb-8">
+        Notepad
+      </h1>
 
-        <div className="bg-[#16161a] border border-[#242428] rounded-xl p-8">
+      <div className="relative bg-[#16161a] border border-[#242428] rounded-xl p-8">
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-md text-[#505060] hover:text-[#e2e2e2] hover:bg-white/5 transition-all duration-150"
+          >
+            <X size={14} />
+          </button>
+        )}
           <div className="flex mb-6 bg-[#0f0f10] rounded-lg p-1">
             <button
               type="button"
@@ -102,7 +110,7 @@ export default function LoginPage({ onSignIn, onSignUp }) {
             </button>
           </form>
         </div>
-      </div>
     </div>
   )
 }
+
