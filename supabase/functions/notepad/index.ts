@@ -2,6 +2,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+// RLS 우회 — DB 직접 접근용 (서버 전용)
+const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,24 +22,27 @@ Deno.serve(async (req) => {
     return new Response(null, { status: 200, headers: corsHeaders });
   }
 
-  // 유저 JWT로 Supabase 클라이언트 생성 → RLS 자동 적용
-  const authHeader = req.headers.get("Authorization") ?? "";
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    global: { headers: { Authorization: authHeader } },
-  });
-
   const json = (data: unknown, status = 200) =>
     new Response(JSON.stringify(data), {
       status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
+  // JWT로 유저 인증 확인
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { headers: { Authorization: authHeader } },
+  });
+  const { data: { user } } = await userClient.auth.getUser();
+  if (!user) return json({ error: "Unauthorized" }, 401);
+
   try {
-    // GET / — 노트 목록
+    // GET / — 노트 목록 (본인 노트 + user_id 없는 기존 노트 포함)
     if (method === "GET" && !id) {
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from("notes")
         .select("*")
+        .or(`user_id.eq.${user.id},user_id.is.null`)
         .order("updated_at", { ascending: false });
       if (error) throw error;
       return json(data);
@@ -43,7 +50,7 @@ Deno.serve(async (req) => {
 
     // GET ?id=... — 단일 노트
     if (method === "GET" && id) {
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from("notes")
         .select("*")
         .eq("id", id)
@@ -54,13 +61,10 @@ Deno.serve(async (req) => {
 
     // POST — 노트 생성
     if (method === "POST") {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) return json({ error: "Unauthorized" }, 401);
-
       const body = await req.json().catch(() => null);
       if (!body) return json({ error: "바디가 비어있습니다." }, 400);
 
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from("notes")
         .insert({ ...body, user_id: user.id })
         .select()
@@ -74,7 +78,7 @@ Deno.serve(async (req) => {
       const body = await req.json().catch(() => null);
       if (!body) return json({ error: "바디가 비어있습니다." }, 400);
 
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from("notes")
         .update(body)
         .eq("id", id)
@@ -86,7 +90,7 @@ Deno.serve(async (req) => {
 
     // DELETE ?id=... — 노트 삭제
     if (method === "DELETE" && id) {
-      const { error } = await supabase
+      const { error } = await adminClient
         .from("notes")
         .delete()
         .eq("id", id);
