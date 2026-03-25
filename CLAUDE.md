@@ -86,13 +86,6 @@ fetch(`${EDGE_FUNCTION_URL}/notepad?id=${id}`, { method: 'PATCH', body: JSON.str
 fetch(`${EDGE_FUNCTION_URL}/notepad?id=${id}`, { method: 'DELETE' })
 ```
 
-## 환경 변수
-```
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_ANON_KEY=...
-```
-`.env.example` 파일 참고. 실제 값은 `.env`에 저장 (gitignore됨).
-
 ## 개발 명령어
 ```bash
 npm run dev      # 개발 서버 시작
@@ -101,9 +94,29 @@ npm run preview  # 빌드 결과 미리보기
 npm run lint     # ESLint 실행
 ```
 
+## 인증 (Auth)
+
+Supabase Auth (이메일/패스워드) 기반.
+
+- `src/hooks/useAuth.js` — signIn / signUp / signOut + onAuthStateChange 세션 관리
+- `src/components/LoginPage.jsx` — 로그인/회원가입 탭 전환 UI
+- `App.jsx` — `user === undefined`(로딩) / `user === null`(미로그인 → LoginPage) / user 있음(메인 앱)
+- `api.js` — 요청마다 `supabase.auth.getSession()`으로 JWT 토큰 주입 (없으면 anon key 폴백)
+- `Sidebar.jsx` — 하단에 이메일 + 로그아웃 버튼 표시
+
+### DB 인증 설정 (Supabase 대시보드에서 적용)
+`supabase-schema.sql` 참고:
+- `notes.user_id` 컬럼 (auth.users FK)
+- RLS 활성화 + "본인 메모만 접근" policy
+
+## 환경 변수
+```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+VITE_NOTEPAD_URL=...
+```
+`.env.example` 파일 참고. 실제 값은 `.env`에 저장 (gitignore됨).
+
 ## 현재 상태 / 한계
-- **인증 없음** — 단일 사용자 or 공개 접근 (user_id 컬럼은 스키마에 준비됨)
-- **RLS 비활성화** — 모든 노트가 누구에게나 보임 (스키마에 주석으로 준비됨)
-- **Supabase 직접 연결** — Edge Function 전환 전까지 anon key로 DB 직접 접근
 - **테스트 없음** — 테스트 파일 없음
 - **TypeScript 미사용** — 순수 JavaScript

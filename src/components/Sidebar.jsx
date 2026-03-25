@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
-import { Plus, Search, Tag, FileText, Trash2, X } from 'lucide-react'
+import { Plus, Search, Tag, FileText, Trash2, X, LogOut } from 'lucide-react'
 
-export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelete }) {
+export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelete, onSignOut, userEmail }) {
   const [search, setSearch] = useState('')
   const [activeTag, setActiveTag] = useState(null)
 
@@ -81,6 +81,8 @@ export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelet
       {/* 구분선 */}
       <div className="mx-3 border-t border-[#1f1f24] mb-1" />
 
+      {/* 하단 유저 정보 + 로그아웃 */}
+
       {/* 메모 목록 */}
       <div className="flex-1 overflow-y-auto px-1.5 py-1">
         {filtered.length === 0 ? (
@@ -122,6 +124,18 @@ export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelet
             </div>
           ))
         )}
+      </div>
+      {/* 하단 유저 정보 + 로그아웃 */}
+      <div className="mx-3 border-t border-[#1f1f24] mt-1" />
+      <div className="px-3 py-3 flex items-center justify-between gap-2">
+        <span className="text-[11px] text-[#505068] truncate">{userEmail}</span>
+        <button
+          onClick={onSignOut}
+          title="로그아웃"
+          className="shrink-0 w-6 h-6 flex items-center justify-center rounded-md text-[#606070] hover:text-red-400 hover:bg-red-400/10 transition-all duration-150"
+        >
+          <LogOut size={13} />
+        </button>
       </div>
     </aside>
   )

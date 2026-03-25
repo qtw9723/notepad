@@ -1,12 +1,16 @@
+import { supabase } from './supabase'
+
 const BASE_URL = import.meta.env.VITE_NOTEPAD_URL
-const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 async function request(path = '', options = {}) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token ?? import.meta.env.VITE_SUPABASE_ANON_KEY
+
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${ANON_KEY}`,
+      'Authorization': `Bearer ${token}`,
       ...options.headers,
     },
   })
