@@ -16,13 +16,12 @@ export function useAuth() {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signIn = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) throw error
-  }
-
-  const signUp = async (email, password) => {
-    const { error } = await supabase.auth.signUp({ email, password })
+  // slug로 프로젝트 계정 로그인 (이메일: {slug}@notepad.local)
+  const signIn = async (slug, password) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: `${slug}@notepad.local`,
+      password,
+    })
     if (error) throw error
   }
 
@@ -30,5 +29,5 @@ export function useAuth() {
     await supabase.auth.signOut()
   }
 
-  return { user, signIn, signUp, signOut }
+  return { user, signIn, signOut }
 }

@@ -17,6 +17,7 @@ Deno.serve(async (req) => {
   const { method } = req;
   const url = new URL(req.url);
   const id = url.searchParams.get("id");
+  const type = url.searchParams.get("type");
 
   if (method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -28,6 +29,16 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
+  // GET ?type=projects — 프로젝트 목록 (공개, 인증 불필요)
+  if (method === "GET" && type === "projects") {
+    const { data, error } = await adminClient
+      .from("projects")
+      .select("id, name, slug, is_master")
+      .order("created_at", { ascending: true });
+    if (error) return json({ error: error.message }, 500);
+    return json(data);
+  }
+
   // JWT로 유저 인증 확인 (선택적 — GET은 비인증 허용)
   const authHeader = req.headers.get("Authorization") ?? "";
   const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -35,19 +46,33 @@ Deno.serve(async (req) => {
   });
   const { data: { user } } = await userClient.auth.getUser();
 
+  // 마스터 여부 확인
+  let isMaster = false;
+  if (user) {
+    const { data: project } = await adminClient
+      .from("projects")
+      .select("is_master")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    isMaster = project?.is_master ?? false;
+  }
+
   try {
     // GET / — 노트 목록
-    // 비로그인: user_id가 없는 공개 노트만
-    // 로그인:   본인 노트 + user_id 없는 기존 노트
+    // 비로그인:     user_id = NULL 인 공개 노트만
+    // 로그인(일반): 본인 노트 + 공개 노트
+    // 마스터:       전체 노트
     if (method === "GET" && !id) {
       const query = adminClient
         .from("notes")
         .select("*")
         .order("updated_at", { ascending: false });
       const { data, error } = await (
-        user
-          ? query.or(`user_id.eq.${user.id},user_id.is.null`)
-          : query.is("user_id", null)
+        isMaster
+          ? query
+          : user
+            ? query.or(`user_id.eq.${user.id},user_id.is.null`)
+            : query.is("user_id", null)
       );
       if (error) throw error;
       return json(data);

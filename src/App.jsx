@@ -4,12 +4,18 @@ import Editor from './components/Editor'
 import LoginPage from './components/LoginPage'
 import { useNotes } from './hooks/useNotes'
 import { useAuth } from './hooks/useAuth'
+import { useProjects } from './hooks/useProjects'
 
 export default function App() {
-  const { user, signIn, signUp, signOut } = useAuth()
+  const { user, signIn, signOut } = useAuth()
+  const { projects } = useProjects()
   const { notes, loading, createNote, updateNote, deleteNote } = useNotes(user)
   const [selectedId, setSelectedId] = useState(null)
   const [showLoginModal, setShowLoginModal] = useState(false)
+
+  // 로그인된 유저의 프로젝트 정보
+  const currentProject = user ? (projects.find(p => p.user_id === user.id) ?? null) : null
+  const isMaster = currentProject?.is_master ?? false
 
   // 로그인 성공 시 모달 닫기
   useEffect(() => {
@@ -43,12 +49,14 @@ export default function App() {
     <div className="flex h-full bg-[#0f0f10]">
       <Sidebar
         notes={notes}
+        projects={projects}
+        currentProject={currentProject}
+        isMaster={isMaster}
         selectedId={selectedId}
         onSelect={setSelectedId}
         onCreate={handleCreate}
         onDelete={handleDelete}
         onSignOut={signOut}
-        userEmail={user?.email ?? null}
         onShowLogin={() => setShowLoginModal(true)}
       />
       <main className="flex-1 flex flex-col overflow-hidden">
@@ -71,8 +79,8 @@ export default function App() {
           onClick={(e) => { if (e.target === e.currentTarget) setShowLoginModal(false) }}
         >
           <LoginPage
+            projects={projects}
             onSignIn={signIn}
-            onSignUp={signUp}
             onClose={() => setShowLoginModal(false)}
           />
         </div>

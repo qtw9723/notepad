@@ -1,7 +1,10 @@
 import { useState, useMemo } from 'react'
 import { Plus, Search, Tag, FileText, Trash2, X, LogOut } from 'lucide-react'
 
-export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelete, onSignOut, userEmail, onShowLogin }) {
+export default function Sidebar({
+  notes, projects, currentProject, isMaster,
+  selectedId, onSelect, onCreate, onDelete, onSignOut, onShowLogin,
+}) {
   const [search, setSearch] = useState('')
   const [activeTag, setActiveTag] = useState(null)
 
@@ -19,10 +22,38 @@ export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelet
     })
   }, [notes, search, activeTag])
 
+  // 노트를 구획으로 분류
+  const sections = useMemo(() => {
+    const publicNotes = filtered.filter(n => !n.user_id)
+    const result = []
+
+    result.push({ name: '공개', notes: publicNotes })
+
+    if (isMaster) {
+      // 마스터: 모든 프로젝트 구획 표시
+      projects.forEach(p => {
+        const pNotes = filtered.filter(n => n.user_id === p.user_id)
+        if (pNotes.length > 0) {
+          result.push({ name: p.name, notes: pNotes })
+        }
+      })
+    } else if (currentProject) {
+      // 일반 로그인: 본인 프로젝트 구획만
+      const myNotes = filtered.filter(n => n.user_id === currentProject.user_id)
+      if (myNotes.length > 0) {
+        result.push({ name: currentProject.name, notes: myNotes })
+      }
+    }
+
+    return result
+  }, [filtered, projects, currentProject, isMaster])
+
   const fmt = (iso) => {
     const d = new Date(iso)
     return d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
   }
+
+  const isLoggedIn = !!currentProject || isMaster
 
   return (
     <aside className="w-60 flex flex-col bg-[#161618] border-r border-[#1f1f24] h-full shrink-0">
@@ -30,13 +61,15 @@ export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelet
       <div className="px-3 pt-4 pb-2">
         <div className="flex items-center justify-between mb-3 px-1">
           <span className="text-[13px] font-semibold text-[#a0a0b8] tracking-wide uppercase">메모</span>
-          <button
-            onClick={onCreate}
-            title="새 메모"
-            className="w-6 h-6 flex items-center justify-center rounded-md text-[#606070] hover:text-[#a990ff] hover:bg-[#7c6af5]/10 transition-all duration-150"
-          >
-            <Plus size={16} />
-          </button>
+          {isLoggedIn && (
+            <button
+              onClick={onCreate}
+              title="새 메모"
+              className="w-6 h-6 flex items-center justify-center rounded-md text-[#606070] hover:text-[#a990ff] hover:bg-[#7c6af5]/10 transition-all duration-150"
+            >
+              <Plus size={16} />
+            </button>
+          )}
         </div>
 
         {/* 검색 */}
@@ -78,58 +111,76 @@ export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelet
         </div>
       )}
 
-      {/* 구분선 */}
       <div className="mx-3 border-t border-[#1f1f24] mb-1" />
 
-      {/* 하단 유저 정보 + 로그아웃 */}
+      {/* 구획별 노트 목록 */}
+      <div className="flex-1 overflow-y-auto py-1">
+        {sections.map((section, idx) => (
+          <div key={section.name}>
+            {/* 구획 헤더 (첫 구획 아닐 때 구분선 포함) */}
+            {idx > 0 && (
+              <div className="mx-3 border-t border-[#1f1f24] mt-2 mb-1" />
+            )}
+            <div className="px-4 py-1.5">
+              <span className="text-[10px] font-semibold text-[#404055] uppercase tracking-widest">
+                {section.name}
+              </span>
+            </div>
 
-      {/* 메모 목록 */}
-      <div className="flex-1 overflow-y-auto px-1.5 py-1">
-        {filtered.length === 0 ? (
-          <div className="text-center text-[#404050] text-[13px] mt-12">
-            <FileText size={24} className="mx-auto mb-2 opacity-30" />
-            <span>메모가 없어요</span>
-          </div>
-        ) : (
-          filtered.map(note => (
-            <div
-              key={note.id}
-              onClick={() => onSelect(note.id)}
-              className={`group relative px-2.5 py-2 rounded-md cursor-pointer transition-all duration-150 mb-0.5 ${
-                selectedId === note.id
-                  ? 'bg-[#7c6af5]/12 text-white'
-                  : 'text-[#c0c0d0] hover:bg-white/5'
-              }`}
-            >
-              <div className="flex items-center justify-between gap-1">
-                <p className={`text-[13.5px] font-medium leading-snug truncate transition-colors duration-150 ${
-                  selectedId === note.id ? 'text-white' : 'text-[#d0d0e0]'
-                }`}>
-                  {note.title || <span className="text-[#404050] italic font-normal">제목 없음</span>}
-                </p>
-                <button
-                  onClick={e => { e.stopPropagation(); onDelete(note.id) }}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#505060] hover:text-red-400 hover:bg-red-400/10 transition-all duration-150 shrink-0"
-                >
-                  <Trash2 size={12} />
-                </button>
+            {/* 해당 구획의 노트들 */}
+            {section.notes.length === 0 ? (
+              <div className="px-4 py-2 flex items-center gap-2 text-[#383848]">
+                <FileText size={13} className="opacity-40" />
+                <span className="text-[12px]">메모 없음</span>
               </div>
-
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[11px] text-[#404055]">{fmt(note.updated_at)}</span>
-                {(note.tags || []).slice(0, 2).map(t => (
-                  <span key={t} className="text-[11px] text-[#505068]">#{t}</span>
+            ) : (
+              <div className="px-1.5">
+                {section.notes.map(note => (
+                  <div
+                    key={note.id}
+                    onClick={() => onSelect(note.id)}
+                    className={`group relative px-2.5 py-2 rounded-md cursor-pointer transition-all duration-150 mb-0.5 ${
+                      selectedId === note.id
+                        ? 'bg-[#7c6af5]/12 text-white'
+                        : 'text-[#c0c0d0] hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-1">
+                      <p className={`text-[13.5px] font-medium leading-snug truncate transition-colors duration-150 ${
+                        selectedId === note.id ? 'text-white' : 'text-[#d0d0e0]'
+                      }`}>
+                        {note.title || <span className="text-[#404050] italic font-normal">제목 없음</span>}
+                      </p>
+                      {isLoggedIn && (
+                        <button
+                          onClick={e => { e.stopPropagation(); onDelete(note.id) }}
+                          className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#505060] hover:text-red-400 hover:bg-red-400/10 transition-all duration-150 shrink-0"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[11px] text-[#404055]">{fmt(note.updated_at)}</span>
+                      {(note.tags || []).slice(0, 2).map(t => (
+                        <span key={t} className="text-[11px] text-[#505068]">#{t}</span>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
-          ))
-        )}
+            )}
+          </div>
+        ))}
       </div>
-      {/* 하단 유저 정보 + 로그아웃 */}
+
+      {/* 하단 유저 정보 */}
       <div className="mx-3 border-t border-[#1f1f24] mt-1" />
-      {userEmail ? (
+      {currentProject || isMaster ? (
         <div className="px-3 py-3 flex items-center justify-between gap-2">
-          <span className="text-[11px] text-[#505068] truncate">{userEmail}</span>
+          <span className="text-[11px] text-[#505068] truncate">
+            {currentProject?.name ?? '마스터'}
+          </span>
           <button
             onClick={onSignOut}
             title="로그아웃"
@@ -144,7 +195,7 @@ export default function Sidebar({ notes, selectedId, onSelect, onCreate, onDelet
             onClick={onShowLogin}
             className="w-full py-1.5 text-[12px] text-[#7c6af5] border border-[#7c6af5]/30 rounded-md hover:bg-[#7c6af5]/10 transition-all duration-150"
           >
-            개인 메모 확인
+            프로젝트 로그인
           </button>
         </div>
       )}

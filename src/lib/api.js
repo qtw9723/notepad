@@ -22,6 +22,7 @@ async function request(path = '', options = {}) {
 }
 
 export const api = {
+  getProjects: () => request('?type=projects'),
   getNotes: () => request(),
   getNote: (id) => request(`?id=${id}`),
   createNote: (body) => request('', { method: 'POST', body: JSON.stringify(body) }),
