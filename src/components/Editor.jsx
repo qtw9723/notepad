@@ -11,7 +11,7 @@ const CONTENT_TYPES = [
   { id: 'text',     label: 'Text', Icon: Code },
 ]
 
-export default function Editor({ noteId, onUpdate }) {
+export default function Editor({ noteId, onUpdate, isLoggedIn = false }) {
   const [note, setNote] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -38,6 +38,7 @@ export default function Editor({ noteId, onUpdate }) {
   }, [onUpdate])
 
   const change = (field, value) => {
+    if (!isLoggedIn) return
     setNote(prev => {
       const next = { ...prev, [field]: value }
       clearTimeout(saveTimer.current)
@@ -96,11 +97,15 @@ export default function Editor({ noteId, onUpdate }) {
 
         <div className="flex-1" />
 
-        <span className={`text-[11px] transition-all duration-300 ${
-          saved ? 'text-[#6ee7b7] opacity-100' : saving ? 'text-[#505068] opacity-100' : 'opacity-0'
-        }`}>
-          {saved ? '저장됨' : '저장 중...'}
-        </span>
+        {isLoggedIn ? (
+          <span className={`text-[11px] transition-all duration-300 ${
+            saved ? 'text-[#6ee7b7] opacity-100' : saving ? 'text-[#505068] opacity-100' : 'opacity-0'
+          }`}>
+            {saved ? '저장됨' : '저장 중...'}
+          </span>
+        ) : (
+          <span className="text-[11px] text-[#404055]">읽기 전용</span>
+        )}
       </div>
 
       {isSplit ? (

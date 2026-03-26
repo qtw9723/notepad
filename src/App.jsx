@@ -69,6 +69,7 @@ export default function App() {
             key={selectedId}
             noteId={selectedId}
             onUpdate={handleUpdate}
+            isLoggedIn={isMaster || !!currentProject}
           />
         )}
       </main>
