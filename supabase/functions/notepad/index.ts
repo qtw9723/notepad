@@ -28,27 +28,32 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
-  // JWT로 유저 인증 확인
+  // JWT로 유저 인증 확인 (선택적 — GET은 비인증 허용)
   const authHeader = req.headers.get("Authorization") ?? "";
   const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: { headers: { Authorization: authHeader } },
   });
   const { data: { user } } = await userClient.auth.getUser();
-  if (!user) return json({ error: "Unauthorized" }, 401);
 
   try {
-    // GET / — 노트 목록 (본인 노트 + user_id 없는 기존 노트 포함)
+    // GET / — 노트 목록
+    // 비로그인: user_id가 없는 공개 노트만
+    // 로그인:   본인 노트 + user_id 없는 기존 노트
     if (method === "GET" && !id) {
-      const { data, error } = await adminClient
+      const query = adminClient
         .from("notes")
         .select("*")
-        .or(`user_id.eq.${user.id},user_id.is.null`)
         .order("updated_at", { ascending: false });
+      const { data, error } = await (
+        user
+          ? query.or(`user_id.eq.${user.id},user_id.is.null`)
+          : query.is("user_id", null)
+      );
       if (error) throw error;
       return json(data);
     }
 
-    // GET ?id=... — 단일 노트
+    // GET ?id=... — 단일 노트 (비인증 허용)
     if (method === "GET" && id) {
       const { data, error } = await adminClient
         .from("notes")
@@ -58,6 +63,9 @@ Deno.serve(async (req) => {
       if (error) throw error;
       return json(data);
     }
+
+    // 쓰기 작업은 로그인 필요
+    if (!user) return json({ error: "Unauthorized" }, 401);
 
     // POST — 노트 생성
     if (method === "POST") {

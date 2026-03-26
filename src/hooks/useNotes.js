@@ -18,11 +18,8 @@ export function useNotes(user) {
   }, [])
 
   useEffect(() => {
-    if (user) {
+    if (user !== undefined) {
       fetchNotes()
-    } else {
-      setNotes([])
-      setLoading(false)
     }
   }, [user, fetchNotes])
 
