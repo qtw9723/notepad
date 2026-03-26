@@ -36,22 +36,19 @@ export default function Sidebar({
     const publicNotes = filtered.filter(n => !n.user_id)
     const result = []
 
-    result.push({ name: '공개', notes: publicNotes })
+    result.push({ name: '공개', notes: publicNotes, canCreate: false })
 
     if (isMaster) {
-      // 마스터: 모든 프로젝트 구획 표시
+      // 마스터: 모든 프로젝트 구획 표시 (노트 없는 구획도 포함)
       projects.forEach(p => {
         const pNotes = filtered.filter(n => n.user_id === p.user_id)
-        if (pNotes.length > 0) {
-          result.push({ name: p.name, notes: pNotes })
-        }
+        const isMySection = currentProject?.user_id === p.user_id
+        result.push({ name: p.name, notes: pNotes, canCreate: isMySection })
       })
     } else if (currentProject) {
       // 일반 로그인: 본인 프로젝트 구획만
       const myNotes = filtered.filter(n => n.user_id === currentProject.user_id)
-      if (myNotes.length > 0) {
-        result.push({ name: currentProject.name, notes: myNotes })
-      }
+      result.push({ name: currentProject.name, notes: myNotes, canCreate: true })
     }
 
     return result
@@ -68,17 +65,8 @@ export default function Sidebar({
     <aside className="w-60 flex flex-col bg-[#161618] border-r border-[#1f1f24] h-full shrink-0">
       {/* 헤더 */}
       <div className="px-3 pt-4 pb-2">
-        <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center mb-3 px-1">
           <span className="text-[13px] font-semibold text-[#a0a0b8] tracking-wide uppercase">메모</span>
-          {isLoggedIn && (
-            <button
-              onClick={onCreate}
-              title="새 메모"
-              className="w-6 h-6 flex items-center justify-center rounded-md text-[#606070] hover:text-[#a990ff] hover:bg-[#7c6af5]/10 transition-all duration-150"
-            >
-              <Plus size={16} />
-            </button>
-          )}
         </div>
 
         {/* 검색 */}
@@ -132,19 +120,30 @@ export default function Sidebar({
             {idx > 0 && (
               <div className="mx-3 border-t border-[#1f1f24] mt-2 mb-1" />
             )}
-            <button
-              onClick={() => toggleSection(section.name)}
-              className="w-full flex items-center gap-1.5 px-3 py-1.5 hover:bg-white/5 transition-colors duration-150 group"
-            >
-              <ChevronRight
-                size={11}
-                className={`text-[#404055] transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`}
-              />
-              <span className="text-[10px] font-semibold text-[#404055] group-hover:text-[#606070] uppercase tracking-widest transition-colors duration-150">
-                {section.name}
-              </span>
-              <span className="ml-auto text-[10px] text-[#383848]">{section.notes.length}</span>
-            </button>
+            <div className="flex items-center group/section">
+              <button
+                onClick={() => toggleSection(section.name)}
+                className="flex-1 flex items-center gap-1.5 px-3 py-1.5 hover:bg-white/5 transition-colors duration-150 group"
+              >
+                <ChevronRight
+                  size={11}
+                  className={`text-[#404055] transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`}
+                />
+                <span className="text-[10px] font-semibold text-[#404055] group-hover:text-[#606070] uppercase tracking-widest transition-colors duration-150">
+                  {section.name}
+                </span>
+                <span className="ml-auto text-[10px] text-[#383848]">{section.notes.length}</span>
+              </button>
+              {section.canCreate && (
+                <button
+                  onClick={onCreate}
+                  title="새 메모"
+                  className="opacity-0 group-hover/section:opacity-100 mr-2 w-5 h-5 flex items-center justify-center rounded text-[#606070] hover:text-[#a990ff] hover:bg-[#7c6af5]/10 transition-all duration-150"
+                >
+                  <Plus size={13} />
+                </button>
+              )}
+            </div>
 
             {/* 해당 구획의 노트들 */}
             {!isCollapsed && (section.notes.length === 0 ? (
