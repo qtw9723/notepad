@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Plus, Search, Tag, FileText, Trash2, X, LogOut, ChevronRight, PanelLeftClose, PanelLeftOpen, Lock } from 'lucide-react'
 
+
 const SIDEBAR_KEY = 'notepad-sidebar-open'
 
 export default function Sidebar({
@@ -132,15 +133,12 @@ export default function Sidebar({
         <>
           {/* 검색 */}
           <div className="px-3 py-3">
-            <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b949e] pointer-events-none" />
-              <input
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="검색..."
-                className="w-full bg-[#0d1117] text-[14px] text-[#e6edf3] placeholder-[#484f58] pl-9 pr-3 py-2 rounded-md border border-[#21262d] focus:outline-none focus:border-[#388bfd]/50 transition-all duration-150"
-              />
-            </div>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="검색..."
+              className="w-full bg-[#0d1117] text-[14px] text-[#e6edf3] placeholder-[#484f58] px-3 py-2 rounded-md border border-[#21262d] focus:outline-none focus:border-[#388bfd]/50 transition-all duration-150"
+            />
           </div>
 
           {/* 태그 필터 */}
@@ -259,9 +257,16 @@ export default function Sidebar({
           <div className="mx-3 border-t border-[#21262d] mt-1" />
           {isLoggedIn ? (
             <div className="px-3 py-3 flex items-center justify-between gap-2">
-              <span className="text-[13px] text-[#8b949e] truncate">
-                {currentProject?.name ?? '마스터'}
-              </span>
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 rounded-md bg-[#388bfd]/20 flex items-center justify-center shrink-0">
+                  <span className="text-[11px] font-bold text-[#58a6ff]">
+                    {(currentProject?.name ?? 'M')[0].toUpperCase()}
+                  </span>
+                </div>
+                <span className="text-[14px] font-medium text-[#cdd9e5] truncate">
+                  {currentProject?.name ?? '마스터'}
+                </span>
+              </div>
               <button
                 onClick={onSignOut}
                 title="로그아웃"
