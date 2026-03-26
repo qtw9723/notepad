@@ -27,7 +27,7 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
         Notepad
       </h1>
 
-      <div className="relative bg-[#16161a] border border-[#242428] rounded-2xl p-8">
+      <div className="relative bg-[#161b22] border border-[#21262d] rounded-2xl p-8">
         {onClose && (
           <button
             onClick={onClose}
@@ -54,11 +54,11 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
                   setError(null)
                 }}
                 required
-                className="w-full appearance-none px-4 py-3 pr-10 bg-[#0f0f10] border border-[#242428] rounded-xl text-[15px] text-[#e2e2e2] focus:outline-none focus:border-[#7c6af5] transition-colors cursor-pointer"
+                className="w-full appearance-none px-4 py-3 pr-10 bg-[#0d1117] border border-[#21262d] rounded-xl text-[15px] text-[#e2e2e2] focus:outline-none focus:border-[#388bfd] transition-colors cursor-pointer"
               >
                 <option value="" disabled className="text-[#404050]">선택...</option>
                 {projects.map(p => (
-                  <option key={p.id} value={p.id} className="bg-[#0f0f10]">
+                  <option key={p.id} value={p.id} className="bg-[#0d1117]">
                     {p.name}{p.is_master ? ' (마스터)' : ''}
                   </option>
                 ))}
@@ -77,7 +77,7 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
               required
               autoFocus
               placeholder="비밀번호 입력"
-              className="w-full px-4 py-3 bg-[#0f0f10] border border-[#242428] rounded-xl text-[15px] text-[#e2e2e2] placeholder-[#404050] focus:outline-none focus:border-[#7c6af5] transition-colors"
+              className="w-full px-4 py-3 bg-[#0d1117] border border-[#21262d] rounded-xl text-[15px] text-[#e2e2e2] placeholder-[#404050] focus:outline-none focus:border-[#388bfd] transition-colors"
             />
           </div>
 
@@ -88,7 +88,7 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
           <button
             type="submit"
             disabled={loading || !selectedProject}
-            className="w-full py-3 bg-[#7c6af5] hover:bg-[#6a59e0] disabled:opacity-40 disabled:cursor-not-allowed text-white text-[15px] font-medium rounded-xl transition-colors"
+            className="w-full py-3 bg-[#388bfd] hover:bg-[#1f6feb] disabled:opacity-40 disabled:cursor-not-allowed text-white text-[15px] font-medium rounded-xl transition-colors"
           >
             {loading ? '로그인 중...' : '로그인'}
           </button>

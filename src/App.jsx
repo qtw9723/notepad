@@ -39,14 +39,14 @@ export default function App() {
   // 초기 로딩 (auth 세션 확인 중)
   if (user === undefined) {
     return (
-      <div className="flex h-full items-center justify-center bg-[#0f0f10] text-[#404050] text-sm animate-pulse">
+      <div className="flex h-full items-center justify-center bg-[#0d1117] text-[#484f58] text-sm animate-pulse">
         불러오는 중...
       </div>
     )
   }
 
   return (
-    <div className="flex h-full bg-[#0f0f10]">
+    <div className="flex h-full bg-[#0d1117]">
       <Sidebar
         notes={notes}
         projects={projects}
@@ -61,7 +61,7 @@ export default function App() {
       />
       <main className="flex-1 flex flex-col overflow-hidden">
         {loading ? (
-          <div className="flex-1 flex items-center justify-center text-[#404050] text-sm animate-pulse">
+          <div className="flex-1 flex items-center justify-center text-[#484f58] text-sm animate-pulse">
             불러오는 중...
           </div>
         ) : (
