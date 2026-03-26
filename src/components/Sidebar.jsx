@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Search, Tag, FileText, Trash2, X, LogOut } from 'lucide-react'
+import { Plus, Search, Tag, FileText, Trash2, X, LogOut, ChevronRight } from 'lucide-react'
 
 export default function Sidebar({
   notes, projects, currentProject, isMaster,
@@ -7,6 +7,15 @@ export default function Sidebar({
 }) {
   const [search, setSearch] = useState('')
   const [activeTag, setActiveTag] = useState(null)
+  const [collapsedSections, setCollapsedSections] = useState(new Set())
+
+  const toggleSection = (name) => {
+    setCollapsedSections(prev => {
+      const next = new Set(prev)
+      next.has(name) ? next.delete(name) : next.add(name)
+      return next
+    })
+  }
 
   const allTags = useMemo(() => {
     const tagSet = new Set()
@@ -115,20 +124,30 @@ export default function Sidebar({
 
       {/* 구획별 노트 목록 */}
       <div className="flex-1 overflow-y-auto py-1">
-        {sections.map((section, idx) => (
+        {sections.map((section, idx) => {
+          const isCollapsed = collapsedSections.has(section.name)
+          return (
           <div key={section.name}>
             {/* 구획 헤더 (첫 구획 아닐 때 구분선 포함) */}
             {idx > 0 && (
               <div className="mx-3 border-t border-[#1f1f24] mt-2 mb-1" />
             )}
-            <div className="px-4 py-1.5">
-              <span className="text-[10px] font-semibold text-[#404055] uppercase tracking-widest">
+            <button
+              onClick={() => toggleSection(section.name)}
+              className="w-full flex items-center gap-1.5 px-3 py-1.5 hover:bg-white/5 transition-colors duration-150 group"
+            >
+              <ChevronRight
+                size={11}
+                className={`text-[#404055] transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`}
+              />
+              <span className="text-[10px] font-semibold text-[#404055] group-hover:text-[#606070] uppercase tracking-widest transition-colors duration-150">
                 {section.name}
               </span>
-            </div>
+              <span className="ml-auto text-[10px] text-[#383848]">{section.notes.length}</span>
+            </button>
 
             {/* 해당 구획의 노트들 */}
-            {section.notes.length === 0 ? (
+            {!isCollapsed && (section.notes.length === 0 ? (
               <div className="px-4 py-2 flex items-center gap-2 text-[#383848]">
                 <FileText size={13} className="opacity-40" />
                 <span className="text-[12px]">메모 없음</span>
@@ -169,9 +188,10 @@ export default function Sidebar({
                   </div>
                 ))}
               </div>
-            )}
+            ))}
           </div>
-        ))}
+        )
+      })}
       </div>
 
       {/* 하단 유저 정보 */}

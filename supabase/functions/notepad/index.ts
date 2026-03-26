@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
   if (method === "GET" && type === "projects") {
     const { data, error } = await adminClient
       .from("projects")
-      .select("id, name, slug, is_master")
+      .select("id, name, slug, is_master, user_id")
       .order("created_at", { ascending: true });
     if (error) return json({ error: error.message }, 500);
     return json(data);
