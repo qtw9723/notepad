@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { FileText, Code, FileCode2 } from 'lucide-react'
+import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import TagInput from './TagInput'
 import { api } from '../lib/api'
 
@@ -109,52 +110,59 @@ export default function Editor({ noteId, onUpdate, isLoggedIn = false }) {
       </div>
 
       {isSplit ? (
-        <div className="flex-1 flex overflow-hidden">
+        <PanelGroup direction="horizontal" className="flex-1 overflow-hidden">
           {/* 왼쪽: 편집 */}
-          <div className="flex-1 flex flex-col overflow-hidden border-r border-[#21262d]">
-            <HeaderArea note={note} change={change} canEdit={canEdit} />
-            <textarea
-              value={note.content}
-              onChange={e => change('content', e.target.value)}
-              readOnly={!canEdit}
-              placeholder={
-                note.content_type === 'markdown'
-                  ? '# 제목\n\n내용을 입력하세요...'
-                  : '<h1>제목</h1>\n<p>내용을 입력하세요...</p>'
-              }
-              className="flex-1 w-full px-10 pb-10 bg-transparent text-[#e6edf3] text-[0.95rem] leading-[1.9] resize-none outline-none placeholder-[#21262d] font-mono"
-              spellCheck={false}
-            />
-          </div>
+          <Panel defaultSize={50} minSize={25}>
+            <div className="h-full flex flex-col overflow-hidden border-r border-[#21262d]">
+              <HeaderArea note={note} change={change} canEdit={canEdit} />
+              <textarea
+                value={note.content}
+                onChange={e => change('content', e.target.value)}
+                readOnly={!canEdit}
+                placeholder={
+                  note.content_type === 'markdown'
+                    ? '# 제목\n\n내용을 입력하세요...'
+                    : '<h1>제목</h1>\n<p>내용을 입력하세요...</p>'
+                }
+                className="flex-1 w-full px-10 pb-10 bg-transparent text-[#e6edf3] text-[0.95rem] leading-[1.9] resize-none outline-none placeholder-[#21262d] font-mono"
+                spellCheck={false}
+              />
+            </div>
+          </Panel>
+
+          {/* 드래그 핸들 */}
+          <PanelResizeHandle className="w-1 bg-[#21262d] hover:bg-[#388bfd]/50 transition-colors duration-150 cursor-col-resize" />
 
           {/* 오른쪽: 미리보기 */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="max-w-[760px] mx-auto px-10 py-10">
-              <h1
-                className="text-[2.2rem] font-bold text-[#e6edf3] leading-tight mb-4"
-                style={{ letterSpacing: '-0.02em' }}
-              >
-                {note.title || <span className="text-[#21262d]">제목 없음</span>}
-              </h1>
-              <div className="border-t border-[#21262d] mb-6" />
-              {note.content_type === 'markdown' ? (
-                <div className="markdown-body text-[#cdd9e5] text-[0.95rem]">
-                  {note.content
-                    ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
-                    : <p className="text-[#484f58] italic text-sm">내용을 입력하면 여기에 표시됩니다</p>
-                  }
-                </div>
-              ) : (
-                <div
-                  className="text-[#cdd9e5] text-[0.95rem] leading-[1.9]"
-                  dangerouslySetInnerHTML={{
-                    __html: note.content || '<p style="color:#484f58;font-style:italic;font-size:0.875rem">내용을 입력하면 여기에 표시됩니다</p>'
-                  }}
-                />
-              )}
+          <Panel defaultSize={50} minSize={25}>
+            <div className="h-full overflow-y-auto">
+              <div className="max-w-[760px] mx-auto px-10 py-10">
+                <h1
+                  className="text-[2.2rem] font-bold text-[#e6edf3] leading-tight mb-4"
+                  style={{ letterSpacing: '-0.02em' }}
+                >
+                  {note.title || <span className="text-[#21262d]">제목 없음</span>}
+                </h1>
+                <div className="border-t border-[#21262d] mb-6" />
+                {note.content_type === 'markdown' ? (
+                  <div className="markdown-body text-[#cdd9e5] text-[0.95rem]">
+                    {note.content
+                      ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
+                      : <p className="text-[#484f58] italic text-sm">내용을 입력하면 여기에 표시됩니다</p>
+                    }
+                  </div>
+                ) : (
+                  <div
+                    className="text-[#cdd9e5] text-[0.95rem] leading-[1.9]"
+                    dangerouslySetInnerHTML={{
+                      __html: note.content || '<p style="color:#484f58;font-style:italic;font-size:0.875rem">내용을 입력하면 여기에 표시됩니다</p>'
+                    }}
+                  />
+                )}
+              </div>
             </div>
-          </div>
-        </div>
+          </Panel>
+        </PanelGroup>
 
       ) : (
         <div className="flex-1 overflow-y-auto">
