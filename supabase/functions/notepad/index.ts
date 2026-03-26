@@ -89,11 +89,9 @@ Deno.serve(async (req) => {
       return json(data);
     }
 
-    // 쓰기 작업은 로그인 필요
-    if (!user) return json({ error: "Unauthorized" }, 401);
-
-    // POST — 노트 생성
+    // POST — 노트 생성 (로그인 필요)
     if (method === "POST") {
+      if (!user) return json({ error: "Unauthorized" }, 401);
       const body = await req.json().catch(() => null);
       if (!body) return json({ error: "바디가 비어있습니다." }, 400);
 
@@ -107,9 +105,17 @@ Deno.serve(async (req) => {
     }
 
     // PATCH ?id=... — 노트 수정
+    // 공개 노트(user_id = NULL)는 비로그인도 수정 가능
+    // 프로젝트 노트는 로그인 필요
     if (method === "PATCH" && id) {
       const body = await req.json().catch(() => null);
       if (!body) return json({ error: "바디가 비어있습니다." }, 400);
+
+      if (!user) {
+        const { data: existing } = await adminClient
+          .from("notes").select("user_id").eq("id", id).single();
+        if (existing?.user_id !== null) return json({ error: "Unauthorized" }, 401);
+      }
 
       const { data, error } = await adminClient
         .from("notes")
@@ -121,8 +127,9 @@ Deno.serve(async (req) => {
       return json(data);
     }
 
-    // DELETE ?id=... — 노트 삭제
+    // DELETE ?id=... — 노트 삭제 (로그인 필요)
     if (method === "DELETE" && id) {
+      if (!user) return json({ error: "Unauthorized" }, 401);
       const { error } = await adminClient
         .from("notes")
         .delete()

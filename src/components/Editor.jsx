@@ -37,8 +37,10 @@ export default function Editor({ noteId, onUpdate, isLoggedIn = false }) {
     if (data) onUpdate(data)
   }, [onUpdate])
 
+  const canEdit = isLoggedIn || !note?.user_id
+
   const change = (field, value) => {
-    if (!isLoggedIn) return
+    if (!canEdit) return
     setNote(prev => {
       const next = { ...prev, [field]: value }
       clearTimeout(saveTimer.current)
@@ -97,7 +99,7 @@ export default function Editor({ noteId, onUpdate, isLoggedIn = false }) {
 
         <div className="flex-1" />
 
-        {isLoggedIn ? (
+        {canEdit ? (
           <span className={`text-[11px] transition-all duration-300 ${
             saved ? 'text-[#6ee7b7] opacity-100' : saving ? 'text-[#505068] opacity-100' : 'opacity-0'
           }`}>
