@@ -3,6 +3,7 @@ import { Plus, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, 
 
 const SIDEBAR_KEY = 'notepad-sidebar-open'
 const SIDEBAR_WIDTH_KEY = 'notepad-sidebar-width'
+const NOTE_ORDER_KEY = 'notepad-note-order'
 
 export default function Sidebar({
   notes, projects, currentProject, isMaster,
@@ -18,6 +19,12 @@ export default function Sidebar({
   })
   const [isResizing, setIsResizing] = useState(false)
   const resizeStart = useRef(null)
+  const [noteOrder, setNoteOrder] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(NOTE_ORDER_KEY) || '[]') }
+    catch { return [] }
+  })
+  const draggingId = useRef(null)
+  const [dragOverId, setDragOverId] = useState(null)
 
   const startResize = useCallback((e) => {
     resizeStart.current = { x: e.clientX, width: sidebarWidth }
@@ -52,6 +59,43 @@ export default function Sidebar({
     }
   }, [])
 
+  const handleDragStart = useCallback((e, noteId) => {
+    draggingId.current = noteId
+    e.dataTransfer.effectAllowed = 'move'
+  }, [])
+
+  const handleDragOver = useCallback((e, noteId) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (noteId !== draggingId.current) setDragOverId(noteId)
+  }, [])
+
+  const handleDragLeave = useCallback(() => setDragOverId(null), [])
+
+  const handleDrop = useCallback((e, targetId) => {
+    e.preventDefault()
+    setDragOverId(null)
+    const fromId = draggingId.current
+    draggingId.current = null
+    if (!fromId || fromId === targetId) return
+    setNoteOrder(prev => {
+      const allIds = notes.map(n => n.id)
+      let order = [...prev]
+      allIds.forEach(id => { if (!order.includes(id)) order.push(id) })
+      order = order.filter(id => id !== fromId)
+      const targetIdx = order.indexOf(targetId)
+      if (targetIdx === -1) order.push(fromId)
+      else order.splice(targetIdx, 0, fromId)
+      localStorage.setItem(NOTE_ORDER_KEY, JSON.stringify(order))
+      return order
+    })
+  }, [notes])
+
+  const handleDragEnd = useCallback(() => {
+    draggingId.current = null
+    setDragOverId(null)
+  }, [])
+
   const toggleSidebar = () => {
     setIsOpen(prev => {
       localStorage.setItem(SIDEBAR_KEY, !prev)
@@ -82,21 +126,32 @@ export default function Sidebar({
   }, [notes, search, activeTag])
 
   const sections = useMemo(() => {
-    const publicNotes = filtered.filter(n => !n.user_id)
+    const sortByOrder = (arr) => {
+      if (noteOrder.length === 0) return arr
+      return [...arr].sort((a, b) => {
+        const ai = noteOrder.indexOf(a.id)
+        const bi = noteOrder.indexOf(b.id)
+        if (ai === -1 && bi === -1) return 0
+        if (ai === -1) return 1
+        if (bi === -1) return -1
+        return ai - bi
+      })
+    }
+    const publicNotes = sortByOrder(filtered.filter(n => !n.user_id))
     const result = []
     result.push({ name: '공개', notes: publicNotes, canCreate: false, icon: '🌐' })
     if (isMaster) {
       projects.forEach(p => {
-        const pNotes = filtered.filter(n => n.user_id === p.user_id)
+        const pNotes = sortByOrder(filtered.filter(n => n.user_id === p.user_id))
         const isMySection = currentProject?.user_id === p.user_id
         result.push({ name: p.name, notes: pNotes, canCreate: isMySection, icon: p.name[0].toUpperCase() })
       })
     } else if (currentProject) {
-      const myNotes = filtered.filter(n => n.user_id === currentProject.user_id)
+      const myNotes = sortByOrder(filtered.filter(n => n.user_id === currentProject.user_id))
       result.push({ name: currentProject.name, notes: myNotes, canCreate: true, icon: currentProject.name[0].toUpperCase() })
     }
     return result
-  }, [filtered, projects, currentProject, isMaster])
+  }, [filtered, projects, currentProject, isMaster, noteOrder])
 
   const fmt = (iso) => {
     const d = new Date(iso)
@@ -207,8 +262,14 @@ export default function Sidebar({
                         section.notes.map(note => (
                           <div
                             key={note.id}
+                            draggable
+                            onDragStart={e => handleDragStart(e, note.id)}
+                            onDragOver={e => handleDragOver(e, note.id)}
+                            onDragLeave={handleDragLeave}
+                            onDrop={e => handleDrop(e, note.id)}
+                            onDragEnd={handleDragEnd}
                             onClick={() => onSelect(note.id)}
-                            className={`sidebar-note${selectedId === note.id ? ' sidebar-note-selected' : ''}`}
+                            className={`sidebar-note${selectedId === note.id ? ' sidebar-note-selected' : ''}${dragOverId === note.id ? ' sidebar-note-drag-over' : ''}`}
                           >
                             <div className="sidebar-note-title">
                               {note.title || <span className="sidebar-note-title-empty">제목 없음</span>}
