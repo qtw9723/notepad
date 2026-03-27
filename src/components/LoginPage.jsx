@@ -30,6 +30,7 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
           background: 'rgba(255,255,255,0.03)',
           border: '1px solid rgba(157,143,252,0.2)',
           backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
         }}
       >
         {/* 닫기 버튼 */}

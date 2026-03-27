@@ -81,9 +81,9 @@ export default function App() {
             backgroundColor: '#0d1117',
             backgroundImage: `
               radial-gradient(ellipse 60% 50% at 50% 40%, rgba(157,143,252,0.12) 0%, transparent 70%),
-              radial-gradient(circle 1px at center, rgba(157,143,252,0.08) 1px, transparent 1px)
+              radial-gradient(rgba(157,143,252,0.07) 1px, transparent 1px)
             `,
-            backgroundSize: 'auto, 20px 20px',
+            backgroundSize: '100% 100%, 20px 20px',
           }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowLoginModal(false) }}
         >
