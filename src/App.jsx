@@ -76,7 +76,15 @@ export default function App() {
 
       {showLoginModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{
+            backgroundColor: '#0d1117',
+            backgroundImage: `
+              radial-gradient(ellipse 60% 50% at 50% 40%, rgba(157,143,252,0.12) 0%, transparent 70%),
+              radial-gradient(circle 1px at center, rgba(157,143,252,0.08) 1px, transparent 1px)
+            `,
+            backgroundSize: 'auto, 20px 20px',
+          }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowLoginModal(false) }}
         >
           <LoginPage
