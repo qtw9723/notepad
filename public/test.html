@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Design Options</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0c;
+      color: #e2e2e2;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 40px 24px 60px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: #9d8ffc;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .desc {
+      text-align: center;
+      font-size: 13px;
+      color: #606070;
+      margin-bottom: 40px;
+    }
+
+    .options {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .option {
+      flex: 1;
+      min-width: 280px;
+      max-width: 340px;
+      border: 1.5px solid #242428;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #111114;
+    }
+    .option:hover {
+      border-color: #9d8ffc55;
+    }
+    .option.selected {
+      border-color: #9d8ffc;
+      box-shadow: 0 0 0 3px #9d8ffc22;
+    }
+
+    .option-label {
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #9d8ffc;
+      background: #0a0a0c;
+      border-bottom: 1px solid #1a1a1e;
+    }
+
+    /* ──── PREVIEW FRAME ──── */
+    .preview {
+      height: 340px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Option A: Centered Minimal ── */
+    .preview-a {
+      background: #0d1117;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-a::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 40%, #9d8ffc18 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .preview-a::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(#9d8ffc08 1px, transparent 1px),
+        linear-gradient(90deg, #9d8ffc08 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+    .form-a {
+      position: relative;
+      z-index: 1;
+      width: 200px;
+      text-align: center;
+    }
+    .form-a .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f0f0f0;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .form-a .subtitle {
+      font-size: 10px;
+      color: #606070;
+      margin-bottom: 20px;
+    }
+    .mock-select {
+      width: 100%;
+      background: #0a0a0c;
+      border: 1px solid #2a2a38;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #606070;
+      margin-bottom: 8px;
+      text-align: left;
+    }
+    .mock-input {
+      width: 100%;
+      background: #0a0a0c;
+      border: 1px solid #2a2a38;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #606070;
+      margin-bottom: 12px;
+    }
+    .mock-btn {
+      width: 100%;
+      background: #9d8ffc;
+      border: none;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #0d0d10;
+      cursor: pointer;
+    }
+
+    /* ── Option B: Glow Card ── */
+    .preview-b {
+      background: #0d1117;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-b::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 50%, #9d8ffc14 0%, transparent 65%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, #5b4fcf0c 0%, transparent 60%);
+    }
+    .preview-b::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(#9d8ffc0a 1px, transparent 1px);
+      background-size: 18px 18px;
+    }
+    .card-b {
+      position: relative;
+      z-index: 1;
+      width: 190px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(157,143,252,0.2);
+      border-radius: 14px;
+      padding: 18px 16px;
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+    .card-b .dot {
+      width: 28px;
+      height: 28px;
+      background: #9d8ffc22;
+      border: 1px solid #9d8ffc44;
+      border-radius: 8px;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .card-b .title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f0f0f0;
+      margin-bottom: 3px;
+    }
+    .card-b .subtitle {
+      font-size: 9px;
+      color: #606070;
+      margin-bottom: 14px;
+    }
+
+    /* ── Option C: Split Layout ── */
+    .preview-c {
+      background: #0d1117;
+      display: flex;
+    }
+    .split-left {
+      width: 45%;
+      background: linear-gradient(160deg, #13101f 0%, #0d1117 100%);
+      border-right: 1px solid #1e1e28;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .split-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 100% 80% at 50% 60%, #9d8ffc1a 0%, transparent 70%);
+    }
+    .split-left .brand {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    .split-left .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #9d8ffc, #7c6af5);
+      border-radius: 9px;
+      margin: 0 auto 10px;
+    }
+    .split-left .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #f0f0f0;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .split-left .brand-desc {
+      font-size: 9px;
+      color: #6060a0;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .split-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 14px;
+    }
+    .split-right .title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #e2e2e2;
+      margin-bottom: 14px;
+      align-self: flex-start;
+    }
+
+    /* ── Shared form mocks ── */
+    .mock-label {
+      font-size: 9px;
+      color: #606070;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-align: left;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+    .mock-field {
+      width: 100%;
+      background: #0a0a0c;
+      border: 1px solid #2a2a38;
+      border-radius: 7px;
+      padding: 7px 9px;
+      font-size: 10px;
+      color: #606070;
+      margin-bottom: 10px;
+    }
+    .mock-btn-sm {
+      width: 100%;
+      background: #9d8ffc;
+      border: none;
+      border-radius: 7px;
+      padding: 7px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #0d0d10;
+      margin-top: 2px;
+    }
+
+    /* ── Caption ── */
+    .option-caption {
+      padding: 14px 16px;
+      border-top: 1px solid #1a1a1e;
+    }
+    .option-caption h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #e2e2e2;
+      margin-bottom: 4px;
+    }
+    .option-caption p {
+      font-size: 11px;
+      color: #606070;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<h1>로그인 화면 방향</h1>
+<p class="desc">3가지 레이아웃 옵션 — 클릭해서 골라봐</p>
+
+<div class="options">
+
+  <!-- A: Centered Minimal + Grid -->
+  <div class="option" onclick="select(this, 'a')">
+    <div class="option-label">A</div>
+    <div class="preview preview-a">
+      <div class="form-a">
+        <div class="title">Notepad</div>
+        <div class="subtitle">프로젝트를 선택하세요</div>
+        <div class="mock-select">프로젝트 선택 ▾</div>
+        <div class="mock-input">비밀번호</div>
+        <button class="mock-btn">로그인</button>
+      </div>
+    </div>
+    <div class="option-caption">
+      <h3>심플 그리드</h3>
+      <p>배경에 미세한 그리드 + 중앙 보라 글로우. 폼은 카드 없이 공중에 떠 있는 느낌. 가장 미니멀.</p>
+    </div>
+  </div>
+
+  <!-- B: Glass Card + Dot Grid -->
+  <div class="option" onclick="select(this, 'b')">
+    <div class="option-label">B</div>
+    <div class="preview preview-b">
+      <div class="card-b">
+        <div class="dot">✦</div>
+        <div class="title">Notepad</div>
+        <div class="subtitle">프로젝트를 선택하세요</div>
+        <div class="mock-field">프로젝트 선택 ▾</div>
+        <div class="mock-field">비밀번호</div>
+        <button class="mock-btn-sm">로그인</button>
+      </div>
+    </div>
+    <div class="option-caption">
+      <h3>글래스 카드 + 닷 그리드</h3>
+      <p>점 패턴 배경 + 글로우 위에 반투명 글래스 카드. 앱 아이콘 역할 할 작은 심볼 상단에 배치.</p>
+    </div>
+  </div>
+
+  <!-- C: Split -->
+  <div class="option" onclick="select(this, 'c')">
+    <div class="option-label">C</div>
+    <div class="preview preview-c">
+      <div class="split-left">
+        <div class="brand">
+          <div class="brand-icon"></div>
+          <div class="brand-title">Notepad</div>
+          <div class="brand-desc">생각을 정리하는<br/>나만의 공간</div>
+        </div>
+      </div>
+      <div class="split-right">
+        <div class="title">로그인</div>
+        <div class="mock-label">프로젝트</div>
+        <div class="mock-field">선택 ▾</div>
+        <div class="mock-label">비밀번호</div>
+        <div class="mock-field">••••••</div>
+        <button class="mock-btn-sm">로그인</button>
+      </div>
+    </div>
+    <div class="option-caption">
+      <h3>분할 레이아웃</h3>
+      <p>왼쪽 브랜딩 패널 + 오른쪽 폼. 가장 전통적인 로그인 화면 구조. 넓은 화면에서 균형감.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let selected = null;
+  function select(el, choice) {
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selected = choice;
+  }
+</script>
+
+</body>
+</html>
