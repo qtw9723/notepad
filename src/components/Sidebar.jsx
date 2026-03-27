@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Search, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, Lock } from 'lucide-react'
+import { Plus, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, Lock } from 'lucide-react'
 
 const SIDEBAR_KEY = 'notepad-sidebar-open'
 
@@ -72,17 +72,13 @@ export default function Sidebar({
       {!isOpen && (
         <>
           <div className="sidebar-collapsed-header">
-            <button onClick={toggleSidebar} className="sidebar-collapsed-icon" title="사이드바 열기">
+            <button onClick={toggleSidebar} className="sidebar-toggle-btn" title="사이드바 열기">
               <PanelLeftOpen size={15} />
             </button>
           </div>
           <div className="sidebar-collapsed-body">
-            <button onClick={toggleSidebar} title="검색" className="sidebar-collapsed-btn">
-              <Search size={15} />
-            </button>
-            <div className="sidebar-collapsed-divider" />
             {sections.map(section => (
-              <button key={section.name} onClick={toggleSidebar} title={section.name} className="sidebar-collapsed-btn">
+              <button key={section.name} onClick={toggleSidebar} title={section.name} className="sidebar-collapsed-section-btn">
                 {section.icon}
               </button>
             ))}
