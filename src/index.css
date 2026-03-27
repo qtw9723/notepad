@@ -234,6 +234,7 @@ body {
 
 /* ── 사이드바 ── */
 .sidebar {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: #0d0d14;
@@ -243,6 +244,20 @@ body {
   transition: width 200ms ease;
   overflow: hidden;
 }
+
+.sidebar-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+  background: transparent;
+  transition: background 150ms ease;
+}
+.sidebar-resize-handle:hover { background: rgba(157,143,252,0.25); }
+.sidebar-resize-handle:active { background: rgba(157,143,252,0.4); }
 
 /* 헤더 */
 .sidebar-header {

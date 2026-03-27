@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { Plus, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, Lock } from 'lucide-react'
 
 const SIDEBAR_KEY = 'notepad-sidebar-open'
+const SIDEBAR_WIDTH_KEY = 'notepad-sidebar-width'
 
 export default function Sidebar({
   notes, projects, currentProject, isMaster,
@@ -11,6 +12,45 @@ export default function Sidebar({
   const [search, setSearch] = useState('')
   const [activeTag, setActiveTag] = useState(null)
   const [collapsedSections, setCollapsedSections] = useState(new Set())
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY)
+    return saved ? parseInt(saved, 10) : 288
+  })
+  const [isResizing, setIsResizing] = useState(false)
+  const resizeStart = useRef(null)
+
+  const startResize = useCallback((e) => {
+    resizeStart.current = { x: e.clientX, width: sidebarWidth }
+    setIsResizing(true)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }, [sidebarWidth])
+
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      if (!resizeStart.current) return
+      const delta = e.clientX - resizeStart.current.x
+      const newWidth = Math.min(480, Math.max(200, resizeStart.current.width + delta))
+      setSidebarWidth(newWidth)
+    }
+    const onMouseUp = () => {
+      if (!resizeStart.current) return
+      resizeStart.current = null
+      setIsResizing(false)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+      setSidebarWidth(prev => {
+        localStorage.setItem(SIDEBAR_WIDTH_KEY, prev)
+        return prev
+      })
+    }
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [])
 
   const toggleSidebar = () => {
     setIsOpen(prev => {
@@ -66,7 +106,7 @@ export default function Sidebar({
   const isLoggedIn = !!currentProject || isMaster
 
   return (
-    <aside className="sidebar" style={{ width: isOpen ? 288 : 48 }}>
+    <aside className="sidebar" style={{ width: isOpen ? sidebarWidth : 48, transition: isResizing ? 'none' : undefined }}>
 
       {/* ── 접힌 상태 ── */}
       {!isOpen && (
@@ -100,6 +140,7 @@ export default function Sidebar({
       {/* ── 펼친 상태 ── */}
       {isOpen && (
         <>
+          <div className="sidebar-resize-handle" onMouseDown={startResize} />
           <div className="sidebar-header">
             <span className="sidebar-header-title">메모</span>
             <button onClick={toggleSidebar} className="sidebar-toggle-btn" title="사이드바 닫기">
