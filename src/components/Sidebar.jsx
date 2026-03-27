@@ -33,134 +33,7 @@ export default function Sidebar({
   const draggingSection = useRef(null)
   const [dragOverSection, setDragOverSection] = useState(null)
 
-  const startResize = useCallback((e) => {
-    resizeStart.current = { x: e.clientX, width: sidebarWidth }
-    setIsResizing(true)
-    document.body.style.cursor = 'col-resize'
-    document.body.style.userSelect = 'none'
-  }, [sidebarWidth])
-
-  useEffect(() => {
-    const onMouseMove = (e) => {
-      if (!resizeStart.current) return
-      const delta = e.clientX - resizeStart.current.x
-      const newWidth = Math.min(480, Math.max(200, resizeStart.current.width + delta))
-      setSidebarWidth(newWidth)
-    }
-    const onMouseUp = () => {
-      if (!resizeStart.current) return
-      resizeStart.current = null
-      setIsResizing(false)
-      document.body.style.cursor = ''
-      document.body.style.userSelect = ''
-      setSidebarWidth(prev => {
-        localStorage.setItem(SIDEBAR_WIDTH_KEY, prev)
-        return prev
-      })
-    }
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUp)
-    return () => {
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
-    }
-  }, [])
-
-  const handleDragStart = useCallback((e, noteId) => {
-    draggingId.current = noteId
-    e.dataTransfer.effectAllowed = 'move'
-  }, [])
-
-  const handleDragOver = useCallback((e, noteId) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = 'move'
-    if (noteId !== draggingId.current) setDragOverId(noteId)
-  }, [])
-
-  const handleDragLeave = useCallback(() => setDragOverId(null), [])
-
-  const handleDrop = useCallback((e, targetId) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragOverId(null)
-    const fromId = draggingId.current
-    draggingId.current = null
-    if (!fromId || fromId === targetId) return
-    setNoteOrder(prev => {
-      const allIds = notes.map(n => n.id)
-      let order = [...prev]
-      allIds.forEach(id => { if (!order.includes(id)) order.push(id) })
-      order = order.filter(id => id !== fromId)
-      const targetIdx = order.indexOf(targetId)
-      if (targetIdx === -1) order.push(fromId)
-      else order.splice(targetIdx, 0, fromId)
-      localStorage.setItem(NOTE_ORDER_KEY, JSON.stringify(order))
-      return order
-    })
-  }, [notes])
-
-  const handleSectionDragStart = useCallback((e, sectionName) => {
-    draggingSection.current = sectionName
-    e.dataTransfer.effectAllowed = 'move'
-    e.stopPropagation()
-  }, [])
-
-  const handleSectionDragOver = useCallback((e, sectionName) => {
-    if (!draggingSection.current) return
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = 'move'
-    if (sectionName !== draggingSection.current) setDragOverSection(sectionName)
-  }, [])
-
-  const handleSectionDragLeave = useCallback(() => setDragOverSection(null), [])
-
-  const handleSectionDrop = useCallback((e, targetName) => {
-    if (!draggingSection.current) return
-    e.preventDefault()
-    e.stopPropagation()
-    setDragOverSection(null)
-    const fromName = draggingSection.current
-    draggingSection.current = null
-    if (fromName === targetName) return
-    setSectionOrder(prev => {
-      const allNames = sections.map(s => s.name)
-      let order = [...prev]
-      allNames.forEach(name => { if (!order.includes(name)) order.push(name) })
-      order = order.filter(n => n !== fromName)
-      const targetIdx = order.indexOf(targetName)
-      if (targetIdx === -1) order.push(fromName)
-      else order.splice(targetIdx, 0, fromName)
-      localStorage.setItem(SECTION_ORDER_KEY, JSON.stringify(order))
-      return order
-    })
-  }, [sections])
-
-  const handleSectionDragEnd = useCallback(() => {
-    draggingSection.current = null
-    setDragOverSection(null)
-  }, [])
-
-  const handleDragEnd = useCallback(() => {
-    draggingId.current = null
-    setDragOverId(null)
-  }, [])
-
-  const toggleSidebar = () => {
-    setIsOpen(prev => {
-      localStorage.setItem(SIDEBAR_KEY, !prev)
-      return !prev
-    })
-  }
-
-  const toggleSection = (name) => {
-    setCollapsedSections(prev => {
-      const next = new Set(prev)
-      next.has(name) ? next.delete(name) : next.add(name)
-      return next
-    })
-  }
+  // ── useMemos (핸들러보다 먼저 선언) ──
 
   const allTags = useMemo(() => {
     const tagSet = new Set()
@@ -215,6 +88,143 @@ export default function Sidebar({
       return ai - bi
     })
   }, [sections, sectionOrder])
+
+  // ── 사이드바 너비 핸들러 ──
+
+  const startResize = useCallback((e) => {
+    resizeStart.current = { x: e.clientX, width: sidebarWidth }
+    setIsResizing(true)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }, [sidebarWidth])
+
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      if (!resizeStart.current) return
+      const delta = e.clientX - resizeStart.current.x
+      const newWidth = Math.min(480, Math.max(200, resizeStart.current.width + delta))
+      setSidebarWidth(newWidth)
+    }
+    const onMouseUp = () => {
+      if (!resizeStart.current) return
+      resizeStart.current = null
+      setIsResizing(false)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+      setSidebarWidth(prev => {
+        localStorage.setItem(SIDEBAR_WIDTH_KEY, prev)
+        return prev
+      })
+    }
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [])
+
+  // ── 노트 드래그 핸들러 ──
+
+  const handleDragStart = useCallback((e, noteId) => {
+    draggingId.current = noteId
+    e.dataTransfer.effectAllowed = 'move'
+  }, [])
+
+  const handleDragOver = useCallback((e, noteId) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = 'move'
+    if (noteId !== draggingId.current) setDragOverId(noteId)
+  }, [])
+
+  const handleDragLeave = useCallback(() => setDragOverId(null), [])
+
+  const handleDrop = useCallback((e, targetId) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOverId(null)
+    const fromId = draggingId.current
+    draggingId.current = null
+    if (!fromId || fromId === targetId) return
+    setNoteOrder(prev => {
+      const allIds = notes.map(n => n.id)
+      let order = [...prev]
+      allIds.forEach(id => { if (!order.includes(id)) order.push(id) })
+      order = order.filter(id => id !== fromId)
+      const targetIdx = order.indexOf(targetId)
+      if (targetIdx === -1) order.push(fromId)
+      else order.splice(targetIdx, 0, fromId)
+      localStorage.setItem(NOTE_ORDER_KEY, JSON.stringify(order))
+      return order
+    })
+  }, [notes])
+
+  const handleDragEnd = useCallback(() => {
+    draggingId.current = null
+    setDragOverId(null)
+  }, [])
+
+  // ── 섹션 드래그 핸들러 ──
+
+  const handleSectionDragStart = useCallback((e, sectionName) => {
+    draggingSection.current = sectionName
+    e.dataTransfer.effectAllowed = 'move'
+    e.stopPropagation()
+  }, [])
+
+  const handleSectionDragOver = useCallback((e, sectionName) => {
+    if (!draggingSection.current) return
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = 'move'
+    if (sectionName !== draggingSection.current) setDragOverSection(sectionName)
+  }, [])
+
+  const handleSectionDragLeave = useCallback(() => setDragOverSection(null), [])
+
+  const handleSectionDrop = useCallback((e, targetName) => {
+    if (!draggingSection.current) return
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOverSection(null)
+    const fromName = draggingSection.current
+    draggingSection.current = null
+    if (fromName === targetName) return
+    setSectionOrder(prev => {
+      const allNames = sections.map(s => s.name)
+      let order = [...prev]
+      allNames.forEach(name => { if (!order.includes(name)) order.push(name) })
+      order = order.filter(n => n !== fromName)
+      const targetIdx = order.indexOf(targetName)
+      if (targetIdx === -1) order.push(fromName)
+      else order.splice(targetIdx, 0, fromName)
+      localStorage.setItem(SECTION_ORDER_KEY, JSON.stringify(order))
+      return order
+    })
+  }, [sections])
+
+  const handleSectionDragEnd = useCallback(() => {
+    draggingSection.current = null
+    setDragOverSection(null)
+  }, [])
+
+  // ── 기타 ──
+
+  const toggleSidebar = () => {
+    setIsOpen(prev => {
+      localStorage.setItem(SIDEBAR_KEY, !prev)
+      return !prev
+    })
+  }
+
+  const toggleSection = (name) => {
+    setCollapsedSections(prev => {
+      const next = new Set(prev)
+      next.has(name) ? next.delete(name) : next.add(name)
+      return next
+    })
+  }
 
   const fmt = (iso) => {
     const d = new Date(iso)
