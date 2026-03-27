@@ -76,15 +76,7 @@ export default function App() {
 
       {showLoginModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{
-            backgroundColor: '#0d1117',
-            backgroundImage: `
-              radial-gradient(ellipse 60% 50% at 50% 40%, rgba(157,143,252,0.12) 0%, transparent 70%),
-              radial-gradient(rgba(157,143,252,0.07) 1px, transparent 1px)
-            `,
-            backgroundSize: '100% 100%, 20px 20px',
-          }}
+          className="login-overlay"
           onClick={(e) => { if (e.target === e.currentTarget) setShowLoginModal(false) }}
         >
           <LoginPage
