@@ -132,7 +132,7 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
               required
               autoFocus
               placeholder="비밀번호 입력"
-              className="w-full px-4 py-3 rounded-xl text-[15px] transition-colors focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl text-[15px] focus:outline-none placeholder-[#484f58]"
               style={{
                 background: '#0a0a0c',
                 border: '1px solid #2a2a38',
@@ -154,8 +154,8 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
           <button
             type="submit"
             disabled={loading || !selectedProject}
-            className="w-full py-3 rounded-xl text-[15px] font-semibold transition-colors mt-1 disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: '#9d8ffc', color: '#0d0d10' }}
+            className="w-full py-3 rounded-xl text-[15px] font-semibold mt-1 disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: '#9d8ffc', color: '#0d0d10', transition: 'background-color 150ms ease' }}
             onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = '#b8aeff' }}
             onMouseLeave={e => { e.currentTarget.style.background = '#9d8ffc' }}
           >
