@@ -4,6 +4,7 @@ import { Plus, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, 
 const SIDEBAR_KEY = 'notepad-sidebar-open'
 const SIDEBAR_WIDTH_KEY = 'notepad-sidebar-width'
 const NOTE_ORDER_KEY = 'notepad-note-order'
+const SECTION_ORDER_KEY = 'notepad-section-order'
 
 export default function Sidebar({
   notes, projects, currentProject, isMaster,
@@ -25,6 +26,12 @@ export default function Sidebar({
   })
   const draggingId = useRef(null)
   const [dragOverId, setDragOverId] = useState(null)
+  const [sectionOrder, setSectionOrder] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(SECTION_ORDER_KEY) || '[]') }
+    catch { return [] }
+  })
+  const draggingSection = useRef(null)
+  const [dragOverSection, setDragOverSection] = useState(null)
 
   const startResize = useCallback((e) => {
     resizeStart.current = { x: e.clientX, width: sidebarWidth }
@@ -66,6 +73,7 @@ export default function Sidebar({
 
   const handleDragOver = useCallback((e, noteId) => {
     e.preventDefault()
+    e.stopPropagation()
     e.dataTransfer.dropEffect = 'move'
     if (noteId !== draggingId.current) setDragOverId(noteId)
   }, [])
@@ -74,6 +82,7 @@ export default function Sidebar({
 
   const handleDrop = useCallback((e, targetId) => {
     e.preventDefault()
+    e.stopPropagation()
     setDragOverId(null)
     const fromId = draggingId.current
     draggingId.current = null
@@ -90,6 +99,48 @@ export default function Sidebar({
       return order
     })
   }, [notes])
+
+  const handleSectionDragStart = useCallback((e, sectionName) => {
+    draggingSection.current = sectionName
+    e.dataTransfer.effectAllowed = 'move'
+    e.stopPropagation()
+  }, [])
+
+  const handleSectionDragOver = useCallback((e, sectionName) => {
+    if (!draggingSection.current) return
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = 'move'
+    if (sectionName !== draggingSection.current) setDragOverSection(sectionName)
+  }, [])
+
+  const handleSectionDragLeave = useCallback(() => setDragOverSection(null), [])
+
+  const handleSectionDrop = useCallback((e, targetName) => {
+    if (!draggingSection.current) return
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOverSection(null)
+    const fromName = draggingSection.current
+    draggingSection.current = null
+    if (fromName === targetName) return
+    setSectionOrder(prev => {
+      const allNames = sections.map(s => s.name)
+      let order = [...prev]
+      allNames.forEach(name => { if (!order.includes(name)) order.push(name) })
+      order = order.filter(n => n !== fromName)
+      const targetIdx = order.indexOf(targetName)
+      if (targetIdx === -1) order.push(fromName)
+      else order.splice(targetIdx, 0, fromName)
+      localStorage.setItem(SECTION_ORDER_KEY, JSON.stringify(order))
+      return order
+    })
+  }, [sections])
+
+  const handleSectionDragEnd = useCallback(() => {
+    draggingSection.current = null
+    setDragOverSection(null)
+  }, [])
 
   const handleDragEnd = useCallback(() => {
     draggingId.current = null
@@ -153,6 +204,18 @@ export default function Sidebar({
     return result
   }, [filtered, projects, currentProject, isMaster, noteOrder])
 
+  const sortedSections = useMemo(() => {
+    if (sectionOrder.length === 0) return sections
+    return [...sections].sort((a, b) => {
+      const ai = sectionOrder.indexOf(a.name)
+      const bi = sectionOrder.indexOf(b.name)
+      if (ai === -1 && bi === -1) return 0
+      if (ai === -1) return 1
+      if (bi === -1) return -1
+      return ai - bi
+    })
+  }, [sections, sectionOrder])
+
   const fmt = (iso) => {
     const d = new Date(iso)
     return d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
@@ -172,7 +235,7 @@ export default function Sidebar({
             </button>
           </div>
           <div className="sidebar-collapsed-body">
-            {sections.map(section => (
+            {sortedSections.map(section => (
               <button key={section.name} onClick={toggleSidebar} title={section.name} className="sidebar-collapsed-section-btn">
                 {section.icon}
               </button>
@@ -232,11 +295,23 @@ export default function Sidebar({
           )}
 
           <div className="sidebar-scroll">
-            {sections.map(section => {
+            {sortedSections.map(section => {
               const isCollapsed = collapsedSections.has(section.name)
               return (
-                <div key={section.name} className="sidebar-section">
-                  <div className="sidebar-section-header" onClick={() => toggleSection(section.name)}>
+                <div
+                  key={section.name}
+                  className={`sidebar-section${dragOverSection === section.name ? ' sidebar-section-drag-over' : ''}`}
+                  onDragOver={e => handleSectionDragOver(e, section.name)}
+                  onDragLeave={handleSectionDragLeave}
+                  onDrop={e => handleSectionDrop(e, section.name)}
+                >
+                  <div
+                    draggable
+                    onDragStart={e => handleSectionDragStart(e, section.name)}
+                    onDragEnd={handleSectionDragEnd}
+                    className="sidebar-section-header"
+                    onClick={() => toggleSection(section.name)}
+                  >
                     <div className="sidebar-section-dot" />
                     <span className="sidebar-section-name">{section.name}</span>
                     <span className="sidebar-section-count">{section.notes.length}</span>
