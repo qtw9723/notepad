@@ -1,10 +1,114 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { Plus, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, Lock } from 'lucide-react'
+import {
+  DndContext, closestCenter, PointerSensor, useSensor, useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext, verticalListSortingStrategy, useSortable, arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const SIDEBAR_KEY = 'notepad-sidebar-open'
 const SIDEBAR_WIDTH_KEY = 'notepad-sidebar-width'
 const NOTE_ORDER_KEY = 'notepad-note-order'
 const SECTION_ORDER_KEY = 'notepad-section-order'
+
+function SortableNote({ note, selectedId, onSelect, onDelete, isLoggedIn, fmt }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: note.id })
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }}
+      onClick={() => onSelect(note.id)}
+      className={`sidebar-note${selectedId === note.id ? ' sidebar-note-selected' : ''}`}
+      {...attributes}
+      {...listeners}
+    >
+      <div className="sidebar-note-title">
+        {note.title || <span className="sidebar-note-title-empty">제목 없음</span>}
+      </div>
+      <div className="sidebar-note-meta">
+        <span>{fmt(note.updated_at)}</span>
+        {(note.tags || []).slice(0, 2).map(t => (
+          <span key={t} className="sidebar-note-tag">#{t}</span>
+        ))}
+      </div>
+      {isLoggedIn && (
+        <div className="sidebar-note-actions">
+          <button
+            className="sidebar-note-delete"
+            onClick={e => { e.stopPropagation(); onDelete(note.id) }}
+          >
+            <Trash2 size={13} />
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SortableSection({
+  section, isCollapsed, onToggle, onCreate,
+  selectedId, onSelect, onDelete, isLoggedIn, fmt, onNoteDragEnd,
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.name })
+  const noteSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }}
+      className="sidebar-section"
+    >
+      <div
+        className="sidebar-section-header"
+        onClick={onToggle}
+        {...attributes}
+        {...listeners}
+      >
+        <div className="sidebar-section-dot" />
+        <span className="sidebar-section-name">{section.name}</span>
+        <span className="sidebar-section-count">{section.notes.length}</span>
+        {section.canCreate && (
+          <button
+            className="sidebar-section-add"
+            onClick={e => { e.stopPropagation(); onCreate() }}
+            title="새 메모"
+          >
+            <Plus size={14} />
+          </button>
+        )}
+      </div>
+
+      {!isCollapsed && (
+        <DndContext sensors={noteSensors} collisionDetection={closestCenter} onDragEnd={onNoteDragEnd}>
+          <SortableContext items={section.notes.map(n => n.id)} strategy={verticalListSortingStrategy}>
+            <div className="sidebar-note-list">
+              {section.notes.length === 0 ? (
+                <div className="sidebar-empty">
+                  <FileText size={14} />
+                  <span>메모 없음</span>
+                </div>
+              ) : (
+                section.notes.map(note => (
+                  <SortableNote
+                    key={note.id}
+                    note={note}
+                    selectedId={selectedId}
+                    onSelect={onSelect}
+                    onDelete={onDelete}
+                    isLoggedIn={isLoggedIn}
+                    fmt={fmt}
+                  />
+                ))
+              )}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
+    </div>
+  )
+}
 
 export default function Sidebar({
   notes, projects, currentProject, isMaster,
@@ -24,16 +128,12 @@ export default function Sidebar({
     try { return JSON.parse(localStorage.getItem(NOTE_ORDER_KEY) || '[]') }
     catch { return [] }
   })
-  const draggingId = useRef(null)
-  const [dragOverId, setDragOverId] = useState(null)
   const [sectionOrder, setSectionOrder] = useState(() => {
     try { return JSON.parse(localStorage.getItem(SECTION_ORDER_KEY) || '[]') }
     catch { return [] }
   })
-  const draggingSection = useRef(null)
-  const [dragOverSection, setDragOverSection] = useState(null)
 
-  // ── useMemos (핸들러보다 먼저 선언) ──
+  // ── useMemos ──
 
   const allTags = useMemo(() => {
     const tagSet = new Set()
@@ -61,9 +161,8 @@ export default function Sidebar({
         return ai - bi
       })
     }
-    const publicNotes = sortByOrder(filtered.filter(n => !n.user_id))
     const result = []
-    result.push({ name: '공개', notes: publicNotes, canCreate: false, icon: '🌐' })
+    result.push({ name: '공개', notes: sortByOrder(filtered.filter(n => !n.user_id)), canCreate: false, icon: '🌐' })
     if (isMaster) {
       projects.forEach(p => {
         const pNotes = sortByOrder(filtered.filter(n => n.user_id === p.user_id))
@@ -89,7 +188,7 @@ export default function Sidebar({
     })
   }, [sections, sectionOrder])
 
-  // ── 사이드바 너비 핸들러 ──
+  // ── 사이드바 너비 ──
 
   const startResize = useCallback((e) => {
     resizeStart.current = { x: e.clientX, width: sidebarWidth }
@@ -124,90 +223,39 @@ export default function Sidebar({
     }
   }, [])
 
-  // ── 노트 드래그 핸들러 ──
+  // ── 드래그 핸들러 ──
 
-  const handleDragStart = useCallback((e, noteId) => {
-    draggingId.current = noteId
-    e.dataTransfer.effectAllowed = 'move'
-  }, [])
+  const sectionSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
-  const handleDragOver = useCallback((e, noteId) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = 'move'
-    if (noteId !== draggingId.current) setDragOverId(noteId)
-  }, [])
-
-  const handleDragLeave = useCallback(() => setDragOverId(null), [])
-
-  const handleDrop = useCallback((e, targetId) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragOverId(null)
-    const fromId = draggingId.current
-    draggingId.current = null
-    if (!fromId || fromId === targetId) return
+  const handleNoteDragEnd = useCallback(({ active, over }) => {
+    if (!over || active.id === over.id) return
     setNoteOrder(prev => {
       const allIds = notes.map(n => n.id)
-      let order = [...prev]
+      let order = prev.length > 0 ? [...prev] : allIds
       allIds.forEach(id => { if (!order.includes(id)) order.push(id) })
-      order = order.filter(id => id !== fromId)
-      const targetIdx = order.indexOf(targetId)
-      if (targetIdx === -1) order.push(fromId)
-      else order.splice(targetIdx, 0, fromId)
-      localStorage.setItem(NOTE_ORDER_KEY, JSON.stringify(order))
-      return order
+      const fromIdx = order.indexOf(active.id)
+      const toIdx = order.indexOf(over.id)
+      if (fromIdx === -1 || toIdx === -1) return prev
+      const newOrder = arrayMove(order, fromIdx, toIdx)
+      localStorage.setItem(NOTE_ORDER_KEY, JSON.stringify(newOrder))
+      return newOrder
     })
   }, [notes])
 
-  const handleDragEnd = useCallback(() => {
-    draggingId.current = null
-    setDragOverId(null)
-  }, [])
-
-  // ── 섹션 드래그 핸들러 ──
-
-  const handleSectionDragStart = useCallback((e, sectionName) => {
-    draggingSection.current = sectionName
-    e.dataTransfer.effectAllowed = 'move'
-    e.stopPropagation()
-  }, [])
-
-  const handleSectionDragOver = useCallback((e, sectionName) => {
-    if (!draggingSection.current) return
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = 'move'
-    if (sectionName !== draggingSection.current) setDragOverSection(sectionName)
-  }, [])
-
-  const handleSectionDragLeave = useCallback(() => setDragOverSection(null), [])
-
-  const handleSectionDrop = useCallback((e, targetName) => {
-    if (!draggingSection.current) return
-    e.preventDefault()
-    e.stopPropagation()
-    setDragOverSection(null)
-    const fromName = draggingSection.current
-    draggingSection.current = null
-    if (fromName === targetName) return
+  const handleSectionDragEnd = useCallback(({ active, over }) => {
+    if (!over || active.id === over.id) return
     setSectionOrder(prev => {
       const allNames = sections.map(s => s.name)
-      let order = [...prev]
-      allNames.forEach(name => { if (!order.includes(name)) order.push(name) })
-      order = order.filter(n => n !== fromName)
-      const targetIdx = order.indexOf(targetName)
-      if (targetIdx === -1) order.push(fromName)
-      else order.splice(targetIdx, 0, fromName)
-      localStorage.setItem(SECTION_ORDER_KEY, JSON.stringify(order))
-      return order
+      let order = prev.length > 0 ? [...prev] : allNames
+      allNames.forEach(n => { if (!order.includes(n)) order.push(n) })
+      const fromIdx = order.indexOf(String(active.id))
+      const toIdx = order.indexOf(String(over.id))
+      if (fromIdx === -1 || toIdx === -1) return prev
+      const newOrder = arrayMove(order, fromIdx, toIdx)
+      localStorage.setItem(SECTION_ORDER_KEY, JSON.stringify(newOrder))
+      return newOrder
     })
   }, [sections])
-
-  const handleSectionDragEnd = useCallback(() => {
-    draggingSection.current = null
-    setDragOverSection(null)
-  }, [])
 
   // ── 기타 ──
 
@@ -305,84 +353,29 @@ export default function Sidebar({
           )}
 
           <div className="sidebar-scroll">
-            {sortedSections.map(section => {
-              const isCollapsed = collapsedSections.has(section.name)
-              return (
-                <div
-                  key={section.name}
-                  className={`sidebar-section${dragOverSection === section.name ? ' sidebar-section-drag-over' : ''}`}
-                  onDragOver={e => handleSectionDragOver(e, section.name)}
-                  onDragLeave={handleSectionDragLeave}
-                  onDrop={e => handleSectionDrop(e, section.name)}
-                >
-                  <div
-                    draggable
-                    onDragStart={e => handleSectionDragStart(e, section.name)}
-                    onDragEnd={handleSectionDragEnd}
-                    className="sidebar-section-header"
-                    onClick={() => toggleSection(section.name)}
-                  >
-                    <div className="sidebar-section-dot" />
-                    <span className="sidebar-section-name">{section.name}</span>
-                    <span className="sidebar-section-count">{section.notes.length}</span>
-                    {section.canCreate && (
-                      <button
-                        className="sidebar-section-add"
-                        onClick={e => { e.stopPropagation(); onCreate() }}
-                        title="새 메모"
-                      >
-                        <Plus size={14} />
-                      </button>
-                    )}
-                  </div>
-
-                  {!isCollapsed && (
-                    <div className="sidebar-note-list">
-                      {section.notes.length === 0 ? (
-                        <div className="sidebar-empty">
-                          <FileText size={14} />
-                          <span>메모 없음</span>
-                        </div>
-                      ) : (
-                        section.notes.map(note => (
-                          <div
-                            key={note.id}
-                            draggable
-                            onDragStart={e => handleDragStart(e, note.id)}
-                            onDragOver={e => handleDragOver(e, note.id)}
-                            onDragLeave={handleDragLeave}
-                            onDrop={e => handleDrop(e, note.id)}
-                            onDragEnd={handleDragEnd}
-                            onClick={() => onSelect(note.id)}
-                            className={`sidebar-note${selectedId === note.id ? ' sidebar-note-selected' : ''}${dragOverId === note.id ? ' sidebar-note-drag-over' : ''}`}
-                          >
-                            <div className="sidebar-note-title">
-                              {note.title || <span className="sidebar-note-title-empty">제목 없음</span>}
-                            </div>
-                            <div className="sidebar-note-meta">
-                              <span>{fmt(note.updated_at)}</span>
-                              {(note.tags || []).slice(0, 2).map(t => (
-                                <span key={t} className="sidebar-note-tag">#{t}</span>
-                              ))}
-                            </div>
-                            {isLoggedIn && (
-                              <div className="sidebar-note-actions">
-                                <button
-                                  className="sidebar-note-delete"
-                                  onClick={e => { e.stopPropagation(); onDelete(note.id) }}
-                                >
-                                  <Trash2 size={13} />
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
+            <DndContext
+              sensors={sectionSensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleSectionDragEnd}
+            >
+              <SortableContext items={sortedSections.map(s => s.name)} strategy={verticalListSortingStrategy}>
+                {sortedSections.map(section => (
+                  <SortableSection
+                    key={section.name}
+                    section={section}
+                    isCollapsed={collapsedSections.has(section.name)}
+                    onToggle={() => toggleSection(section.name)}
+                    onCreate={onCreate}
+                    selectedId={selectedId}
+                    onSelect={onSelect}
+                    onDelete={onDelete}
+                    isLoggedIn={isLoggedIn}
+                    fmt={fmt}
+                    onNoteDragEnd={handleNoteDragEnd}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
 
           <div className="sidebar-bottom">

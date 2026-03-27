@@ -447,12 +447,10 @@ body {
 }
 .sidebar-note-tag { color: #7060c0; }
 .sidebar-note-title-empty { color: #404050; font-style: italic; font-weight: 400; }
-.sidebar-note[draggable] { cursor: grab; }
-.sidebar-note[draggable]:active { cursor: grabbing; }
-.sidebar-note-drag-over { box-shadow: inset 0 2px 0 rgba(157,143,252,0.6); }
-.sidebar-section-header[draggable] { cursor: grab; }
-.sidebar-section-header[draggable]:active { cursor: grabbing; }
-.sidebar-section-drag-over { box-shadow: 0 -2px 0 rgba(157,143,252,0.6); }
+.sidebar-note { cursor: grab; }
+.sidebar-note:active { cursor: grabbing; }
+.sidebar-section-header { cursor: grab; }
+.sidebar-section-header:active { cursor: grabbing; }
 .sidebar-note-actions {
   position: absolute;
   top: 50%;
