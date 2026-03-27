@@ -431,6 +431,7 @@ body {
   gap: 4px;
 }
 .sidebar-note-tag { color: #7060c0; }
+.sidebar-note-title-empty { color: #404050; font-style: italic; font-weight: 400; }
 .sidebar-note-actions {
   position: absolute;
   top: 50%;

@@ -174,7 +174,7 @@ export default function Sidebar({
                             className={`sidebar-note${selectedId === note.id ? ' sidebar-note-selected' : ''}`}
                           >
                             <div className="sidebar-note-title">
-                              {note.title || <span style={{ color: '#404050', fontStyle: 'italic', fontWeight: 400 }}>제목 없음</span>}
+                              {note.title || <span className="sidebar-note-title-empty">제목 없음</span>}
                             </div>
                             <div className="sidebar-note-meta">
                               <span>{fmt(note.updated_at)}</span>
