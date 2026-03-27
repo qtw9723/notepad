@@ -22,7 +22,7 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto px-4">
+    <div style={{ width: '100%', maxWidth: '384px', margin: '0 16px' }}>
       {/* 글래스 카드 */}
       <div
         className="relative rounded-2xl p-8"
@@ -74,9 +74,9 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
           프로젝트를 선택하고 비밀번호를 입력하세요
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit}>
           {/* 프로젝트 드롭다운 */}
-          <div>
+          <div style={{ marginBottom: '20px' }}>
             <label
               className="block mb-2 text-xs font-semibold uppercase tracking-wider"
               style={{ color: '#8b8890' }}
@@ -119,7 +119,7 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
           </div>
 
           {/* 비밀번호 */}
-          <div>
+          <div style={{ marginBottom: '20px' }}>
             <label
               className="block mb-2 text-xs font-semibold uppercase tracking-wider"
               style={{ color: '#8b8890' }}
@@ -146,7 +146,7 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
 
           {/* 에러 */}
           {error && (
-            <p className="text-[13px] text-red-400 bg-red-400/10 px-4 py-2.5 rounded-lg">
+            <p className="text-[13px] text-red-400 bg-red-400/10 px-4 py-2.5 rounded-lg" style={{ marginBottom: '20px' }}>
               {error}
             </p>
           )}
@@ -155,8 +155,8 @@ export default function LoginPage({ projects, onSignIn, onClose }) {
           <button
             type="submit"
             disabled={loading || !selectedProject}
-            className="w-full py-3 rounded-xl text-[15px] font-semibold mt-1 disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: '#9d8ffc', color: '#0d0d10', transition: 'background-color 150ms ease' }}
+            className="w-full py-3 rounded-xl text-[15px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ marginTop: '4px', background: '#9d8ffc', color: '#0d0d10', transition: 'background-color 150ms ease' }}
             onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = '#b8aeff' }}
             onMouseLeave={e => { e.currentTarget.style.background = '#9d8ffc' }}
           >
