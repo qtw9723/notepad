@@ -162,16 +162,15 @@ export default function Sidebar({
       })
     }
     const result = []
-    result.push({ name: '공개', notes: sortByOrder(filtered.filter(n => !n.user_id)), canCreate: false, icon: '🌐' })
+    result.push({ name: '공개', notes: sortByOrder(filtered.filter(n => !n.user_id)), canCreate: false, userId: null, icon: '🌐' })
     if (isMaster) {
       projects.forEach(p => {
         const pNotes = sortByOrder(filtered.filter(n => n.user_id === p.user_id))
-        const isMySection = currentProject?.user_id === p.user_id
-        result.push({ name: p.name, notes: pNotes, canCreate: isMySection, icon: p.name[0].toUpperCase() })
+        result.push({ name: p.name, notes: pNotes, canCreate: true, userId: p.user_id, icon: p.name[0].toUpperCase() })
       })
     } else if (currentProject) {
       const myNotes = sortByOrder(filtered.filter(n => n.user_id === currentProject.user_id))
-      result.push({ name: currentProject.name, notes: myNotes, canCreate: true, icon: currentProject.name[0].toUpperCase() })
+      result.push({ name: currentProject.name, notes: myNotes, canCreate: true, userId: currentProject.user_id, icon: currentProject.name[0].toUpperCase() })
     }
     return result
   }, [filtered, projects, currentProject, isMaster, noteOrder])
@@ -365,7 +364,7 @@ export default function Sidebar({
                     section={section}
                     isCollapsed={collapsedSections.has(section.name)}
                     onToggle={() => toggleSection(section.name)}
-                    onCreate={onCreate}
+                    onCreate={() => onCreate(section.userId)}
                     selectedId={selectedId}
                     onSelect={onSelect}
                     onDelete={onDelete}
