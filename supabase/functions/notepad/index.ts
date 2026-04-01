@@ -95,9 +95,13 @@ Deno.serve(async (req) => {
       const body = await req.json().catch(() => null);
       if (!body) return json({ error: "바디가 비어있습니다." }, 400);
 
+      // 마스터는 body.user_id를 지정해 다른 프로젝트 소속으로 생성 가능
+      const { user_id: bodyUserId, ...rest } = body;
+      const userId = (isMaster && bodyUserId) ? bodyUserId : user.id;
+
       const { data, error } = await adminClient
         .from("notes")
-        .insert({ ...body, user_id: user.id })
+        .insert({ ...rest, user_id: userId })
         .select()
         .single();
       if (error) throw error;
