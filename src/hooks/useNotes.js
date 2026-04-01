@@ -23,8 +23,10 @@ export function useNotes(user) {
     }
   }, [user, fetchNotes])
 
-  const createNote = async () => {
-    const note = await api.createNote({ title: '새 메모', content: '', content_type: 'markdown', tags: [] })
+  const createNote = async (targetUserId) => {
+    const body = { title: '새 메모', content: '', content_type: 'markdown', tags: [] }
+    if (targetUserId) body.user_id = targetUserId
+    const note = await api.createNote(body)
     if (note) setNotes(prev => [note, ...prev])
     return note
   }
