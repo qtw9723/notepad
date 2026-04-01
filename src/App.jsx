@@ -22,8 +22,8 @@ export default function App() {
     if (user) setShowLoginModal(false)
   }, [user])
 
-  const handleCreate = async () => {
-    const note = await createNote()
+  const handleCreate = async (targetUserId) => {
+    const note = await createNote(targetUserId)
     if (note) setSelectedId(note.id)
   }
 
