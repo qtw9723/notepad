@@ -12,7 +12,7 @@ const CONTENT_TYPES = [
   { id: 'text',     label: 'Text', Icon: Code },
 ]
 
-export default function Editor({ noteId, onUpdate, isLoggedIn = false }) {
+export default function Editor({ noteId, fetchNote, onUpdate, isLoggedIn = false }) {
   const [note, setNote] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -20,8 +20,8 @@ export default function Editor({ noteId, onUpdate, isLoggedIn = false }) {
 
   useEffect(() => {
     if (!noteId) return
-    api.getNote(noteId).then(data => setNote(data))
-  }, [noteId])
+    fetchNote(noteId).then(data => setNote(data))
+  }, [noteId, fetchNote])
 
   const save = useCallback(async (updated) => {
     if (!updated?.id) return

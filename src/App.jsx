@@ -9,7 +9,7 @@ import { useProjects } from './hooks/useProjects'
 export default function App() {
   const { user, signIn, signOut } = useAuth()
   const { projects } = useProjects()
-  const { notes, loading, createNote, updateNote, deleteNote } = useNotes(user)
+  const { notes, loading, fetchNote, createNote, updateNote, deleteNote } = useNotes(user)
   const [selectedId, setSelectedId] = useState(null)
   const [showLoginModal, setShowLoginModal] = useState(false)
 
@@ -68,6 +68,7 @@ export default function App() {
           <Editor
             key={selectedId}
             noteId={selectedId}
+            fetchNote={fetchNote}
             onUpdate={handleUpdate}
             isLoggedIn={isMaster || !!currentProject}
           />

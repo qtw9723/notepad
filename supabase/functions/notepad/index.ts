@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
     if (method === "GET" && !id) {
       const query = adminClient
         .from("notes")
-        .select("*")
+        .select("id, title, tags, content_type, updated_at, user_id")
         .order("updated_at", { ascending: false });
       const { data, error } = await (
         isMaster
