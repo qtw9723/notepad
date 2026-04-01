@@ -106,8 +106,8 @@ Supabase Auth (이메일/패스워드) 기반. 개인용 앱이므로 계정은 
 
 ### Edge Function 배포
 ```bash
-# notepad 레포 루트에서
-supabase functions deploy notepad --project-ref enawzdqroidrhtjqhpka
+# notepad 레포 루트에서 (--no-verify-jwt 필수 — 함수 내부에서 직접 JWT 검증)
+supabase functions deploy notepad --project-ref enawzdqroidrhtjqhpka --no-verify-jwt
 ```
 
 ### DB 마이그레이션
