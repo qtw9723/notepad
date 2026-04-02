@@ -5,6 +5,7 @@ import LoginPage from './components/LoginPage'
 import { useNotes } from './hooks/useNotes'
 import { useAuth } from './hooks/useAuth'
 import { useProjects } from './hooks/useProjects'
+import { useMobile } from './hooks/useMobile'
 
 export default function App() {
   const { user, signIn, signOut } = useAuth()
@@ -12,6 +13,8 @@ export default function App() {
   const { notes, loading, fetchNote, createNote, updateNote, deleteNote } = useNotes(user)
   const [selectedId, setSelectedId] = useState(null)
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const isMobile = useMobile()
+  const [mobileView, setMobileView] = useState('list') // 'list' | 'preview' | 'edit'
 
   // 로그인된 유저의 프로젝트 정보
   const currentProject = user ? (projects.find(p => p.user_id === user.id) ?? null) : null
@@ -22,14 +25,30 @@ export default function App() {
     if (user) setShowLoginModal(false)
   }, [user])
 
+  // 데스크탑 전환 시 mobileView 리셋
+  useEffect(() => {
+    if (!isMobile) setMobileView('list')
+  }, [isMobile])
+
+  const handleSelect = (id) => {
+    setSelectedId(id)
+    if (isMobile) setMobileView('preview')
+  }
+
   const handleCreate = async (targetUserId) => {
     const note = await createNote(targetUserId)
-    if (note) setSelectedId(note.id)
+    if (note) {
+      setSelectedId(note.id)
+      if (isMobile) setMobileView('edit')
+    }
   }
 
   const handleDelete = async (id) => {
     await deleteNote(id)
-    if (selectedId === id) setSelectedId(null)
+    if (selectedId === id) {
+      setSelectedId(null)
+      if (isMobile) setMobileView('list')
+    }
   }
 
   const handleUpdate = useCallback((updated) => {
@@ -45,35 +64,45 @@ export default function App() {
     )
   }
 
+  const showSidebar = !isMobile || mobileView === 'list'
+  const showEditor = !isMobile || mobileView !== 'list'
+
   return (
     <div className="flex h-full bg-[#0d1117]">
-      <Sidebar
-        notes={notes}
-        projects={projects}
-        currentProject={currentProject}
-        isMaster={isMaster}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-        onCreate={handleCreate}
-        onDelete={handleDelete}
-        onSignOut={signOut}
-        onShowLogin={() => setShowLoginModal(true)}
-      />
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center text-[#484f58] text-sm animate-pulse">
-            불러오는 중...
-          </div>
-        ) : (
-          <Editor
-            key={selectedId}
-            noteId={selectedId}
-            fetchNote={fetchNote}
-            onUpdate={handleUpdate}
-            isLoggedIn={isMaster || !!currentProject}
-          />
-        )}
-      </main>
+      {showSidebar && (
+        <Sidebar
+          notes={notes}
+          projects={projects}
+          currentProject={currentProject}
+          isMaster={isMaster}
+          selectedId={selectedId}
+          onSelect={handleSelect}
+          onCreate={handleCreate}
+          onDelete={handleDelete}
+          onSignOut={signOut}
+          onShowLogin={() => setShowLoginModal(true)}
+        />
+      )}
+      {showEditor && (
+        <main className="flex-1 flex flex-col overflow-hidden">
+          {loading ? (
+            <div className="flex-1 flex items-center justify-center text-[#484f58] text-sm animate-pulse">
+              불러오는 중...
+            </div>
+          ) : (
+            <Editor
+              key={selectedId}
+              noteId={selectedId}
+              fetchNote={fetchNote}
+              onUpdate={handleUpdate}
+              isLoggedIn={isMaster || !!currentProject}
+              isMobile={isMobile}
+              mobileView={mobileView}
+              onMobileViewChange={setMobileView}
+            />
+          )}
+        </main>
+      )}
 
       {showLoginModal && (
         <div

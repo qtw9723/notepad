@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { FileText, Code, FileCode2 } from 'lucide-react'
+import { FileText, Code, FileCode2, Pencil, ArrowLeft } from 'lucide-react'
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import TagInput from './TagInput'
 import { api } from '../lib/api'
@@ -12,11 +12,16 @@ const CONTENT_TYPES = [
   { id: 'text',     label: 'Text', Icon: Code },
 ]
 
-export default function Editor({ noteId, fetchNote, onUpdate, isLoggedIn = false }) {
+export default function Editor({
+  noteId, fetchNote, onUpdate, isLoggedIn = false,
+  isMobile = false, mobileView = 'preview', onMobileViewChange,
+}) {
   const [note, setNote] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const saveTimer = useRef(null)
+  const textareaRef = useRef(null)
+  const previewRef = useRef(null)
 
   useEffect(() => {
     if (!noteId) return
@@ -50,6 +55,15 @@ export default function Editor({ noteId, fetchNote, onUpdate, isLoggedIn = false
     })
   }
 
+  // 스크롤 싱크: 에디터 → 프리뷰
+  const handleEditorScroll = useCallback(() => {
+    const ta = textareaRef.current
+    const pv = previewRef.current
+    if (!ta || !pv) return
+    const ratio = ta.scrollTop / (ta.scrollHeight - ta.clientHeight)
+    pv.scrollTop = ratio * (pv.scrollHeight - pv.clientHeight)
+  }, [])
+
   if (!noteId) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[#0d1117]">
@@ -71,6 +85,98 @@ export default function Editor({ noteId, fetchNote, onUpdate, isLoggedIn = false
 
   const isSplit = note.content_type !== 'text'
 
+  // 모바일: preview 전용 뷰
+  if (isMobile && mobileView === 'preview') {
+    return (
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0d1117]">
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#21262d] bg-[#161b22] shrink-0">
+          <button
+            onClick={() => onMobileViewChange('list')}
+            className="flex items-center gap-1 text-[12px] text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
+          >
+            <ArrowLeft size={14} /> 목록
+          </button>
+          <div className="flex-1" />
+          {canEdit && (
+            <button
+              onClick={() => onMobileViewChange('edit')}
+              className="flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-lg bg-[#388bfd] text-white"
+            >
+              <Pencil size={12} /> 편집
+            </button>
+          )}
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-[760px] mx-auto px-6 py-8">
+            <h1 className="text-[1.8rem] font-bold text-[#e6edf3] leading-tight mb-4" style={{ letterSpacing: '-0.02em' }}>
+              {note.title || <span className="text-[#21262d]">제목 없음</span>}
+            </h1>
+            <div className="border-t border-[#21262d] mb-6" />
+            {note.content_type === 'markdown' ? (
+              <div className="markdown-body text-[#cdd9e5] text-[1rem]">
+                {note.content
+                  ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
+                  : <p className="text-[#484f58] italic text-sm">내용이 없습니다</p>
+                }
+              </div>
+            ) : note.content_type === 'html' ? (
+              <div className="text-[#cdd9e5] text-[1rem] leading-[2.0]"
+                dangerouslySetInnerHTML={{ __html: note.content || '' }} />
+            ) : (
+              <p className="text-[#cdd9e5] text-[1rem] leading-[2.0] whitespace-pre-wrap">{note.content}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // 모바일: edit 전용 뷰
+  if (isMobile && mobileView === 'edit') {
+    return (
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0d1117]">
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#21262d] bg-[#161b22] shrink-0">
+          <button
+            onClick={() => onMobileViewChange('list')}
+            className="flex items-center gap-1 text-[12px] text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
+          >
+            <ArrowLeft size={14} /> 목록
+          </button>
+          <div className="flex-1" />
+          <span className={`text-[11px] transition-all duration-300 ${
+            saved ? 'text-[#58a6ff] opacity-100' : saving ? 'text-[#8b949e] opacity-100' : 'opacity-0'
+          }`}>
+            {saved ? '저장됨' : '저장 중...'}
+          </span>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-[760px] mx-auto w-full px-6 py-8">
+            <input
+              value={note.title}
+              onChange={e => change('title', e.target.value)}
+              readOnly={!canEdit}
+              placeholder="제목 없음"
+              className="w-full bg-transparent text-[1.8rem] font-bold text-[#e6edf3] placeholder-[#21262d] outline-none leading-tight mb-4"
+              style={{ letterSpacing: '-0.02em' }}
+            />
+            <TagInput tags={note.tags || []} onChange={tags => change('tags', tags)} />
+            <div className="border-t border-[#21262d] mt-4 mb-4" />
+            <textarea
+              value={note.content}
+              onChange={e => change('content', e.target.value)}
+              readOnly={!canEdit}
+              placeholder="내용을 입력하세요..."
+              className="w-full bg-transparent text-[#e6edf3] text-[1rem] leading-[2.0] resize-none outline-none placeholder-[#21262d] font-mono"
+              style={{ minHeight: 'calc(100vh - 280px)' }}
+              spellCheck={false}
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // 데스크탑 뷰
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0d1117]">
       {/* 툴바 */}
@@ -112,19 +218,21 @@ export default function Editor({ noteId, fetchNote, onUpdate, isLoggedIn = false
       {isSplit ? (
         <PanelGroup direction="horizontal" className="flex-1 overflow-hidden">
           {/* 왼쪽: 편집 */}
-          <Panel defaultSize={50} minSize={25}>
+          <Panel defaultSize={42} minSize={25}>
             <div className="h-full flex flex-col overflow-hidden border-r border-[#21262d]">
               <HeaderArea note={note} change={change} canEdit={canEdit} />
               <textarea
+                ref={textareaRef}
                 value={note.content}
                 onChange={e => change('content', e.target.value)}
+                onScroll={handleEditorScroll}
                 readOnly={!canEdit}
                 placeholder={
                   note.content_type === 'markdown'
                     ? '# 제목\n\n내용을 입력하세요...'
                     : '<h1>제목</h1>\n<p>내용을 입력하세요...</p>'
                 }
-                className="flex-1 w-full px-10 pb-10 bg-transparent text-[#e6edf3] text-[0.95rem] leading-[1.9] resize-none outline-none placeholder-[#21262d] font-mono"
+                className="flex-1 w-full px-10 pb-10 bg-transparent text-[#e6edf3] text-[1rem] leading-[2.0] resize-none outline-none placeholder-[#21262d] font-mono"
                 spellCheck={false}
               />
             </div>
@@ -134,8 +242,8 @@ export default function Editor({ noteId, fetchNote, onUpdate, isLoggedIn = false
           <PanelResizeHandle className="w-1 bg-[#21262d] hover:bg-[#388bfd]/50 transition-colors duration-150 cursor-col-resize" />
 
           {/* 오른쪽: 미리보기 */}
-          <Panel defaultSize={50} minSize={25}>
-            <div className="h-full overflow-y-auto">
+          <Panel defaultSize={58} minSize={25}>
+            <div ref={previewRef} className="h-full overflow-y-auto">
               <div className="max-w-[760px] mx-auto px-10 py-10">
                 <h1
                   className="text-[2.2rem] font-bold text-[#e6edf3] leading-tight mb-4"
@@ -145,7 +253,7 @@ export default function Editor({ noteId, fetchNote, onUpdate, isLoggedIn = false
                 </h1>
                 <div className="border-t border-[#21262d] mb-6" />
                 {note.content_type === 'markdown' ? (
-                  <div className="markdown-body text-[#cdd9e5] text-[0.95rem]">
+                  <div className="markdown-body text-[#cdd9e5] text-[1rem]">
                     {note.content
                       ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
                       : <p className="text-[#484f58] italic text-sm">내용을 입력하면 여기에 표시됩니다</p>
@@ -153,7 +261,7 @@ export default function Editor({ noteId, fetchNote, onUpdate, isLoggedIn = false
                   </div>
                 ) : (
                   <div
-                    className="text-[#cdd9e5] text-[0.95rem] leading-[1.9]"
+                    className="text-[#cdd9e5] text-[1rem] leading-[2.0]"
                     dangerouslySetInnerHTML={{
                       __html: note.content || '<p style="color:#484f58;font-style:italic;font-size:0.875rem">내용을 입력하면 여기에 표시됩니다</p>'
                     }}
@@ -173,7 +281,7 @@ export default function Editor({ noteId, fetchNote, onUpdate, isLoggedIn = false
               onChange={e => change('content', e.target.value)}
               readOnly={!canEdit}
               placeholder="내용을 입력하세요..."
-              className="w-full bg-transparent text-[#e6edf3] text-[0.95rem] leading-[1.9] resize-none outline-none placeholder-[#21262d]"
+              className="w-full bg-transparent text-[#e6edf3] text-[1rem] leading-[2.0] resize-none outline-none placeholder-[#21262d]"
               style={{ minHeight: 'calc(100vh - 320px)' }}
               spellCheck={false}
             />
