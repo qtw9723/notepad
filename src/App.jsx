@@ -81,6 +81,7 @@ export default function App() {
           onDelete={handleDelete}
           onSignOut={signOut}
           onShowLogin={() => setShowLoginModal(true)}
+          isMobile={isMobile}
         />
       )}
       {showEditor && (

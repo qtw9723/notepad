@@ -113,6 +113,7 @@ function SortableSection({
 export default function Sidebar({
   notes, projects, currentProject, isMaster,
   selectedId, onSelect, onCreate, onDelete, onSignOut, onShowLogin,
+  isMobile = false,
 }) {
   const [isOpen, setIsOpen] = useState(() => localStorage.getItem(SIDEBAR_KEY) !== 'false')
   const [search, setSearch] = useState('')
@@ -280,11 +281,15 @@ export default function Sidebar({
 
   const isLoggedIn = !!currentProject || isMaster
 
-  return (
-    <aside className="sidebar" style={{ width: isOpen ? sidebarWidth : 48, transition: isResizing ? 'none' : undefined }}>
+  // 모바일: 항상 전체 너비로 펼침
+  const open = isMobile ? true : isOpen
+  const width = isMobile ? '100%' : (open ? sidebarWidth : 48)
 
-      {/* ── 접힌 상태 ── */}
-      {!isOpen && (
+  return (
+    <aside className="sidebar" style={{ width, transition: isResizing ? 'none' : undefined }}>
+
+      {/* ── 접힌 상태 (데스크탑 전용) ── */}
+      {!open && (
         <>
           <div className="sidebar-collapsed-header">
             <button onClick={toggleSidebar} className="sidebar-toggle-btn" title="사이드바 열기">
@@ -313,14 +318,16 @@ export default function Sidebar({
       )}
 
       {/* ── 펼친 상태 ── */}
-      {isOpen && (
+      {open && (
         <>
-          <div className="sidebar-resize-handle" onMouseDown={startResize} />
+          {!isMobile && <div className="sidebar-resize-handle" onMouseDown={startResize} />}
           <div className="sidebar-header">
             <span className="sidebar-header-title">메모</span>
-            <button onClick={toggleSidebar} className="sidebar-toggle-btn" title="사이드바 닫기">
-              <PanelLeftClose size={15} />
-            </button>
+            {!isMobile && (
+              <button onClick={toggleSidebar} className="sidebar-toggle-btn" title="사이드바 닫기">
+                <PanelLeftClose size={15} />
+              </button>
+            )}
           </div>
 
           <div className="sidebar-search">
