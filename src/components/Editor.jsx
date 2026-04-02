@@ -64,8 +64,11 @@ export default function Editor({
     const ta = textareaRef.current
     const pv = previewRef.current
     if (!ta || !pv) return
-    const ratio = ta.scrollTop / (ta.scrollHeight - ta.clientHeight)
-    pv.scrollTop = ratio * (pv.scrollHeight - pv.clientHeight)
+    const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 32
+    const totalLines = Math.max(1, ta.value.split('\n').length)
+    const firstVisibleLine = ta.scrollTop / lineHeight
+    const lineRatio = firstVisibleLine / totalLines
+    pv.scrollTop = lineRatio * (pv.scrollHeight - pv.clientHeight)
     requestAnimationFrame(() => { scrollingFrom.current = null })
   }, [])
 
@@ -75,8 +78,10 @@ export default function Editor({
     const ta = textareaRef.current
     const pv = previewRef.current
     if (!ta || !pv) return
-    const ratio = pv.scrollTop / (pv.scrollHeight - pv.clientHeight)
-    ta.scrollTop = ratio * (ta.scrollHeight - ta.clientHeight)
+    const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 32
+    const totalLines = Math.max(1, ta.value.split('\n').length)
+    const previewRatio = pv.scrollTop / (pv.scrollHeight - pv.clientHeight)
+    ta.scrollTop = previewRatio * totalLines * lineHeight
     requestAnimationFrame(() => { scrollingFrom.current = null })
   }, [])
 
