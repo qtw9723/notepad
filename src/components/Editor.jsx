@@ -12,6 +12,26 @@ const CONTENT_TYPES = [
   { id: 'text',     label: 'Text', Icon: Code },
 ]
 
+// 프리뷰 DOM 요소의 스크롤 컨테이너 기준 offsetTop 계산
+function getOffsetInContainer(el, container) {
+  return el.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop
+}
+
+// data-line 속성을 붙이는 ReactMarkdown 커스텀 컴포넌트
+function makeLineComponents() {
+  const wrap = (Tag) => ({ node, children, ...props }) => (
+    <Tag data-line={node?.position?.start?.line} {...props}>{children}</Tag>
+  )
+  return {
+    h1: wrap('h1'), h2: wrap('h2'), h3: wrap('h3'),
+    h4: wrap('h4'), h5: wrap('h5'), h6: wrap('h6'),
+    p: wrap('p'), pre: wrap('pre'),
+    ul: wrap('ul'), ol: wrap('ol'),
+    blockquote: wrap('blockquote'),
+  }
+}
+const MD_COMPONENTS = makeLineComponents()
+
 export default function Editor({
   noteId, fetchNote, onUpdate, isLoggedIn = false,
   isMobile = false, mobileView = 'preview', onMobileViewChange,
@@ -64,11 +84,25 @@ export default function Editor({
     const ta = textareaRef.current
     const pv = previewRef.current
     if (!ta || !pv) return
+
     const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 32
-    const totalLines = Math.max(1, ta.value.split('\n').length)
-    const firstVisibleLine = ta.scrollTop / lineHeight
-    const lineRatio = firstVisibleLine / totalLines
-    pv.scrollTop = lineRatio * (pv.scrollHeight - pv.clientHeight)
+    const topLine = Math.floor(ta.scrollTop / lineHeight) + 1  // 1-indexed, remark 기준
+
+    const lineEls = Array.from(pv.querySelectorAll('[data-line]'))
+    if (lineEls.length === 0) {
+      // HTML/fallback: 비율 기반
+      const ratio = (ta.scrollTop / (ta.scrollHeight - ta.clientHeight)) || 0
+      pv.scrollTop = ratio * (pv.scrollHeight - pv.clientHeight)
+    } else {
+      // 현재 줄에 가장 가까운 data-line 요소 찾기
+      let best = lineEls[0]
+      let bestDiff = Infinity
+      for (const el of lineEls) {
+        const diff = Math.abs(parseInt(el.dataset.line, 10) - topLine)
+        if (diff < bestDiff) { bestDiff = diff; best = el }
+      }
+      pv.scrollTop = getOffsetInContainer(best, pv) - pv.clientHeight * 0.15
+    }
     requestAnimationFrame(() => { scrollingFrom.current = null })
   }, [])
 
@@ -78,10 +112,24 @@ export default function Editor({
     const ta = textareaRef.current
     const pv = previewRef.current
     if (!ta || !pv) return
-    const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 32
-    const totalLines = Math.max(1, ta.value.split('\n').length)
-    const previewRatio = pv.scrollTop / (pv.scrollHeight - pv.clientHeight)
-    ta.scrollTop = previewRatio * totalLines * lineHeight
+
+    const lineEls = Array.from(pv.querySelectorAll('[data-line]'))
+    if (lineEls.length === 0) {
+      const ratio = (pv.scrollTop / (pv.scrollHeight - pv.clientHeight)) || 0
+      ta.scrollTop = ratio * (ta.scrollHeight - ta.clientHeight)
+    } else {
+      // 뷰포트 상단에 가장 가까운 data-line 요소 찾기
+      const viewTop = pv.scrollTop + pv.clientHeight * 0.15
+      let best = lineEls[0]
+      let bestDiff = Infinity
+      for (const el of lineEls) {
+        const diff = Math.abs(getOffsetInContainer(el, pv) - viewTop)
+        if (diff < bestDiff) { bestDiff = diff; best = el }
+      }
+      const sourceLine = parseInt(best.dataset.line, 10) - 1  // 0-indexed
+      const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 32
+      ta.scrollTop = sourceLine * lineHeight
+    }
     requestAnimationFrame(() => { scrollingFrom.current = null })
   }, [])
 
@@ -143,7 +191,7 @@ export default function Editor({
             {note.content_type === 'markdown' ? (
               <div className="markdown-body text-[#cdd9e5] text-[1rem]">
                 {note.content
-                  ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
+                  ? <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>{note.content}</ReactMarkdown>
                   : <p className="text-[#484f58] italic text-sm">내용이 없습니다</p>
                 }
               </div>
@@ -290,7 +338,7 @@ export default function Editor({
                 {note.content_type === 'markdown' ? (
                   <div className="markdown-body text-[#cdd9e5] text-[1rem]">
                     {note.content
-                      ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
+                      ? <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>{note.content}</ReactMarkdown>
                       : <p className="text-[#484f58] italic text-sm">내용을 입력하면 여기에 표시됩니다</p>
                     }
                   </div>
