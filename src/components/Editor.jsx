@@ -106,25 +106,25 @@ export default function Editor({
     return (
       <div className="flex-1 flex flex-col overflow-hidden bg-[#0d1117]">
         <div className="bg-[#161b22] border-b border-[#21262d] shrink-0">
-          <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+          <div className="flex items-center gap-3 px-5 pt-5 pb-2">
             <button
               onClick={() => onMobileViewChange('list')}
-              className="flex items-center gap-1 text-[14px] text-[#9d8ffc] active:opacity-60 transition-opacity"
+              className="flex items-center gap-1.5 text-[16px] font-medium text-[#9d8ffc] active:opacity-60 transition-opacity"
             >
-              <ArrowLeft size={17} /> 목록
+              <ArrowLeft size={20} /> 목록
             </button>
             <div className="flex-1" />
             {canEdit && (
               <button
                 onClick={() => onMobileViewChange('edit')}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#9d8ffc] text-[#0d0d10] text-[13px] font-semibold active:opacity-80 transition-opacity"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#9d8ffc] text-[#0d0d10] text-[15px] font-semibold active:opacity-80 transition-opacity"
               >
-                <Pencil size={12} /> 편집
+                <Pencil size={15} /> 편집
               </button>
             )}
           </div>
-          <div className="px-4 pb-3 pt-1">
-            <p className="text-[17px] font-bold text-[#f0f0f0] leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>
+          <div className="px-5 pb-5 pt-1">
+            <p className="text-[22px] font-bold text-[#f0f0f0] leading-tight truncate" style={{ letterSpacing: '-0.02em' }}>
               {note.title || '제목 없음'}
             </p>
           </div>
@@ -160,12 +160,12 @@ export default function Editor({
       <div className="flex-1 flex flex-col overflow-hidden bg-[#0d1117]">
         {/* 상단 툴바 */}
         <div className="bg-[#161b22] border-b border-[#21262d] shrink-0">
-          <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+          <div className="flex items-center gap-3 px-5 pt-5 pb-2">
             <button
               onClick={() => onMobileViewChange('preview')}
-              className="flex items-center gap-1 text-[14px] text-[#9d8ffc] active:opacity-60 transition-opacity"
+              className="flex items-center gap-1.5 text-[16px] font-medium text-[#9d8ffc] active:opacity-60 transition-opacity"
             >
-              <ArrowLeft size={17} /> 미리보기
+              <ArrowLeft size={20} /> 미리보기
             </button>
             <div className="flex-1" />
             <span className={`text-[13px] transition-all duration-300 ${
@@ -174,8 +174,8 @@ export default function Editor({
               {saved ? '저장됨' : '저장 중...'}
             </span>
           </div>
-          <div className="px-4 pb-3 pt-1">
-            <p className="text-[17px] font-bold text-[#f0f0f0] leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>
+          <div className="px-5 pb-5 pt-1">
+            <p className="text-[22px] font-bold text-[#f0f0f0] leading-tight truncate" style={{ letterSpacing: '-0.02em' }}>
               {note.title || '제목 없음'}
             </p>
           </div>
