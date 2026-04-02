@@ -55,13 +55,29 @@ export default function Editor({
     })
   }
 
-  // 스크롤 싱크: 에디터 → 프리뷰
+  // 스크롤 싱크 (양방향) — 무한 루프 방지 플래그
+  const scrollingFrom = useRef(null)
+
   const handleEditorScroll = useCallback(() => {
+    if (scrollingFrom.current === 'preview') return
+    scrollingFrom.current = 'editor'
     const ta = textareaRef.current
     const pv = previewRef.current
     if (!ta || !pv) return
     const ratio = ta.scrollTop / (ta.scrollHeight - ta.clientHeight)
     pv.scrollTop = ratio * (pv.scrollHeight - pv.clientHeight)
+    requestAnimationFrame(() => { scrollingFrom.current = null })
+  }, [])
+
+  const handlePreviewScroll = useCallback(() => {
+    if (scrollingFrom.current === 'editor') return
+    scrollingFrom.current = 'preview'
+    const ta = textareaRef.current
+    const pv = previewRef.current
+    if (!ta || !pv) return
+    const ratio = pv.scrollTop / (pv.scrollHeight - pv.clientHeight)
+    ta.scrollTop = ratio * (ta.scrollHeight - ta.clientHeight)
+    requestAnimationFrame(() => { scrollingFrom.current = null })
   }, [])
 
   if (!noteId) {
@@ -243,7 +259,7 @@ export default function Editor({
 
           {/* 오른쪽: 미리보기 */}
           <Panel defaultSize={58} minSize={25}>
-            <div ref={previewRef} className="h-full overflow-y-auto">
+            <div ref={previewRef} onScroll={handlePreviewScroll} className="h-full overflow-y-auto">
               <div className="max-w-[760px] mx-auto px-10 py-10">
                 <h1
                   className="text-[2.2rem] font-bold text-[#e6edf3] leading-tight mb-4"
