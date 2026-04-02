@@ -105,22 +105,29 @@ export default function Editor({
   if (isMobile && mobileView === 'preview') {
     return (
       <div className="flex-1 flex flex-col overflow-hidden bg-[#0d1117]">
-        <div className="flex items-center gap-2 px-4 py-3 bg-[#161b22] border-b border-[#21262d] shrink-0">
-          <button
-            onClick={() => onMobileViewChange('list')}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#21262d] text-[#cdd9e5] text-[13px] active:bg-[#30363d] transition-colors"
-          >
-            <ArrowLeft size={15} /> 목록
-          </button>
-          <div className="flex-1" />
-          {canEdit && (
+        <div className="bg-[#161b22] border-b border-[#21262d] shrink-0">
+          <div className="flex items-center gap-2 px-4 pt-3 pb-1">
             <button
-              onClick={() => onMobileViewChange('edit')}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#388bfd] text-white text-[13px] font-medium active:bg-[#1f6feb] transition-colors"
+              onClick={() => onMobileViewChange('list')}
+              className="flex items-center gap-1 text-[14px] text-[#9d8ffc] active:opacity-60 transition-opacity"
             >
-              <Pencil size={13} /> 편집
+              <ArrowLeft size={17} /> 목록
             </button>
-          )}
+            <div className="flex-1" />
+            {canEdit && (
+              <button
+                onClick={() => onMobileViewChange('edit')}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#9d8ffc] text-[#0d0d10] text-[13px] font-semibold active:opacity-80 transition-opacity"
+              >
+                <Pencil size={12} /> 편집
+              </button>
+            )}
+          </div>
+          <div className="px-4 pb-3 pt-1">
+            <p className="text-[17px] font-bold text-[#f0f0f0] leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>
+              {note.title || '제목 없음'}
+            </p>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-[760px] mx-auto px-6 py-8">
@@ -152,19 +159,26 @@ export default function Editor({
     return (
       <div className="flex-1 flex flex-col overflow-hidden bg-[#0d1117]">
         {/* 상단 툴바 */}
-        <div className="flex items-center gap-2 px-4 py-3 bg-[#161b22] border-b border-[#21262d] shrink-0">
-          <button
-            onClick={() => onMobileViewChange('preview')}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#21262d] text-[#cdd9e5] text-[13px] active:bg-[#30363d] transition-colors"
-          >
-            <ArrowLeft size={15} /> 미리보기
-          </button>
-          <div className="flex-1" />
-          <span className={`text-[13px] transition-all duration-300 ${
-            saved ? 'text-[#58a6ff] opacity-100' : saving ? 'text-[#8b949e] opacity-100' : 'opacity-0'
-          }`}>
-            {saved ? '저장됨' : '저장 중...'}
-          </span>
+        <div className="bg-[#161b22] border-b border-[#21262d] shrink-0">
+          <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+            <button
+              onClick={() => onMobileViewChange('preview')}
+              className="flex items-center gap-1 text-[14px] text-[#9d8ffc] active:opacity-60 transition-opacity"
+            >
+              <ArrowLeft size={17} /> 미리보기
+            </button>
+            <div className="flex-1" />
+            <span className={`text-[13px] transition-all duration-300 ${
+              saved ? 'text-[#58a6ff] opacity-100' : saving ? 'text-[#8b949e] opacity-100' : 'opacity-0'
+            }`}>
+              {saved ? '저장됨' : '저장 중...'}
+            </span>
+          </div>
+          <div className="px-4 pb-3 pt-1">
+            <p className="text-[17px] font-bold text-[#f0f0f0] leading-tight truncate" style={{ letterSpacing: '-0.01em' }}>
+              {note.title || '제목 없음'}
+            </p>
+          </div>
         </div>
         {/* 제목 + 태그 */}
         <div className="shrink-0 px-6 pt-6 pb-0">
