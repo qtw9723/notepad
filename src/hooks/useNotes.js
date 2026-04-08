@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { api } from '../lib/api'
+import { deleteNoteImages } from '../lib/storage'
 
 export function useNotes(user) {
   const [notes, setNotes] = useState([])
@@ -70,6 +71,7 @@ export function useNotes(user) {
   }
 
   const deleteNote = async (id) => {
+    await deleteNoteImages(id).catch(err => console.error('Storage 정리 실패:', err))
     await api.deleteNote(id)
     contentCache.current.delete(id)
     setNotes(prev => prev.filter(n => n.id !== id))
