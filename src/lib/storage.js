@@ -5,7 +5,7 @@ const BUCKET = 'note-images'
 export async function uploadImage(noteId, file) {
   const ext = file.name.split('.').pop() || 'png'
   const uid = crypto.randomUUID()
-  const path = `images/${noteId}/${uid}.${ext}`
+  const path = `public/${noteId}/${uid}.${ext}`
 
   const { error } = await supabase.storage.from(BUCKET).upload(path, file)
   if (error) throw error
@@ -17,8 +17,8 @@ export async function uploadImage(noteId, file) {
 export async function deleteNoteImages(noteId) {
   const { data: files } = await supabase.storage
     .from(BUCKET)
-    .list(`images/${noteId}`)
+    .list(`public/${noteId}`)
   if (!files?.length) return
-  const paths = files.map(f => `images/${noteId}/${f.name}`)
+  const paths = files.map(f => `public/${noteId}/${f.name}`)
   await supabase.storage.from(BUCKET).remove(paths)
 }
