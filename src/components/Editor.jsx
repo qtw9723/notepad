@@ -5,6 +5,7 @@ import { FileText, Code, FileCode2, Pencil, ArrowLeft } from 'lucide-react'
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import TagInput from './TagInput'
 import { api } from '../lib/api'
+import { uploadImage } from '../lib/storage'
 
 const CONTENT_TYPES = [
   { id: 'markdown', label: 'MD',   Icon: FileText },
@@ -133,6 +134,39 @@ export default function Editor({
     requestAnimationFrame(() => { scrollingFrom.current = null })
   }, [])
 
+  const handlePaste = async (e) => {
+    if (!canEdit || !note?.id) return
+    const files = Array.from(e.clipboardData.files).filter(f => f.type.startsWith('image/'))
+    if (!files.length) return
+    e.preventDefault()
+
+    const file = files[0]
+    const { selectionStart: start, selectionEnd: end } = e.target
+    const uid = crypto.randomUUID().slice(0, 8)
+    const placeholder = `![업로드 중...-${uid}]()`
+
+    const withPlaceholder = note.content.slice(0, start) + placeholder + note.content.slice(end)
+    change('content', withPlaceholder)
+
+    try {
+      const url = await uploadImage(note.id, file)
+      setNote(prev => {
+        const next = { ...prev, content: prev.content.replace(placeholder, `![](${url})`) }
+        clearTimeout(saveTimer.current)
+        saveTimer.current = setTimeout(() => save(next), 800)
+        return next
+      })
+    } catch (err) {
+      console.error('이미지 업로드 실패:', err)
+      setNote(prev => {
+        const next = { ...prev, content: prev.content.replace(placeholder, '') }
+        clearTimeout(saveTimer.current)
+        saveTimer.current = setTimeout(() => save(next), 800)
+        return next
+      })
+    }
+  }
+
   if (!noteId) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[#0d1117]">
@@ -250,6 +284,7 @@ export default function Editor({
         <textarea
           value={note.content}
           onChange={e => change('content', e.target.value)}
+          onPaste={handlePaste}
           readOnly={!canEdit}
           placeholder="내용을 입력하세요..."
           className="flex-1 w-full px-6 py-4 bg-transparent text-[#e6edf3] text-[1rem] leading-[2.0] resize-none outline-none placeholder-[#21262d] font-mono min-h-0"
@@ -309,6 +344,7 @@ export default function Editor({
                 value={note.content}
                 onChange={e => change('content', e.target.value)}
                 onScroll={handleEditorScroll}
+                onPaste={handlePaste}
                 readOnly={!canEdit}
                 placeholder={
                   note.content_type === 'markdown'
@@ -362,6 +398,7 @@ export default function Editor({
             <textarea
               value={note.content}
               onChange={e => change('content', e.target.value)}
+              onPaste={handlePaste}
               readOnly={!canEdit}
               placeholder="내용을 입력하세요..."
               className="w-full bg-transparent text-[#e6edf3] text-[1rem] leading-[2.0] resize-none outline-none placeholder-[#21262d]"
