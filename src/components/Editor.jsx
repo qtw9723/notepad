@@ -5,7 +5,7 @@ import { FileText, Code, FileCode2, Pencil, ArrowLeft } from 'lucide-react'
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import TagInput from './TagInput'
 import { api } from '../lib/api'
-import { uploadImage } from '../lib/storage'
+import { uploadImage, findRemovedStoragePaths, deleteImagePaths } from '../lib/storage'
 
 const CONTENT_TYPES = [
   { id: 'markdown', label: 'MD',   Icon: FileText },
@@ -43,15 +43,22 @@ export default function Editor({
   const saveTimer = useRef(null)
   const textareaRef = useRef(null)
   const previewRef = useRef(null)
+  const lastSavedContent = useRef('')
 
   useEffect(() => {
     if (!noteId) return
-    fetchNote(noteId).then(data => setNote(data))
+    fetchNote(noteId).then(data => {
+      setNote(data)
+      lastSavedContent.current = data?.content ?? ''
+    })
   }, [noteId, fetchNote])
 
   const save = useCallback(async (updated) => {
     if (!updated?.id) return
     setSaving(true)
+    const removed = findRemovedStoragePaths(lastSavedContent.current, updated.content)
+    if (removed.length) deleteImagePaths(removed).catch(console.error)
+    lastSavedContent.current = updated.content ?? ''
     const data = await api.updateNote(updated.id, {
       title: updated.title,
       content: updated.content,

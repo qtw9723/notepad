@@ -1,6 +1,28 @@
 import { supabase } from './supabase'
 
 const BUCKET = 'note-images'
+const STORAGE_PREFIX = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${BUCKET}/`
+
+function extractStoragePaths(content) {
+  const paths = []
+  for (const match of (content || '').matchAll(/!\[.*?\]\((https?:\/\/[^)]+)\)/g)) {
+    if (match[1].startsWith(STORAGE_PREFIX)) {
+      paths.push(match[1].slice(STORAGE_PREFIX.length))
+    }
+  }
+  return paths
+}
+
+export function findRemovedStoragePaths(oldContent, newContent) {
+  const oldPaths = extractStoragePaths(oldContent)
+  const newPathSet = new Set(extractStoragePaths(newContent))
+  return oldPaths.filter(p => !newPathSet.has(p))
+}
+
+export async function deleteImagePaths(paths) {
+  if (!paths.length) return
+  await supabase.storage.from(BUCKET).remove(paths)
+}
 
 export async function uploadImage(noteId, file) {
   const ext = file.name.split('.').pop() || 'png'
