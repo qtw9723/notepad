@@ -46,7 +46,7 @@ export default function SharePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090e] flex items-center justify-center py-20 px-6">
+    <div className="min-h-screen bg-[#09090e] flex items-start justify-center py-20 px-6">
       <div className="w-full max-w-[720px] rounded-2xl border border-[#21262d] overflow-hidden shadow-2xl">
         {/* 헤더 */}
         <div className="px-12 pt-12 pb-8 border-b border-[#21262d] bg-[#0d1117]">
