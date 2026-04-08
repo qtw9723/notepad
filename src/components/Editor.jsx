@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { FileText, Code, FileCode2, Pencil, ArrowLeft } from 'lucide-react'
+import { FileText, Code, FileCode2, Pencil, ArrowLeft, Link } from 'lucide-react'
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import TagInput from './TagInput'
 import { api } from '../lib/api'
@@ -40,6 +40,13 @@ export default function Editor({
   const [note, setNote] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/share/${noteId}`)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
   const saveTimer = useRef(null)
   const textareaRef = useRef(null)
   const previewRef = useRef(null)
@@ -328,6 +335,16 @@ export default function Editor({
         )}
 
         <div className="flex-1" />
+
+        {canEdit && (
+          <button
+            onClick={copyShareLink}
+            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
+          >
+            <Link size={11} />
+            {copied ? '복사됨' : '공유'}
+          </button>
+        )}
 
         {canEdit ? (
           <span className={`text-[11px] transition-all duration-300 ${
