@@ -3,409 +3,153 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>모바일 상단바 디자인 옵션</title>
+  <title>Share Page Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0d1117;
-      color: #e2e2e2;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      padding: 24px 16px 60px;
-    }
-    h1 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #f0f0f0;
-      margin-bottom: 6px;
-    }
-    .subtitle {
-      font-size: 0.8rem;
-      color: #606070;
-      margin-bottom: 32px;
-    }
+    body { font-family: 'Inter', sans-serif; background: #0d1117; color: #cdd9e5; }
 
-    /* 폰 프레임 */
-    .phones {
-      display: flex;
-      flex-direction: column;
-      gap: 40px;
-    }
-    .option {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .option-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #9d8ffc;
-    }
-    .option-desc {
-      font-size: 0.8rem;
-      color: #8b8890;
-      margin-bottom: 4px;
-      line-height: 1.5;
-    }
-    .phone {
-      width: 100%;
-      max-width: 360px;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid #2a2a38;
-      background: #0d1117;
-    }
+    .prose h1 { font-size: 1.875rem; font-weight: 700; color: #e6edf3; margin: 2rem 0 1rem; line-height: 1.3; letter-spacing: -0.02em; }
+    .prose h2 { font-size: 1.25rem; font-weight: 600; color: #e6edf3; margin: 1.75rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid #21262d; }
+    .prose h3 { font-size: 1.05rem; font-weight: 600; color: #e6edf3; margin: 1.5rem 0 0.5rem; }
+    .prose p  { color: #cdd9e5; line-height: 1.9; margin: 0.85rem 0; font-size: 1rem; }
+    .prose ul, .prose ol { padding-left: 1.5rem; margin: 0.85rem 0; }
+    .prose li { color: #cdd9e5; line-height: 1.85; margin: 0.3rem 0; }
+    .prose ul li { list-style-type: disc; }
+    .prose ol li { list-style-type: decimal; }
+    .prose code { font-family: 'JetBrains Mono', monospace; background: #161b22; color: #79c0ff; padding: 0.15em 0.45em; border-radius: 4px; font-size: 0.875em; }
+    .prose pre  { font-family: 'JetBrains Mono', monospace; background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 1.25rem 1.5rem; overflow-x: auto; margin: 1.25rem 0; }
+    .prose pre code { background: none; color: #cdd9e5; padding: 0; font-size: 0.875rem; line-height: 1.7; }
+    .prose blockquote { border-left: 3px solid #388bfd; padding-left: 1rem; margin: 1.25rem 0; color: #8b949e; font-style: italic; }
+    .prose strong { color: #e6edf3; font-weight: 600; }
+    .prose a { color: #79c0ff; text-decoration: underline; text-underline-offset: 3px; }
+    .prose hr { border-color: #21262d; margin: 2rem 0; }
+    .prose table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.9rem; }
+    .prose th { background: #161b22; color: #e6edf3; font-weight: 600; padding: 0.6rem 1rem; border: 1px solid #30363d; text-align: left; }
+    .prose td { padding: 0.6rem 1rem; border: 1px solid #21262d; }
 
-    /* ── OPTION A: 현재 상태 ── */
-    .a-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      background: #161b22;
-      border-bottom: 1px solid #21262d;
-    }
-    .a-btn {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: #8b949e;
-      background: #21262d;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 10px;
-      cursor: pointer;
-    }
-    .a-save {
-      font-size: 11px;
-      color: #58a6ff;
-      margin-left: auto;
-    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
 
-    /* ── OPTION B: 네이티브 앱 헤더 ── */
-    .b-bar {
-      display: flex;
-      align-items: center;
-      padding: 14px 16px 12px;
-      background: #161b22;
-      border-bottom: 1px solid #21262d;
-      position: relative;
-    }
-    .b-back {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      font-size: 16px;
-      color: #9d8ffc;
-      background: none;
-      border: none;
-      cursor: pointer;
-      min-width: 72px;
-    }
-    .b-back svg { width: 20px; height: 20px; }
-    .b-title {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 15px;
-      font-weight: 600;
-      color: #f0f0f0;
-    }
-    .b-action {
-      margin-left: auto;
-      font-size: 15px;
-      font-weight: 600;
-      color: #9d8ffc;
-      background: none;
-      border: none;
-      cursor: pointer;
-      min-width: 72px;
-      text-align: right;
-    }
-
-    /* ── OPTION C: 플로팅 카드 ── */
-    .c-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      background: #0d1117;
-    }
-    .c-btn-back {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: #cdd9e5;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid #2a2a38;
-      border-radius: 999px;
-      padding: 8px 14px;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-    }
-    .c-btn-edit {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #0d0d10;
-      background: #9d8ffc;
-      border: none;
-      border-radius: 999px;
-      padding: 8px 16px;
-      cursor: pointer;
-    }
-    .c-save {
-      font-size: 12px;
-      color: #58a6ff;
-      margin-left: auto;
-    }
-
-    /* ── OPTION D: 대형 타이틀 ── */
-    .d-bar {
-      background: #161b22;
-      border-bottom: 1px solid #21262d;
-    }
-    .d-top {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px 8px;
-    }
-    .d-back {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-      color: #9d8ffc;
-      background: none;
-      border: none;
-      cursor: pointer;
-    }
-    .d-action {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #0d0d10;
-      background: #9d8ffc;
-      border: none;
-      border-radius: 999px;
-      padding: 7px 14px;
-      cursor: pointer;
-    }
-    .d-bigtitle {
-      font-size: 22px;
-      font-weight: 700;
-      color: #f0f0f0;
-      padding: 0 16px 14px;
-      letter-spacing: -0.02em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* 공통 콘텐츠 미리보기 */
-    .preview-body {
-      padding: 20px 16px;
-      min-height: 160px;
-    }
-    .preview-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #e6edf3;
-      margin-bottom: 8px;
-    }
-    .preview-text {
-      font-size: 0.9rem;
-      color: #8b949e;
-      line-height: 1.7;
-    }
-    .editor-body {
-      padding: 16px;
-      min-height: 120px;
-    }
-    .fake-input {
-      width: 100%;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #e6edf3;
-      background: transparent;
-      border: none;
-      outline: none;
-      margin-bottom: 12px;
-      font-family: inherit;
-    }
-    .fake-textarea {
-      width: 100%;
-      font-size: 0.875rem;
-      color: #8b949e;
-      background: transparent;
-      border: none;
-      outline: none;
-      font-family: 'SF Mono', monospace;
-      line-height: 1.8;
-      resize: none;
-    }
-    .divider { height: 1px; background: #21262d; margin: 0 16px 16px; }
-
-    svg { display: inline-block; vertical-align: middle; }
-
-    /* 레이블 배지 */
-    .current-badge {
-      display: inline-block;
-      font-size: 0.65rem;
-      font-weight: 700;
-      background: #21262d;
-      color: #606070;
-      border-radius: 4px;
-      padding: 2px 6px;
-      margin-left: 6px;
-      vertical-align: middle;
-      letter-spacing: 0.05em;
-    }
+    .label { position: sticky; top: 0; z-index: 10; background: #7c6af5; color: white; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 16px; }
   </style>
 </head>
 <body>
-  <h1>모바일 상단바 — 디자인 옵션</h1>
-  <p class="subtitle">미리보기 뷰(뷰모드) 기준으로 비교</p>
 
-  <div class="phones">
-
-    <!-- OPTION A: 현재 -->
-    <div class="option">
-      <div>
-        <span class="option-label">A. 현재</span>
-        <span class="current-badge">CURRENT</span>
-      </div>
-      <p class="option-desc">작고 얇은 바. 버튼 타겟 작음.</p>
-      <div class="phone">
-        <div class="a-bar">
-          <button class="a-btn">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-            목록
-          </button>
-          <span style="flex:1"></span>
-          <button style="display:flex;align-items:center;gap:4px;font-size:12px;color:white;background:#388bfd;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            편집
-          </button>
-        </div>
-        <div class="preview-body">
-          <div class="preview-title">Cafe24 백오피스 데일리 업무</div>
-          <div class="preview-text">오늘 처리한 주요 업무 목록을 정리합니다...</div>
-        </div>
-      </div>
+<!-- ── Option A: 심플 센터 ──────────────────────────────────────── -->
+<div class="label">Option A — Simple Center (추천)</div>
+<div class="min-h-screen py-20 px-6">
+  <div class="max-w-[680px] mx-auto">
+    <h1 class="text-[2.5rem] font-bold text-[#e6edf3] leading-[1.2] mb-5" style="letter-spacing:-0.03em">
+      React에서 상태 관리 잘하는 법
+    </h1>
+    <div class="flex flex-wrap gap-2 mb-10">
+      <span class="text-xs px-2.5 py-1 rounded-full bg-[#161b22] text-[#8b949e] border border-[#21262d]">react</span>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-[#161b22] text-[#8b949e] border border-[#21262d]">frontend</span>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-[#161b22] text-[#8b949e] border border-[#21262d]">state</span>
     </div>
+    <hr class="border-[#21262d] mb-10" />
+    <div class="prose">
+      <p>상태 관리는 React 앱에서 가장 중요한 설계 결정 중 하나입니다. 잘못된 선택은 컴포넌트 트리 전체를 복잡하게 만들고, 디버깅을 어렵게 만들 수 있습니다.</p>
+      <h2>로컬 상태 vs 전역 상태</h2>
+      <p>모든 상태를 전역으로 올리려는 충동을 참아야 합니다. 상태는 그것을 필요로 하는 컴포넌트에 최대한 가깝게 유지하세요.</p>
+      <ul>
+        <li><strong>UI 상태</strong> (모달 열림/닫힘, 탭 선택) → 로컬 <code>useState</code></li>
+        <li><strong>서버 데이터</strong> → React Query 또는 SWR</li>
+        <li><strong>공유 앱 상태</strong> → Context API 또는 Zustand</li>
+      </ul>
+      <h2>Context API의 함정</h2>
+      <p>Context는 강력하지만 모든 컨슈머를 리렌더링시킵니다. 값이 자주 바뀌는 상태에는 사용을 피하세요.</p>
+      <pre><code>// 잘못된 예
+const AppContext = createContext({ user, theme, notifications })
 
-    <!-- OPTION B: 네이티브 앱 헤더 -->
-    <div class="option">
-      <span class="option-label">B. 네이티브 앱 헤더</span>
-      <p class="option-desc">iOS/Android 네이티브 패턴. 중앙 타이틀, 좌측 뒤로가기, 우측 액션.</p>
-      <div class="phone">
-        <div class="b-bar">
-          <button class="b-back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-            목록
-          </button>
-          <span class="b-title">데일리 업무</span>
-          <button class="b-action">편집</button>
-        </div>
-        <div class="preview-body">
-          <div class="preview-title">Cafe24 백오피스 데일리 업무</div>
-          <div class="preview-text">오늘 처리한 주요 업무 목록을 정리합니다...</div>
-        </div>
-      </div>
+// 올바른 예: 목적별 분리
+const UserContext = createContext(user)
+const ThemeContext = createContext(theme)</code></pre>
+      <h2>결론</h2>
+      <p>상태 관리의 황금률은 <strong>"필요한 만큼만"</strong>입니다. 먼저 로컬 상태로 시작하고, 실제로 공유가 필요해질 때 올리세요. 과도한 추상화는 오히려 코드를 복잡하게 만듭니다.</p>
+      <blockquote>Don't solve problems you don't have yet.</blockquote>
     </div>
-
-    <!-- OPTION C: 플로팅 카드 -->
-    <div class="option">
-      <span class="option-label">C. 플로팅 필 버튼</span>
-      <p class="option-desc">배경에 녹아든 바, 필(알약) 버튼. 앱 전체 어두운 무드와 자연스럽게 어울림.</p>
-      <div class="phone">
-        <div class="c-bar">
-          <button class="c-btn-back">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-            목록
-          </button>
-          <button class="c-btn-edit">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            편집
-          </button>
-        </div>
-        <div class="preview-body">
-          <div class="preview-title">Cafe24 백오피스 데일리 업무</div>
-          <div class="preview-text">오늘 처리한 주요 업무 목록을 정리합니다...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- OPTION D: 대형 타이틀 -->
-    <div class="option">
-      <span class="option-label">D. 대형 타이틀 헤더</span>
-      <p class="option-desc">노트 제목을 헤더에 크게 표시. 콘텐츠 맥락이 바로 보임. iOS Safari 스타일.</p>
-      <div class="phone">
-        <div class="d-bar">
-          <div class="d-top">
-            <button class="d-back">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-              목록
-            </button>
-            <button class="d-action">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              편집
-            </button>
-          </div>
-          <div class="d-bigtitle">Cafe24 백오피스 데일리 업무</div>
-        </div>
-        <div class="preview-body">
-          <div class="preview-text">오늘 처리한 주요 업무 목록을 정리합니다...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 편집 모드 비교 (C 기준) -->
-    <div class="option">
-      <span class="option-label">편집 모드 (C 기준)</span>
-      <p class="option-desc">← 미리보기 버튼 + 저장 상태 표시.</p>
-      <div class="phone">
-        <div class="c-bar">
-          <button class="c-btn-back">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-            미리보기
-          </button>
-          <span class="c-save" style="margin-left:auto;">저장됨</span>
-        </div>
-        <div class="editor-body">
-          <input class="fake-input" value="Cafe24 백오피스 데일리 업무" readonly />
-        </div>
-        <div class="divider"></div>
-        <div style="padding: 0 16px 20px;">
-          <textarea class="fake-textarea" rows="4" readonly>오늘 처리한 주요 업무 목록을 정리합니다.
-
-## 완료
-- 주문 오류 건 처리 (3건)
-- CS 답변 작성</textarea>
-        </div>
-      </div>
-    </div>
-
   </div>
+</div>
 
-  <div style="margin-top: 48px; padding: 16px; background: #161b22; border-radius: 12px; border: 1px solid #2a2a38;">
-    <p style="font-size: 0.8rem; color: #606070; line-height: 1.6;">
-      <strong style="color:#9d8ffc;">A</strong> — 현재 (너무 얇음)<br>
-      <strong style="color:#9d8ffc;">B</strong> — 네이티브 앱 (중앙 타이틀, 익숙한 패턴)<br>
-      <strong style="color:#9d8ffc;">C</strong> — 플로팅 필 (앱 무드에 잘 맞음, 권장)<br>
-      <strong style="color:#9d8ffc;">D</strong> — 대형 타이틀 (제목 가시성 최고, 공간 많이 차지)
-    </p>
+<!-- ── Option B: 좌측 보라 액센트 ─────────────────────────────── -->
+<div class="label">Option B — Purple Accent</div>
+<div class="min-h-screen py-20 px-6">
+  <div class="max-w-[680px] mx-auto">
+    <div class="border-l-[3px] border-[#7c6af5] pl-7 mb-10">
+      <h1 class="text-[2.3rem] font-bold text-[#e6edf3] leading-[1.2] mb-4" style="letter-spacing:-0.03em">
+        React에서 상태 관리 잘하는 법
+      </h1>
+      <div class="flex flex-wrap gap-2">
+        <span class="text-xs px-2.5 py-1 rounded-full bg-[#7c6af5]/10 text-[#9d8ffc] border border-[#7c6af5]/25">react</span>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-[#7c6af5]/10 text-[#9d8ffc] border border-[#7c6af5]/25">frontend</span>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-[#7c6af5]/10 text-[#9d8ffc] border border-[#7c6af5]/25">state</span>
+      </div>
+    </div>
+    <div class="prose">
+      <p>상태 관리는 React 앱에서 가장 중요한 설계 결정 중 하나입니다. 잘못된 선택은 컴포넌트 트리 전체를 복잡하게 만들고, 디버깅을 어렵게 만들 수 있습니다.</p>
+      <h2>로컬 상태 vs 전역 상태</h2>
+      <p>모든 상태를 전역으로 올리려는 충동을 참아야 합니다. 상태는 그것을 필요로 하는 컴포넌트에 최대한 가깝게 유지하세요.</p>
+      <ul>
+        <li><strong>UI 상태</strong> (모달 열림/닫힘, 탭 선택) → 로컬 <code>useState</code></li>
+        <li><strong>서버 데이터</strong> → React Query 또는 SWR</li>
+        <li><strong>공유 앱 상태</strong> → Context API 또는 Zustand</li>
+      </ul>
+      <h2>Context API의 함정</h2>
+      <p>Context는 강력하지만 모든 컨슈머를 리렌더링시킵니다. 값이 자주 바뀌는 상태에는 사용을 피하세요.</p>
+      <pre><code>// 잘못된 예
+const AppContext = createContext({ user, theme, notifications })
+
+// 올바른 예: 목적별 분리
+const UserContext = createContext(user)
+const ThemeContext = createContext(theme)</code></pre>
+      <h2>결론</h2>
+      <p>상태 관리의 황금률은 <strong>"필요한 만큼만"</strong>입니다.</p>
+      <blockquote>Don't solve problems you don't have yet.</blockquote>
+    </div>
   </div>
+</div>
+
+<!-- ── Option C: 카드 페이퍼 ───────────────────────────────────── -->
+<div class="label">Option C — Card Paper</div>
+<div class="min-h-screen py-20 px-6 bg-[#09090e]">
+  <div class="max-w-[720px] mx-auto rounded-2xl border border-[#21262d] overflow-hidden shadow-2xl">
+    <div class="px-12 pt-12 pb-8 border-b border-[#21262d] bg-[#0d1117]">
+      <h1 class="text-[2.2rem] font-bold text-[#e6edf3] leading-[1.2] mb-5" style="letter-spacing:-0.03em">
+        React에서 상태 관리 잘하는 법
+      </h1>
+      <div class="flex flex-wrap gap-2">
+        <span class="text-xs px-2.5 py-1 rounded-full bg-[#21262d] text-[#8b949e]">react</span>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-[#21262d] text-[#8b949e]">frontend</span>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-[#21262d] text-[#8b949e]">state</span>
+      </div>
+    </div>
+    <div class="px-12 py-12 bg-[#0d1117] prose">
+      <p>상태 관리는 React 앱에서 가장 중요한 설계 결정 중 하나입니다. 잘못된 선택은 컴포넌트 트리 전체를 복잡하게 만들고, 디버깅을 어렵게 만들 수 있습니다.</p>
+      <h2>로컬 상태 vs 전역 상태</h2>
+      <p>모든 상태를 전역으로 올리려는 충동을 참아야 합니다. 상태는 그것을 필요로 하는 컴포넌트에 최대한 가깝게 유지하세요.</p>
+      <ul>
+        <li><strong>UI 상태</strong> (모달 열림/닫힘, 탭 선택) → 로컬 <code>useState</code></li>
+        <li><strong>서버 데이터</strong> → React Query 또는 SWR</li>
+        <li><strong>공유 앱 상태</strong> → Context API 또는 Zustand</li>
+      </ul>
+      <h2>Context API의 함정</h2>
+      <p>Context는 강력하지만 모든 컨슈머를 리렌더링시킵니다. 값이 자주 바뀌는 상태에는 사용을 피하세요.</p>
+      <pre><code>// 잘못된 예
+const AppContext = createContext({ user, theme, notifications })
+
+// 올바른 예: 목적별 분리
+const UserContext = createContext(user)
+const ThemeContext = createContext(theme)</code></pre>
+      <h2>결론</h2>
+      <p>상태 관리의 황금률은 <strong>"필요한 만큼만"</strong>입니다.</p>
+      <blockquote>Don't solve problems you don't have yet.</blockquote>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
