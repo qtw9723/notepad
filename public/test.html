@@ -1,155 +1,257 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Share Page Mockup</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    body { font-family: 'Inter', sans-serif; background: #0d1117; color: #cdd9e5; }
-
-    .prose h1 { font-size: 1.875rem; font-weight: 700; color: #e6edf3; margin: 2rem 0 1rem; line-height: 1.3; letter-spacing: -0.02em; }
-    .prose h2 { font-size: 1.25rem; font-weight: 600; color: #e6edf3; margin: 1.75rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid #21262d; }
-    .prose h3 { font-size: 1.05rem; font-weight: 600; color: #e6edf3; margin: 1.5rem 0 0.5rem; }
-    .prose p  { color: #cdd9e5; line-height: 1.9; margin: 0.85rem 0; font-size: 1rem; }
-    .prose ul, .prose ol { padding-left: 1.5rem; margin: 0.85rem 0; }
-    .prose li { color: #cdd9e5; line-height: 1.85; margin: 0.3rem 0; }
-    .prose ul li { list-style-type: disc; }
-    .prose ol li { list-style-type: decimal; }
-    .prose code { font-family: 'JetBrains Mono', monospace; background: #161b22; color: #79c0ff; padding: 0.15em 0.45em; border-radius: 4px; font-size: 0.875em; }
-    .prose pre  { font-family: 'JetBrains Mono', monospace; background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 1.25rem 1.5rem; overflow-x: auto; margin: 1.25rem 0; }
-    .prose pre code { background: none; color: #cdd9e5; padding: 0; font-size: 0.875rem; line-height: 1.7; }
-    .prose blockquote { border-left: 3px solid #388bfd; padding-left: 1rem; margin: 1.25rem 0; color: #8b949e; font-style: italic; }
-    .prose strong { color: #e6edf3; font-weight: 600; }
-    .prose a { color: #79c0ff; text-decoration: underline; text-underline-offset: 3px; }
-    .prose hr { border-color: #21262d; margin: 2rem 0; }
-    .prose table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.9rem; }
-    .prose th { background: #161b22; color: #e6edf3; font-weight: 600; padding: 0.6rem 1rem; border: 1px solid #30363d; text-align: left; }
-    .prose td { padding: 0.6rem 1rem; border: 1px solid #21262d; }
-
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
-
-    .label { position: sticky; top: 0; z-index: 10; background: #7c6af5; color: white; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 16px; }
-  </style>
+<meta charset="UTF-8"/>
+<title>API Doc Preview</title>
+<style>
+  body { background:#0d1117; color:#cdd9e5; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; padding:2rem; }
+  /* 아래는 노트패드 HTML 모드에 붙여넣을 실제 코드를 미리보기 위한 wrapper */
+  .preview { max-width:760px; }
+</style>
 </head>
 <body>
+<div class="preview">
 
-<!-- ── Option A: 심플 센터 ──────────────────────────────────────── -->
-<div class="label">Option A — Simple Center (추천)</div>
-<div class="min-h-screen py-20 px-6">
-  <div class="max-w-[680px] mx-auto">
-    <h1 class="text-[2.5rem] font-bold text-[#e6edf3] leading-[1.2] mb-5" style="letter-spacing:-0.03em">
-      React에서 상태 관리 잘하는 법
-    </h1>
-    <div class="flex flex-wrap gap-2 mb-10">
-      <span class="text-xs px-2.5 py-1 rounded-full bg-[#161b22] text-[#8b949e] border border-[#21262d]">react</span>
-      <span class="text-xs px-2.5 py-1 rounded-full bg-[#161b22] text-[#8b949e] border border-[#21262d]">frontend</span>
-      <span class="text-xs px-2.5 py-1 rounded-full bg-[#161b22] text-[#8b949e] border border-[#21262d]">state</span>
-    </div>
-    <hr class="border-[#21262d] mb-10" />
-    <div class="prose">
-      <p>상태 관리는 React 앱에서 가장 중요한 설계 결정 중 하나입니다. 잘못된 선택은 컴포넌트 트리 전체를 복잡하게 만들고, 디버깅을 어렵게 만들 수 있습니다.</p>
-      <h2>로컬 상태 vs 전역 상태</h2>
-      <p>모든 상태를 전역으로 올리려는 충동을 참아야 합니다. 상태는 그것을 필요로 하는 컴포넌트에 최대한 가깝게 유지하세요.</p>
-      <ul>
-        <li><strong>UI 상태</strong> (모달 열림/닫힘, 탭 선택) → 로컬 <code>useState</code></li>
-        <li><strong>서버 데이터</strong> → React Query 또는 SWR</li>
-        <li><strong>공유 앱 상태</strong> → Context API 또는 Zustand</li>
-      </ul>
-      <h2>Context API의 함정</h2>
-      <p>Context는 강력하지만 모든 컨슈머를 리렌더링시킵니다. 값이 자주 바뀌는 상태에는 사용을 피하세요.</p>
-      <pre><code>// 잘못된 예
-const AppContext = createContext({ user, theme, notifications })
+<!-- ===================== 여기서부터 복사 ===================== -->
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#cdd9e5;line-height:1.7;">
 
-// 올바른 예: 목적별 분리
-const UserContext = createContext(user)
-const ThemeContext = createContext(theme)</code></pre>
-      <h2>결론</h2>
-      <p>상태 관리의 황금률은 <strong>"필요한 만큼만"</strong>입니다. 먼저 로컬 상태로 시작하고, 실제로 공유가 필요해질 때 올리세요. 과도한 추상화는 오히려 코드를 복잡하게 만듭니다.</p>
-      <blockquote>Don't solve problems you don't have yet.</blockquote>
+  <!-- 헤더 -->
+  <div style="margin-bottom:2.5rem;">
+    <div style="display:inline-flex;align-items:center;gap:10px;background:#161b22;border:1px solid #21262d;border-radius:12px;padding:8px 14px;margin-bottom:1.25rem;">
+      <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9d8ffc;">MonsterCollector</span>
+      <span style="width:1px;height:12px;background:#21262d;"></span>
+      <span style="font-size:11px;color:#484f58;">API Reference</span>
     </div>
+    <h1 style="font-size:2rem;font-weight:700;color:#e6edf3;margin:0 0 .5rem;letter-spacing:-.03em;">MonsterCollector API</h1>
+    <p style="font-size:.9rem;color:#8b949e;margin:0 0 1rem;">Base URL</p>
+    <code style="display:block;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 14px;font-size:.85rem;color:#79c0ff;font-family:'Fira Code','D2Coding',monospace;word-break:break-all;">https://elqomxaemqiqalzhczfc.supabase.co/functions/v1</code>
   </div>
-</div>
 
-<!-- ── Option B: 좌측 보라 액센트 ─────────────────────────────── -->
-<div class="label">Option B — Purple Accent</div>
-<div class="min-h-screen py-20 px-6">
-  <div class="max-w-[680px] mx-auto">
-    <div class="border-l-[3px] border-[#7c6af5] pl-7 mb-10">
-      <h1 class="text-[2.3rem] font-bold text-[#e6edf3] leading-[1.2] mb-4" style="letter-spacing:-0.03em">
-        React에서 상태 관리 잘하는 법
-      </h1>
-      <div class="flex flex-wrap gap-2">
-        <span class="text-xs px-2.5 py-1 rounded-full bg-[#7c6af5]/10 text-[#9d8ffc] border border-[#7c6af5]/25">react</span>
-        <span class="text-xs px-2.5 py-1 rounded-full bg-[#7c6af5]/10 text-[#9d8ffc] border border-[#7c6af5]/25">frontend</span>
-        <span class="text-xs px-2.5 py-1 rounded-full bg-[#7c6af5]/10 text-[#9d8ffc] border border-[#7c6af5]/25">state</span>
+  <!-- 공통 -->
+  <section style="margin-bottom:2.5rem;">
+    <h2 style="font-size:1.1rem;font-weight:700;color:#e6edf3;margin:0 0 1rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;letter-spacing:-.01em;">공통</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:14px 16px;">
+        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#606070;margin:0 0 6px;">응답 형식</p>
+        <p style="margin:0;font-size:.875rem;"><code style="background:#0d1117;color:#79c0ff;padding:2px 7px;border-radius:4px;font-size:.8rem;">Content-Type: application/json</code></p>
+      </div>
+      <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:14px 16px;">
+        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#606070;margin:0 0 6px;">에러 형식</p>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#8b949e;">{"error": "메시지"}</code>
       </div>
     </div>
-    <div class="prose">
-      <p>상태 관리는 React 앱에서 가장 중요한 설계 결정 중 하나입니다. 잘못된 선택은 컴포넌트 트리 전체를 복잡하게 만들고, 디버깅을 어렵게 만들 수 있습니다.</p>
-      <h2>로컬 상태 vs 전역 상태</h2>
-      <p>모든 상태를 전역으로 올리려는 충동을 참아야 합니다. 상태는 그것을 필요로 하는 컴포넌트에 최대한 가깝게 유지하세요.</p>
-      <ul>
-        <li><strong>UI 상태</strong> (모달 열림/닫힘, 탭 선택) → 로컬 <code>useState</code></li>
-        <li><strong>서버 데이터</strong> → React Query 또는 SWR</li>
-        <li><strong>공유 앱 상태</strong> → Context API 또는 Zustand</li>
-      </ul>
-      <h2>Context API의 함정</h2>
-      <p>Context는 강력하지만 모든 컨슈머를 리렌더링시킵니다. 값이 자주 바뀌는 상태에는 사용을 피하세요.</p>
-      <pre><code>// 잘못된 예
-const AppContext = createContext({ user, theme, notifications })
+  </section>
 
-// 올바른 예: 목적별 분리
-const UserContext = createContext(user)
-const ThemeContext = createContext(theme)</code></pre>
-      <h2>결론</h2>
-      <p>상태 관리의 황금률은 <strong>"필요한 만큼만"</strong>입니다.</p>
-      <blockquote>Don't solve problems you don't have yet.</blockquote>
-    </div>
-  </div>
-</div>
+  <!-- Member API -->
+  <section style="margin-bottom:2.5rem;">
+    <h2 style="font-size:1.1rem;font-weight:700;color:#e6edf3;margin:0 0 1.25rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">Member API</h2>
 
-<!-- ── Option C: 카드 페이퍼 ───────────────────────────────────── -->
-<div class="label">Option C — Card Paper</div>
-<div class="min-h-screen py-20 px-6 bg-[#09090e]">
-  <div class="max-w-[720px] mx-auto rounded-2xl border border-[#21262d] overflow-hidden shadow-2xl">
-    <div class="px-12 pt-12 pb-8 border-b border-[#21262d] bg-[#0d1117]">
-      <h1 class="text-[2.2rem] font-bold text-[#e6edf3] leading-[1.2] mb-5" style="letter-spacing:-0.03em">
-        React에서 상태 관리 잘하는 법
-      </h1>
-      <div class="flex flex-wrap gap-2">
-        <span class="text-xs px-2.5 py-1 rounded-full bg-[#21262d] text-[#8b949e]">react</span>
-        <span class="text-xs px-2.5 py-1 rounded-full bg-[#21262d] text-[#8b949e]">frontend</span>
-        <span class="text-xs px-2.5 py-1 rounded-full bg-[#21262d] text-[#8b949e]">state</span>
+    <!-- 회원 등록 -->
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;overflow:hidden;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #21262d;">
+        <span style="background:#7c6af5;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:.04em;">POST</span>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.875rem;color:#e6edf3;">/member</code>
+        <span style="margin-left:auto;font-size:.8rem;color:#8b949e;">회원 등록</span>
+      </div>
+      <div style="padding:16px;">
+        <p style="font-size:.8rem;color:#606070;margin:0 0 10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;">Request Body</p>
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:14px;">
+          <thead><tr style="border-bottom:1px solid #21262d;">
+            <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.75rem;">필드</th>
+            <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.75rem;">타입</th>
+            <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.75rem;">필수</th>
+            <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.75rem;">설명</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #21262d;">
+              <td style="padding:7px 10px;"><code style="color:#79c0ff;font-size:.8rem;">user_id</code></td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">string</td>
+              <td style="padding:7px 10px;"><span style="color:#58a6ff;font-size:.75rem;">✅</span></td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">유저 고유 ID</td>
+            </tr>
+            <tr>
+              <td style="padding:7px 10px;"><code style="color:#79c0ff;font-size:.8rem;">nickname</code></td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">string</td>
+              <td style="padding:7px 10px;"><span style="color:#58a6ff;font-size:.75rem;">✅</span></td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">닉네임 (중복 불가)</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px 14px;margin:0 0 14px;overflow-x:auto;"><code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#cdd9e5;">{
+  "user_id": "user-abc123",
+  "nickname": "플레이어1"
+}</code></pre>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);color:#58a6ff;font-size:.75rem;padding:3px 10px;border-radius:5px;">201 Created</span>
+          <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgb(248,113,113);font-size:.75rem;padding:3px 10px;border-radius:5px;">400 필수 필드 누락</span>
+          <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgb(248,113,113);font-size:.75rem;padding:3px 10px;border-radius:5px;">400 중복 user_id / 닉네임</span>
+        </div>
       </div>
     </div>
-    <div class="px-12 py-12 bg-[#0d1117] prose">
-      <p>상태 관리는 React 앱에서 가장 중요한 설계 결정 중 하나입니다. 잘못된 선택은 컴포넌트 트리 전체를 복잡하게 만들고, 디버깅을 어렵게 만들 수 있습니다.</p>
-      <h2>로컬 상태 vs 전역 상태</h2>
-      <p>모든 상태를 전역으로 올리려는 충동을 참아야 합니다. 상태는 그것을 필요로 하는 컴포넌트에 최대한 가깝게 유지하세요.</p>
-      <ul>
-        <li><strong>UI 상태</strong> (모달 열림/닫힘, 탭 선택) → 로컬 <code>useState</code></li>
-        <li><strong>서버 데이터</strong> → React Query 또는 SWR</li>
-        <li><strong>공유 앱 상태</strong> → Context API 또는 Zustand</li>
-      </ul>
-      <h2>Context API의 함정</h2>
-      <p>Context는 강력하지만 모든 컨슈머를 리렌더링시킵니다. 값이 자주 바뀌는 상태에는 사용을 피하세요.</p>
-      <pre><code>// 잘못된 예
-const AppContext = createContext({ user, theme, notifications })
 
-// 올바른 예: 목적별 분리
-const UserContext = createContext(user)
-const ThemeContext = createContext(theme)</code></pre>
-      <h2>결론</h2>
-      <p>상태 관리의 황금률은 <strong>"필요한 만큼만"</strong>입니다.</p>
-      <blockquote>Don't solve problems you don't have yet.</blockquote>
+    <!-- 회원 조회 -->
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #21262d;">
+        <span style="background:#388bfd;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:.04em;">GET</span>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.875rem;color:#e6edf3;">/member/<span style="color:#9d8ffc;">{user_id}</span></code>
+        <span style="margin-left:auto;font-size:.8rem;color:#8b949e;">회원 조회</span>
+      </div>
+      <div style="padding:16px;">
+        <pre style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px 14px;margin:0 0 14px;overflow-x:auto;"><code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#cdd9e5;">{
+  "user_id": "user-abc123",
+  "nickname": "플레이어1",
+  "created_at": "2026-03-25T00:00:00.000Z"
+}</code></pre>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);color:#58a6ff;font-size:.75rem;padding:3px 10px;border-radius:5px;">200 OK</span>
+          <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgb(248,113,113);font-size:.75rem;padding:3px 10px;border-radius:5px;">400 user_id 미입력</span>
+          <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgb(248,113,113);font-size:.75rem;padding:3px 10px;border-radius:5px;">404 존재하지 않는 유저</span>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  </section>
 
+  <!-- Rank API -->
+  <section style="margin-bottom:2.5rem;">
+    <h2 style="font-size:1.1rem;font-weight:700;color:#e6edf3;margin:0 0 1.25rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">Rank API</h2>
+
+    <!-- Top 10 -->
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;overflow:hidden;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #21262d;">
+        <span style="background:#388bfd;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;">GET</span>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.875rem;color:#e6edf3;">/rank</code>
+        <span style="margin-left:auto;font-size:.8rem;color:#8b949e;">Top 10 랭킹</span>
+      </div>
+      <div style="padding:16px;">
+        <pre style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px 14px;margin:0;overflow-x:auto;"><code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#cdd9e5;">[
+  {
+    "user_id": "user-abc123",
+    "nickname": "플레이어1",
+    "score": 9500,
+    "level": 10,
+    "created_at": "2026-03-25T00:00:00.000Z"
+  }
+]</code></pre>
+      </div>
+    </div>
+
+    <!-- 단일 유저 -->
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;overflow:hidden;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #21262d;">
+        <span style="background:#388bfd;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;">GET</span>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.875rem;color:#e6edf3;">/rank/<span style="color:#9d8ffc;">{user_id}</span></code>
+        <span style="margin-left:auto;font-size:.8rem;color:#8b949e;">유저 랭킹 조회</span>
+      </div>
+      <div style="padding:16px;">
+        <pre style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px 14px;margin:0 0 12px;overflow-x:auto;"><code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#cdd9e5;">{
+  "user_id": "user-abc123",
+  "nickname": "플레이어1",
+  "score": 9500,
+  "level": 10,
+  "ranking": 3
+}</code></pre>
+        <div style="background:rgba(56,139,253,.06);border:1px solid rgba(56,139,253,.2);border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+          <p style="margin:0;font-size:.8rem;color:#8b949e;"><span style="color:#58a6ff;margin-right:6px;">ℹ</span>ranking은 매일 자정 갱신되는 스냅샷 기준. 당일 점수는 다음날 반영. 미반영 시 <code style="color:#79c0ff;font-size:.78rem;">ranking: null</code></p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);color:#58a6ff;font-size:.75rem;padding:3px 10px;border-radius:5px;">200 OK</span>
+          <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgb(248,113,113);font-size:.75rem;padding:3px 10px;border-radius:5px;">404 존재하지 않는 유저</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 점수 등록 -->
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #21262d;">
+        <span style="background:#7c6af5;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;">POST</span>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.875rem;color:#e6edf3;">/rank</code>
+        <span style="margin-left:auto;font-size:.8rem;color:#8b949e;">점수 등록</span>
+      </div>
+      <div style="padding:16px;">
+        <div style="background:rgba(157,143,252,.06);border:1px solid rgba(157,143,252,.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;">
+          <p style="margin:0;font-size:.8rem;color:#8b949e;"><span style="color:#9d8ffc;margin-right:6px;">⚠</span><code style="color:#9d8ffc;font-size:.78rem;">POST /member</code> 로 회원 등록 후 사용 가능</p>
+        </div>
+        <p style="font-size:.8rem;color:#606070;margin:0 0 10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;">Request Body</p>
+        <table style="width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:14px;">
+          <thead><tr style="border-bottom:1px solid #21262d;">
+            <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.75rem;">필드</th>
+            <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.75rem;">타입</th>
+            <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.75rem;">필수</th>
+            <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.75rem;">설명</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #21262d;">
+              <td style="padding:7px 10px;"><code style="color:#79c0ff;font-size:.8rem;">user_id</code></td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">string</td>
+              <td style="padding:7px 10px;"><span style="color:#58a6ff;font-size:.75rem;">✅</span></td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">등록된 유저 ID</td>
+            </tr>
+            <tr style="border-bottom:1px solid #21262d;">
+              <td style="padding:7px 10px;"><code style="color:#79c0ff;font-size:.8rem;">score</code></td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">number</td>
+              <td style="padding:7px 10px;"><span style="color:#58a6ff;font-size:.75rem;">✅</span></td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">점수</td>
+            </tr>
+            <tr>
+              <td style="padding:7px 10px;"><code style="color:#79c0ff;font-size:.8rem;">level</code></td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">number</td>
+              <td style="padding:7px 10px;color:#484f58;font-size:.75rem;">선택</td>
+              <td style="padding:7px 10px;color:#8b949e;font-size:.8rem;">레벨</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px 14px;margin:0 0 14px;overflow-x:auto;"><code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#cdd9e5;">{
+  "user_id": "user-abc123",
+  "score": 9500,
+  "level": 10
+}</code></pre>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);color:#58a6ff;font-size:.75rem;padding:3px 10px;border-radius:5px;">200 OK</span>
+          <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgb(248,113,113);font-size:.75rem;padding:3px 10px;border-radius:5px;">400 필수 필드 누락</span>
+          <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgb(248,113,113);font-size:.75rem;padding:3px 10px;border-radius:5px;">500 미등록 유저 / 서버 오류</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 게임 플로우 -->
+  <section>
+    <h2 style="font-size:1.1rem;font-weight:700;color:#e6edf3;margin:0 0 1rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">게임 플로우</h2>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;gap:12px;background:#161b22;border:1px solid #21262d;border-radius:10px;padding:12px 16px;">
+        <span style="background:#7c6af5;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;">POST</span>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.85rem;color:#e6edf3;flex-shrink:0;">/member</code>
+        <span style="color:#21262d;flex-shrink:0;">→</span>
+        <span style="font-size:.85rem;color:#8b949e;">회원 등록 <span style="color:#484f58;">(최초 1회)</span></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;background:#161b22;border:1px solid #21262d;border-radius:10px;padding:12px 16px;">
+        <span style="background:#21262d;color:#8b949e;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;">PLAY</span>
+        <span style="font-size:.85rem;color:#8b949e;">게임 플레이</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;background:#161b22;border:1px solid #21262d;border-radius:10px;padding:12px 16px;">
+        <span style="background:#7c6af5;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;">POST</span>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.85rem;color:#e6edf3;flex-shrink:0;">/rank</code>
+        <span style="color:#21262d;flex-shrink:0;">→</span>
+        <span style="font-size:.85rem;color:#8b949e;">점수 업로드</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;background:#161b22;border:1px solid #21262d;border-radius:10px;padding:12px 16px;">
+        <span style="background:#388bfd;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;">GET</span>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.85rem;color:#e6edf3;flex-shrink:0;">/rank</code>
+        <span style="color:#21262d;flex-shrink:0;">→</span>
+        <span style="font-size:.85rem;color:#8b949e;">Top 10 확인</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;background:#161b22;border:1px solid #21262d;border-radius:10px;padding:12px 16px;">
+        <span style="background:#388bfd;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;">GET</span>
+        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.85rem;color:#e6edf3;flex-shrink:0;">/rank/{id}</code>
+        <span style="color:#21262d;flex-shrink:0;">→</span>
+        <span style="font-size:.85rem;color:#8b949e;">내 순위 확인</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+<!-- ===================== 여기까지 복사 ===================== -->
+
+</div>
 </body>
 </html>
