@@ -37,4 +37,16 @@ export const api = {
     method: 'POST',
     body: JSON.stringify({ action: 'restore', noteId, versionId }),
   }),
+  r2Presign: (path, contentType) => request('', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'r2-presign', path, contentType }),
+  }),
+  r2Delete: (paths) => request('', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'r2-delete', paths }),
+  }),
+  r2DeleteFolder: (noteId) => request('', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'r2-delete-folder', noteId }),
+  }),
 }
