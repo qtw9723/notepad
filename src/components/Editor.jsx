@@ -335,7 +335,7 @@ export default function Editor({
           onPaste={handlePaste}
           readOnly={!canEdit}
           placeholder="내용을 입력하세요..."
-          className="flex-1 w-full px-6 py-4 bg-transparent text-[#e6edf3] text-[1rem] leading-[2.0] resize-none outline-none placeholder-[#21262d] font-mono min-h-0"
+          className="flex-1 w-full px-6 py-4 bg-transparent text-[#e6edf3] text-[1rem] leading-[2.0] resize-none outline-none placeholder-[#21262d] min-h-0"
           spellCheck={false}
         />
       </div>
@@ -387,7 +387,7 @@ export default function Editor({
           {canEdit && (
             <button
               onClick={copyShareLink}
-              className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
+              className="flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
             >
               <Link size={11} />
               {copied ? '복사됨' : '공유'}
@@ -396,7 +396,7 @@ export default function Editor({
           {canEdit && (
             <button
               onClick={() => setIsEditMode(true)}
-              className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-[#9d8ffc]/10 text-[#9d8ffc] hover:bg-[#9d8ffc]/20 transition-colors"
+              className="flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-md bg-[#9d8ffc]/10 text-[#9d8ffc] hover:bg-[#9d8ffc]/20 transition-colors"
             >
               <Pencil size={11} />
               편집하기
@@ -452,7 +452,7 @@ export default function Editor({
             <button
               key={ct.id}
               onClick={() => change('content_type', ct.id)}
-              className={`flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md transition-all duration-150 ${
+              className={`flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-md transition-all duration-150 ${
                 note.content_type === ct.id
                   ? 'bg-[#388bfd] text-white shadow-sm'
                   : 'text-[#8b949e] hover:text-[#cdd9e5]'
@@ -465,7 +465,7 @@ export default function Editor({
         </div>
 
         {isSplit && (
-          <span className="text-[11px] text-[#484f58] select-none">미리보기 자동</span>
+          <span className="text-[12px] text-[#484f58] select-none">미리보기 자동</span>
         )}
 
         <div className="flex-1" />
@@ -473,7 +473,7 @@ export default function Editor({
         {canEdit && isPreviewOnlyNote(noteId) && (
           <button
             onClick={() => setIsEditMode(false)}
-            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-[#9d8ffc]/10 text-[#9d8ffc] hover:bg-[#9d8ffc]/20 transition-colors"
+            className="flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-md bg-[#9d8ffc]/10 text-[#9d8ffc] hover:bg-[#9d8ffc]/20 transition-colors"
           >
             <Eye size={11} />
             미리보기
@@ -492,7 +492,7 @@ export default function Editor({
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingFile}
-              className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors disabled:opacity-40"
+              className="flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors disabled:opacity-40"
             >
               <Paperclip size={11} />
               {uploadingFile ? '업로드 중...' : '파일'}
@@ -503,7 +503,7 @@ export default function Editor({
         {canEdit && (
           <button
             onClick={() => setShowHistory(true)}
-            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
+            className="flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
           >
             <History size={11} />
             히스토리
@@ -513,7 +513,7 @@ export default function Editor({
         {canEdit && (
           <button
             onClick={copyShareLink}
-            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
+            className="flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
           >
             <Link size={11} />
             {copied ? '복사됨' : '공유'}
@@ -521,13 +521,13 @@ export default function Editor({
         )}
 
         {canEdit ? (
-          <span className={`text-[11px] transition-all duration-300 ${
+          <span className={`text-[12px] transition-all duration-300 ${
             saved ? 'text-[#58a6ff] opacity-100' : saving ? 'text-[#8b949e] opacity-100' : 'opacity-0'
           }`}>
             {saved ? '저장됨' : '저장 중...'}
           </span>
         ) : (
-          <span className="text-[11px] text-[#484f58]">읽기 전용</span>
+          <span className="text-[12px] text-[#484f58]">읽기 전용</span>
         )}
       </div>
 
@@ -549,7 +549,7 @@ export default function Editor({
                     ? '# 제목\n\n내용을 입력하세요...'
                     : '<h1>제목</h1>\n<p>내용을 입력하세요...</p>'
                 }
-                className="flex-1 w-full px-10 pb-10 bg-transparent text-[#e6edf3] text-[1rem] leading-[2.0] resize-none outline-none placeholder-[#21262d] font-mono"
+                className="flex-1 w-full px-10 pb-10 bg-transparent text-[#e6edf3] text-[1rem] leading-[2.0] resize-none outline-none placeholder-[#21262d]"
                 spellCheck={false}
               />
             </div>
@@ -644,7 +644,7 @@ function FileAttachments({ files, canEdit, onView, onRemove }) {
             <FileText size={13} className="text-[#9d8ffc] shrink-0" />
             <span className="text-[12px] text-[#cdd9e5] max-w-[180px] truncate">{file.name}</span>
             {file.size && (
-              <span className="text-[11px] text-[#484f58] shrink-0">{formatFileSize(file.size)}</span>
+              <span className="text-[12px] text-[#484f58] shrink-0">{formatFileSize(file.size)}</span>
             )}
             {canEdit && (
               <button

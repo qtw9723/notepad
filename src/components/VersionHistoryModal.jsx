@@ -85,7 +85,7 @@ export default function VersionHistoryModal({ noteId, onClose, onRestore }) {
                   }`}
                 >
                   <p className="text-[12px] text-[#cdd9e5] font-mono">{formatDate(v.created_at)}</p>
-                  <p className={`text-[11px] mt-0.5 ${
+                  <p className={`text-[12px] mt-0.5 ${
                     v.trigger === 'shrinkage' ? 'text-[#f87171]'
                     : v.trigger === 'pre_restore' ? 'text-[#9d8ffc]'
                     : 'text-[#8b949e]'
