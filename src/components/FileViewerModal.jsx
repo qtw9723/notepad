@@ -123,7 +123,7 @@ export default function FileViewerModal({ file, onClose }) {
 
       {/* 헤더 — 드래그 영역 */}
       <div
-        className="flex items-center gap-3 px-4 py-2.5 border-b border-[#21262d] bg-[#161b22] rounded-t-xl shrink-0 select-none"
+        className="relative z-10 flex items-center gap-3 px-4 py-2.5 border-b border-[#21262d] bg-[#161b22] rounded-t-xl shrink-0 select-none"
         style={{ cursor: 'move' }}
         onPointerDown={startDrag}
       >
