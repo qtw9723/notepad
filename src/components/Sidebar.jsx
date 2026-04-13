@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
-import { Plus, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, Lock } from 'lucide-react'
+import { Plus, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, Lock, ChevronUp, Check } from 'lucide-react'
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core'
@@ -12,6 +12,87 @@ const SIDEBAR_KEY = 'notepad-sidebar-open'
 const SIDEBAR_WIDTH_KEY = 'notepad-sidebar-width'
 const NOTE_ORDER_KEY = 'notepad-note-order'
 const SECTION_ORDER_KEY = 'notepad-section-order'
+
+function ProjectSwitcher({ projects, currentProject, onSignIn, onClose }) {
+  const [target, setTarget] = useState(null)
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const inputRef = useRef(null)
+
+  const handleSwitch = async (e) => {
+    e.preventDefault()
+    if (!target) return
+    setError(null)
+    setLoading(true)
+    try {
+      await onSignIn(target.slug, password)
+      onClose()
+    } catch {
+      setError('비밀번호가 올바르지 않습니다')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const selectTarget = (p) => {
+    setTarget(p)
+    setPassword('')
+    setError(null)
+    setTimeout(() => inputRef.current?.focus(), 50)
+  }
+
+  return (
+    <div className="absolute bottom-full left-0 right-0 mb-1.5 mx-2 bg-[#161b22] border border-[#21262d] rounded-xl shadow-2xl overflow-hidden z-50">
+      <div className="p-1.5">
+        {projects.map(p => {
+          const isCurrent = currentProject?.id === p.id
+          const isSelected = target?.id === p.id
+          return (
+            <button
+              key={p.id}
+              onClick={() => !isCurrent && selectTarget(p)}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors ${
+                isCurrent
+                  ? 'text-[#8b949e] cursor-default'
+                  : isSelected
+                    ? 'bg-[#9d8ffc]/10 text-[#9d8ffc]'
+                    : 'text-[#cdd9e5] hover:bg-[#21262d]'
+              }`}
+            >
+              <span className="w-6 h-6 rounded-full bg-[#21262d] flex items-center justify-center text-[11px] font-bold text-[#9d8ffc] shrink-0">
+                {p.name[0].toUpperCase()}
+              </span>
+              <span className="text-[13px] flex-1 truncate">{p.name}{p.is_master ? ' (마스터)' : ''}</span>
+              {isCurrent && <Check size={12} className="text-[#9d8ffc] shrink-0" />}
+            </button>
+          )
+        })}
+      </div>
+
+      {target && target.id !== currentProject?.id && (
+        <form onSubmit={handleSwitch} className="border-t border-[#21262d] p-2.5 flex flex-col gap-2">
+          <input
+            ref={inputRef}
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder={`${target.name} 비밀번호`}
+            className="w-full px-3 py-2 text-[12px] bg-[#0d1117] border border-[#21262d] rounded-lg text-[#e6edf3] placeholder-[#484f58] outline-none focus:border-[#9d8ffc]/50 transition-colors"
+          />
+          {error && <p className="text-[11px] text-[#f87171] px-1">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading || !password}
+            className="w-full py-2 rounded-lg bg-[#9d8ffc] text-[#0d0d10] text-[12px] font-semibold hover:bg-[#b8aeff] transition-colors disabled:opacity-40"
+          >
+            {loading ? '전환 중...' : `${target.name}으로 전환`}
+          </button>
+        </form>
+      )}
+    </div>
+  )
+}
 
 function SortableNote({ note, selectedId, onSelect, onDelete, isLoggedIn, fmt }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: note.id })
@@ -112,7 +193,7 @@ function SortableSection({
 
 export default function Sidebar({
   notes, projects, currentProject, isMaster,
-  selectedId, onSelect, onCreate, onDelete, onSignOut, onShowLogin,
+  selectedId, onSelect, onCreate, onDelete, onSignIn, onSignOut, onShowLogin,
   isMobile = false,
 }) {
   const [isOpen, setIsOpen] = useState(() => localStorage.getItem(SIDEBAR_KEY) !== 'false')
@@ -124,7 +205,20 @@ export default function Sidebar({
     return saved ? parseInt(saved, 10) : 288
   })
   const [isResizing, setIsResizing] = useState(false)
+  const [showSwitcher, setShowSwitcher] = useState(false)
   const resizeStart = useRef(null)
+  const switcherRef = useRef(null)
+
+  useEffect(() => {
+    if (!showSwitcher) return
+    const handle = (e) => {
+      if (switcherRef.current && !switcherRef.current.contains(e.target)) {
+        setShowSwitcher(false)
+      }
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [showSwitcher])
   const [noteOrder, setNoteOrder] = useState(() => {
     try { return JSON.parse(localStorage.getItem(NOTE_ORDER_KEY) || '[]') }
     catch { return [] }
@@ -384,15 +478,38 @@ export default function Sidebar({
             </DndContext>
           </div>
 
-          <div className="sidebar-bottom">
+          <div className="sidebar-bottom" style={{ position: 'relative' }} ref={switcherRef}>
+            {showSwitcher && (
+              <ProjectSwitcher
+                projects={projects}
+                currentProject={currentProject}
+                onSignIn={onSignIn}
+                onClose={() => setShowSwitcher(false)}
+              />
+            )}
             {isLoggedIn ? (
               <>
-                <div className="sidebar-avatar">
+                <button
+                  onClick={() => setShowSwitcher(p => !p)}
+                  className="sidebar-avatar"
+                  title="프로젝트 전환"
+                  style={{ cursor: 'pointer' }}
+                >
                   {(currentProject?.name ?? 'M')[0].toUpperCase()}
-                </div>
-                <span className="sidebar-username">
+                </button>
+                <button
+                  onClick={() => setShowSwitcher(p => !p)}
+                  className="sidebar-username"
+                  style={{ cursor: 'pointer', textAlign: 'left', background: 'none', border: 'none', padding: 0, flex: 1 }}
+                  title="프로젝트 전환"
+                >
                   {currentProject?.name ?? '마스터'}
-                </span>
+                </button>
+                <ChevronUp
+                  size={13}
+                  className={`text-[#484f58] transition-transform duration-150 ${showSwitcher ? '' : 'rotate-180'}`}
+                  style={{ flexShrink: 0 }}
+                />
                 <button onClick={onSignOut} title="로그아웃" className="sidebar-logout-btn">
                   <LogOut size={15} />
                 </button>

@@ -79,6 +79,7 @@ export default function App() {
           onSelect={handleSelect}
           onCreate={handleCreate}
           onDelete={handleDelete}
+          onSignIn={signIn}
           onSignOut={signOut}
           onShowLogin={() => setShowLoginModal(true)}
           isMobile={isMobile}
