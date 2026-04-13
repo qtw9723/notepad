@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { FileText, Code, FileCode2, Pencil, ArrowLeft, Link, History } from 'lucide-react'
+import { FileText, Code, FileCode2, Pencil, ArrowLeft, Link, History, Eye } from 'lucide-react'
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import TagInput from './TagInput'
 import VersionHistoryModal from './VersionHistoryModal'
+import { isPreviewOnlyNote } from '../lib/noteConfig'
 import { api } from '../lib/api'
 import { uploadImage, findRemovedStoragePaths, deleteImagePaths } from '../lib/storage'
 
@@ -43,6 +44,7 @@ export default function Editor({
   const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(() => !isPreviewOnlyNote(noteId))
 
   const copyShareLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/share/${noteId}`)
@@ -345,6 +347,54 @@ export default function Editor({
     onUpdate(restoredNote)
   }
 
+  // 미리보기 전용 노트 — 미리보기 모드
+  if (isPreviewOnlyNote(noteId) && !isEditMode) {
+    return (
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0d1117]">
+        <div className="flex items-center gap-2 px-6 py-2.5 border-b border-[#21262d] bg-[#161b22] shrink-0">
+          <div className="flex-1" />
+          {canEdit && (
+            <button
+              onClick={copyShareLink}
+              className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
+            >
+              <Link size={11} />
+              {copied ? '복사됨' : '공유'}
+            </button>
+          )}
+          {canEdit && (
+            <button
+              onClick={() => setIsEditMode(true)}
+              className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-[#9d8ffc]/10 text-[#9d8ffc] hover:bg-[#9d8ffc]/20 transition-colors"
+            >
+              <Pencil size={11} />
+              편집하기
+            </button>
+          )}
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-[760px] mx-auto px-10 py-10">
+            {note.content_type === 'markdown' ? (
+              <div className="markdown-body text-[#cdd9e5] text-[1rem]">
+                {note.content
+                  ? <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>{note.content}</ReactMarkdown>
+                  : <p className="text-[#484f58] italic text-sm">내용이 없습니다</p>
+                }
+              </div>
+            ) : note.content_type === 'html' ? (
+              <div
+                className="text-[#cdd9e5] text-[1rem] leading-[2.0]"
+                dangerouslySetInnerHTML={{ __html: note.content || '' }}
+              />
+            ) : (
+              <p className="text-[#cdd9e5] text-[1rem] leading-[2.0] whitespace-pre-wrap">{note.content}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // 데스크탑 뷰
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0d1117]">
@@ -379,6 +429,16 @@ export default function Editor({
         )}
 
         <div className="flex-1" />
+
+        {canEdit && isPreviewOnlyNote(noteId) && (
+          <button
+            onClick={() => setIsEditMode(false)}
+            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-[#9d8ffc]/10 text-[#9d8ffc] hover:bg-[#9d8ffc]/20 transition-colors"
+          >
+            <Eye size={11} />
+            미리보기
+          </button>
+        )}
 
         {canEdit && (
           <button
