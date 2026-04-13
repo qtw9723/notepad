@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { FileText, Code, FileCode2, Pencil, ArrowLeft, Link } from 'lucide-react'
+import { FileText, Code, FileCode2, Pencil, ArrowLeft, Link, History } from 'lucide-react'
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import TagInput from './TagInput'
+import VersionHistoryModal from './VersionHistoryModal'
 import { api } from '../lib/api'
 import { uploadImage, findRemovedStoragePaths, deleteImagePaths } from '../lib/storage'
 
@@ -41,6 +42,7 @@ export default function Editor({
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
 
   const copyShareLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/share/${noteId}`)
@@ -51,12 +53,16 @@ export default function Editor({
   const textareaRef = useRef(null)
   const previewRef = useRef(null)
   const lastSavedContent = useRef('')
+  const lastSnapshottedContent = useRef('')
+  const undoBuffer = useRef([])
 
   useEffect(() => {
     if (!noteId) return
     fetchNote(noteId).then(data => {
       setNote(data)
       lastSavedContent.current = data?.content ?? ''
+      lastSnapshottedContent.current = data?.content ?? ''
+      undoBuffer.current = []
     })
   }, [noteId, fetchNote])
 
@@ -66,6 +72,7 @@ export default function Editor({
     const removed = findRemovedStoragePaths(lastSavedContent.current, updated.content)
     if (removed.length) deleteImagePaths(removed).catch(console.error)
     lastSavedContent.current = updated.content ?? ''
+    lastSnapshottedContent.current = updated.content ?? ''
     const data = await api.updateNote(updated.id, {
       title: updated.title,
       content: updated.content,
@@ -82,6 +89,27 @@ export default function Editor({
 
   const change = (field, value) => {
     if (!canEdit) return
+
+    // undo 버퍼: 변경 전 상태 저장 (최대 50개 FIFO)
+    if (note) {
+      undoBuffer.current = [...undoBuffer.current.slice(-49), { ...note }]
+    }
+
+    // shrinkage 감지: content가 마지막 스냅샷 대비 20% 이상 감소 시
+    if (field === 'content' && note) {
+      const lastLen = lastSnapshottedContent.current.length
+      const newLen = value.length
+      if (lastLen > 50 && newLen < lastLen * 0.8) {
+        api.saveSnapshot(note.id, {
+          title: note.title,
+          content: lastSavedContent.current,
+          content_type: note.content_type,
+          tags: note.tags,
+        }).catch(console.error)
+        lastSnapshottedContent.current = value
+      }
+    }
+
     setNote(prev => {
       const next = { ...prev, [field]: value }
       clearTimeout(saveTimer.current)
@@ -308,9 +336,25 @@ export default function Editor({
     )
   }
 
+  const handleRestore = (restoredNote) => {
+    setNote(restoredNote)
+    lastSavedContent.current = restoredNote.content ?? ''
+    lastSnapshottedContent.current = restoredNote.content ?? ''
+    undoBuffer.current = []
+    setShowHistory(false)
+    onUpdate(restoredNote)
+  }
+
   // 데스크탑 뷰
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0d1117]">
+      {showHistory && (
+        <VersionHistoryModal
+          noteId={noteId}
+          onClose={() => setShowHistory(false)}
+          onRestore={handleRestore}
+        />
+      )}
       {/* 툴바 */}
       <div className="flex items-center gap-2 px-6 py-2.5 border-b border-[#21262d] bg-[#161b22] shrink-0">
         <div className="flex bg-[#0d1117] rounded-lg p-0.5 gap-0.5">
@@ -335,6 +379,16 @@ export default function Editor({
         )}
 
         <div className="flex-1" />
+
+        {canEdit && (
+          <button
+            onClick={() => setShowHistory(true)}
+            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors"
+          >
+            <History size={11} />
+            히스토리
+          </button>
+        )}
 
         {canEdit && (
           <button
