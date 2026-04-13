@@ -43,3 +43,21 @@ export async function uploadImage(noteId, file) {
 export async function deleteNoteImages(noteId) {
   await api.r2DeleteFolder(noteId)
 }
+
+export async function uploadFile(noteId, file) {
+  const ext = file.name.split('.').pop() || 'bin'
+  const uid = crypto.randomUUID()
+  const path = `public/${noteId}/files/${uid}.${ext}`
+  const contentType = file.type || 'application/octet-stream'
+
+  const { signedUrl, publicUrl } = await api.r2Presign(path, contentType)
+
+  const res = await fetch(signedUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': contentType },
+    body: file,
+  })
+  if (!res.ok) throw new Error(`R2 upload failed: ${res.status}`)
+
+  return { name: file.name, path, url: publicUrl, size: file.size, type: contentType }
+}

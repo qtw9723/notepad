@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { FileText, Code, FileCode2, Pencil, ArrowLeft, Link, History, Eye } from 'lucide-react'
+import { FileText, Code, FileCode2, Pencil, ArrowLeft, Link, History, Eye, Paperclip, X } from 'lucide-react'
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import TagInput from './TagInput'
 import VersionHistoryModal from './VersionHistoryModal'
+import FileViewerModal from './FileViewerModal'
 import { isPreviewOnlyNote } from '../lib/noteConfig'
 import { api } from '../lib/api'
-import { uploadImage, findRemovedStoragePaths, deleteImagePaths } from '../lib/storage'
+import { uploadImage, uploadFile, findRemovedStoragePaths, deleteImagePaths } from '../lib/storage'
 
 const CONTENT_TYPES = [
   { id: 'markdown', label: 'MD',   Icon: FileText },
@@ -45,6 +46,9 @@ export default function Editor({
   const [copied, setCopied] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [isEditMode, setIsEditMode] = useState(() => !isPreviewOnlyNote(noteId))
+  const [viewingFile, setViewingFile] = useState(null)
+  const [uploadingFile, setUploadingFile] = useState(false)
+  const fileInputRef = useRef(null)
 
   const copyShareLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/share/${noteId}`)
@@ -338,6 +342,33 @@ export default function Editor({
     )
   }
 
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !note?.id) return
+    setUploadingFile(true)
+    try {
+      const fileData = await uploadFile(note.id, file)
+      const newFiles = [...(note.files || []), fileData]
+      const updated = await api.updateNote(note.id, { files: newFiles })
+      setNote(prev => ({ ...prev, files: updated.files }))
+      onUpdate(updated)
+    } catch (err) {
+      console.error('파일 업로드 실패:', err)
+    } finally {
+      setUploadingFile(false)
+    }
+  }
+
+  const handleFileRemove = async (filePath) => {
+    if (!note?.id) return
+    const newFiles = (note.files || []).filter(f => f.path !== filePath)
+    const updated = await api.updateNote(note.id, { files: newFiles })
+    setNote(prev => ({ ...prev, files: updated.files }))
+    onUpdate(updated)
+    api.r2Delete([filePath]).catch(console.error)
+  }
+
   const handleRestore = (restoredNote) => {
     setNote(restoredNote)
     lastSavedContent.current = restoredNote.content ?? ''
@@ -389,6 +420,12 @@ export default function Editor({
             ) : (
               <p className="text-[#cdd9e5] text-[1rem] leading-[2.0] whitespace-pre-wrap">{note.content}</p>
             )}
+            <FileAttachments
+              files={note.files}
+              canEdit={canEdit}
+              onView={setViewingFile}
+              onRemove={handleFileRemove}
+            />
           </div>
         </div>
       </div>
@@ -404,6 +441,9 @@ export default function Editor({
           onClose={() => setShowHistory(false)}
           onRestore={handleRestore}
         />
+      )}
+      {viewingFile && (
+        <FileViewerModal file={viewingFile} onClose={() => setViewingFile(null)} />
       )}
       {/* 툴바 */}
       <div className="flex items-center gap-2 px-6 py-2.5 border-b border-[#21262d] bg-[#161b22] shrink-0">
@@ -438,6 +478,26 @@ export default function Editor({
             <Eye size={11} />
             미리보기
           </button>
+        )}
+
+        {canEdit && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.hwp"
+              onChange={handleFileSelect}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingFile}
+              className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md text-[#8b949e] hover:text-[#cdd9e5] transition-colors disabled:opacity-40"
+            >
+              <Paperclip size={11} />
+              {uploadingFile ? '업로드 중...' : '파일'}
+            </button>
+          </>
         )}
 
         {canEdit && (
@@ -524,6 +584,12 @@ export default function Editor({
                     }}
                   />
                 )}
+                <FileAttachments
+                  files={note.files}
+                  canEdit={canEdit}
+                  onView={setViewingFile}
+                  onRemove={handleFileRemove}
+                />
               </div>
             </div>
           </Panel>
@@ -543,9 +609,54 @@ export default function Editor({
               style={{ minHeight: 'calc(100vh - 320px)' }}
               spellCheck={false}
             />
+            <FileAttachments
+              files={note.files}
+              canEdit={canEdit}
+              onView={setViewingFile}
+              onRemove={handleFileRemove}
+            />
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function formatFileSize(bytes) {
+  if (!bytes) return ''
+  if (bytes < 1024) return `${bytes}B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`
+}
+
+function FileAttachments({ files, canEdit, onView, onRemove }) {
+  if (!files?.length) return null
+  return (
+    <div className="border-t border-[#21262d] pt-4 mt-8">
+      <p className="text-[10px] font-extrabold text-[#484f58] uppercase tracking-[0.12em] mb-3">첨부 파일</p>
+      <div className="flex flex-wrap gap-2">
+        {files.map(file => (
+          <div
+            key={file.path}
+            onClick={() => onView(file)}
+            className="flex items-center gap-2 px-3 py-2 bg-[#161b22] border border-[#21262d] rounded-lg cursor-pointer hover:border-[#9d8ffc]/40 transition-colors group"
+          >
+            <FileText size={13} className="text-[#9d8ffc] shrink-0" />
+            <span className="text-[12px] text-[#cdd9e5] max-w-[180px] truncate">{file.name}</span>
+            {file.size && (
+              <span className="text-[11px] text-[#484f58] shrink-0">{formatFileSize(file.size)}</span>
+            )}
+            {canEdit && (
+              <button
+                onClick={e => { e.stopPropagation(); onRemove(file.path) }}
+                className="opacity-0 group-hover:opacity-100 text-[#484f58] hover:text-[#f87171] transition-all shrink-0"
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
