@@ -199,6 +199,11 @@ Supabase Auth (이메일/패스워드) 기반. 개인용 앱이므로 계정은 
 supabase functions deploy notepad --project-ref enawzdqroidrhtjqhpka --no-verify-jwt
 ```
 
+> ⚠️ **배포 전 필수 체크**: Edge Function을 수정/배포할 때는 반드시 **로컬 파일이 현재 배포된 버전과 일치하는지** 확인할 것.
+> 로컬에 없는 핸들러(예: `?type=projects`, `getNotes`의 select 필드 등)가 배포 버전에만 존재할 수 있음.
+> 배포 전 `parking/supabase/functions/notepad/` 전체 파일을 검토하고, 기존 동작을 유지하는지 확인한 뒤 배포.
+> 배포 후 앱에서 노트 목록, 프로젝트 구분, 로그인이 정상 동작하는지 즉시 확인.
+
 ### DB 마이그레이션
 마이그레이션 파일은 `/Users/sangjun/IdeaProjects/parking/supabase/migrations/`에 관리.
 ```bash
