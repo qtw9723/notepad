@@ -21,7 +21,11 @@ export default function FileViewerModal({ file, onClose }) {
       : null
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#0d1117]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={e => e.target === e.currentTarget && onClose()}
+    >
+    <div className="flex flex-col bg-[#0d1117] border border-[#21262d] rounded-2xl shadow-2xl w-[900px] max-w-[92vw] h-[620px] max-h-[88vh] overflow-hidden">
       {/* 헤더 */}
       <div className="flex items-center gap-3 px-6 py-3 border-b border-[#21262d] bg-[#161b22] shrink-0">
         <span className="text-[13px] font-medium text-[#e6edf3] truncate flex-1">{file.name}</span>
@@ -65,6 +69,7 @@ export default function FileViewerModal({ file, onClose }) {
           </a>
         </div>
       )}
+    </div>
     </div>
   )
 }
