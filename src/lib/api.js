@@ -28,4 +28,13 @@ export const api = {
   createNote: (body) => request('', { method: 'POST', body: JSON.stringify(body) }),
   updateNote: (id, changes) => request(`?id=${id}`, { method: 'PATCH', body: JSON.stringify(changes) }),
   deleteNote: (id) => request(`?id=${id}`, { method: 'DELETE' }),
+  getVersions: (noteId) => request(`?action=versions&noteId=${noteId}`),
+  saveSnapshot: (noteId, note) => request('', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'snapshot', noteId, ...note }),
+  }),
+  restoreVersion: (noteId, versionId) => request('', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'restore', noteId, versionId }),
+  }),
 }
