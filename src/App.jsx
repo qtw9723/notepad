@@ -98,6 +98,7 @@ export default function App() {
               fetchNote={fetchNote}
               onUpdate={handleUpdate}
               isLoggedIn={isMaster || !!currentProject}
+              isMaster={isMaster}
               isMobile={isMobile}
               mobileView={mobileView}
               onMobileViewChange={setMobileView}

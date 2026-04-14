@@ -37,7 +37,7 @@ function makeLineComponents() {
 const MD_COMPONENTS = makeLineComponents()
 
 export default function Editor({
-  noteId, fetchNote, onUpdate, isLoggedIn = false,
+  noteId, fetchNote, onUpdate, isLoggedIn = false, isMaster = false,
   isMobile = false, mobileView = 'preview', onMobileViewChange,
 }) {
   const [note, setNote] = useState(null)
@@ -393,7 +393,7 @@ export default function Editor({
               {copied ? '복사됨' : '공유'}
             </button>
           )}
-          {canEdit && (
+          {isMaster && (
             <button
               onClick={() => setIsEditMode(true)}
               className="flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-md bg-[#9d8ffc]/10 text-[#9d8ffc] hover:bg-[#9d8ffc]/20 transition-colors"
@@ -470,7 +470,7 @@ export default function Editor({
 
         <div className="flex-1" />
 
-        {canEdit && isPreviewOnlyNote(noteId) && (
+        {isMaster && isPreviewOnlyNote(noteId) && (
           <button
             onClick={() => setIsEditMode(false)}
             className="flex items-center gap-1 text-[12px] px-2.5 py-1 rounded-md bg-[#9d8ffc]/10 text-[#9d8ffc] hover:bg-[#9d8ffc]/20 transition-colors"
