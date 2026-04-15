@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, Bell, BellOff } from 'lucide-react'
 import { useTodos } from '../hooks/useTodos'
 import { usePush } from '../hooks/usePush'
+import { useNotes } from '../hooks/useNotes'
 import { TodoSidebar } from '../components/todo/TodoSidebar'
 import { TodoBoard } from '../components/todo/TodoBoard'
 
@@ -14,6 +15,7 @@ export function TodoPage({ user }) {
     createItem, updateItem, deleteItem, reorderItems,
     getItemsByList,
   } = useTodos(user)
+  const { notes } = useNotes(user)
 
   const { supported, subscribed, loading: pushLoading, subscribe, unsubscribe } = usePush(user)
 
@@ -93,6 +95,7 @@ export function TodoPage({ user }) {
           <TodoBoard
             list={selectedList}
             items={items}
+            notes={notes}
             onCreateItem={createItem}
             onUpdateItem={updateItem}
             onDeleteItem={deleteItem}

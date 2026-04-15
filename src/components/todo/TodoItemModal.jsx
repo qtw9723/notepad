@@ -1,5 +1,18 @@
 import { useState } from 'react'
-import { X, Flag, Calendar, Clock, RefreshCw, Tag, AlignLeft, Play } from 'lucide-react'
+import { X, Flag, Calendar, Clock, RefreshCw, Tag, AlignLeft, Play, Timer } from 'lucide-react'
+import { NoteLinkPicker } from './NoteLinkPicker'
+
+function calcDuration(item, completedDate, completedTime) {
+  if (!item.scheduled_time || !item.start_date || !completedTime || !completedDate) return null
+  const start = new Date(`${item.start_date}T${item.scheduled_time}`)
+  const end = new Date(`${completedDate}T${completedTime}:00`)
+  const mins = Math.round((end - start) / 60000)
+  if (mins <= 0) return null
+  if (mins < 60) return `${mins}분`
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  return m > 0 ? `${h}시간 ${m}분` : `${h}시간`
+}
 
 const PRIORITY_OPTIONS = [
   { value: 1, label: '낮음', color: '#606070' },
@@ -38,7 +51,7 @@ function combineDateTime(dateStr, timeStr) {
   return new Date(`${dateStr}T${timeStr}:00`).toISOString()
 }
 
-export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
+export function TodoItemModal({ item, notes = [], onClose, onUpdate, onDelete }) {
   const [text, setText] = useState(item.text)
   const [priority, setPriority] = useState(item.priority ?? 1)
   const [date, setDate] = useState(item.start_date ?? todayStr())
@@ -47,6 +60,7 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
   const [recurrence, setRecurrence] = useState(item.recurrence ?? 'none')
   const [tags, setTags] = useState((item.tags ?? []).join(', '))
   const [memo, setMemo] = useState(item.memo ?? '')
+  const [noteId, setNoteId] = useState(item.note_id ?? null)
   // 완료 시간
   const [completedTime, setCompletedTime] = useState(
     item.done && item.completed_at ? toTimeInput(item.completed_at) : nowTimeStr()
@@ -56,6 +70,8 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
       ? new Date(item.completed_at).toISOString().split('T')[0]
       : todayStr()
   )
+
+  const duration = item.done ? calcDuration(item, completedDate, completedTime) : null
 
   const handleSave = () => {
     const tagArr = tags.split(',').map(t => t.trim()).filter(Boolean)
@@ -67,8 +83,8 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
       recurrence,
       tags: tagArr,
       memo: memo.trim() || null,
+      note_id: noteId || null,
     }
-    // 완료 항목이면 completed_at 반영
     if (item.done) {
       changes.completed_at = combineDateTime(completedDate, completedTime)
     }
@@ -198,6 +214,18 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
             </div>
           )}
 
+          {/* 수행 시간 (완료 항목) */}
+          {duration && (
+            <div
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-[12px]"
+              style={{ background: 'rgba(157,143,252,0.07)', border: '1px solid rgba(157,143,252,0.15)' }}
+            >
+              <Timer size={12} style={{ color: '#9d8ffc' }} />
+              <span style={{ color: '#8b949e' }}>수행 시간</span>
+              <span style={{ color: '#9d8ffc', fontWeight: 550 }}>{duration}</span>
+            </div>
+          )}
+
           {/* 주기 */}
           <div>
             <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
@@ -272,6 +300,13 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
               style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid #21262d', lineHeight: 1.7 }}
             />
           </div>
+
+          {/* 노트 연결 */}
+          <NoteLinkPicker
+            notes={notes}
+            selectedNoteId={noteId}
+            onChange={setNoteId}
+          />
         </div>
 
         {/* footer */}

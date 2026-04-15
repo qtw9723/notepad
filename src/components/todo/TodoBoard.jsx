@@ -52,7 +52,7 @@ function sortItems(items, sort) {
   return arr.sort((a, b) => a.order_index - b.order_index)
 }
 
-export function TodoBoard({ list, items, onCreateItem, onUpdateItem, onDeleteItem }) {
+export function TodoBoard({ list, items, notes = [], onCreateItem, onUpdateItem, onDeleteItem }) {
   const [sort, setSort] = useState('time')
   const [filter, setFilter] = useState('active')
   const [editingItem, setEditingItem] = useState(null)
@@ -251,6 +251,7 @@ export function TodoBoard({ list, items, onCreateItem, onUpdateItem, onDeleteIte
             <TodoItem
               key={item.id}
               item={item}
+              notes={notes}
               onUpdate={onUpdateItem}
               onDelete={onDeleteItem}
               onClick={setEditingItem}
@@ -262,6 +263,7 @@ export function TodoBoard({ list, items, onCreateItem, onUpdateItem, onDeleteIte
       {editingItem && (
         <TodoItemModal
           item={editingItem}
+          notes={notes}
           onClose={() => setEditingItem(null)}
           onUpdate={onUpdateItem}
           onDelete={onDeleteItem}
@@ -270,6 +272,7 @@ export function TodoBoard({ list, items, onCreateItem, onUpdateItem, onDeleteIte
 
       {showAddModal && list && (
         <TodoAddModal
+          notes={notes}
           onClose={() => setShowAddModal(false)}
           onSubmit={handleAdd}
         />

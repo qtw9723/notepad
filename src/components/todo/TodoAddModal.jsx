@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { X, Calendar, Clock, RefreshCw, AlignLeft, Flag, Play } from 'lucide-react'
+import { NoteLinkPicker } from './NoteLinkPicker'
 
 const RECURRENCE_OPTIONS = [
   { value: 'none',     label: '없음' },
@@ -25,7 +26,7 @@ function nowTimeStr() {
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
 }
 
-export function TodoAddModal({ onClose, onSubmit }) {
+export function TodoAddModal({ notes = [], onClose, onSubmit }) {
   const [text, setText] = useState('')
   const [isAllDay, setIsAllDay] = useState(true)
   const [date, setDate] = useState(todayStr())
@@ -33,6 +34,7 @@ export function TodoAddModal({ onClose, onSubmit }) {
   const [recurrence, setRecurrence] = useState('none')
   const [priority, setPriority] = useState(1)
   const [memo, setMemo] = useState('')
+  const [noteId, setNoteId] = useState(null)
 
   const handleSubmit = () => {
     if (!text.trim()) return
@@ -43,6 +45,7 @@ export function TodoAddModal({ onClose, onSubmit }) {
       scheduled_time: (!isAllDay && startTime) ? startTime : null,
       recurrence,
       memo: memo.trim() || null,
+      note_id: noteId || null,
     })
     onClose()
   }
@@ -210,6 +213,13 @@ export function TodoAddModal({ onClose, onSubmit }) {
               style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid #21262d', lineHeight: 1.7 }}
             />
           </div>
+
+          {/* 노트 연결 */}
+          <NoteLinkPicker
+            notes={notes}
+            selectedNoteId={noteId}
+            onChange={setNoteId}
+          />
         </div>
 
         {/* footer */}

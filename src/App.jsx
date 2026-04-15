@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import Editor from './components/Editor'
 import LoginPage from './components/LoginPage'
@@ -12,6 +13,16 @@ export default function App() {
   const { projects } = useProjects()
   const { notes, loading, fetchNote, createNote, updateNote, deleteNote } = useNotes(user)
   const [selectedId, setSelectedId] = useState(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Todo에서 노트 링크 클릭 시 해당 노트 자동 선택
+  useEffect(() => {
+    const noteParam = searchParams.get('note')
+    if (noteParam) {
+      setSelectedId(noteParam)
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
   const [showLoginModal, setShowLoginModal] = useState(false)
   const isMobile = useMobile()
   const [mobileView, setMobileView] = useState('list') // 'list' | 'preview' | 'edit'
