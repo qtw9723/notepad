@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X, Flag, Calendar, Clock, RefreshCw, Tag, AlignLeft, Play, Timer } from 'lucide-react'
 import { NoteLinkPicker } from './NoteLinkPicker'
+import { NotePreviewPanel } from './NotePreviewPanel'
 
 function calcDuration(item, completedDate, completedTime) {
   if (!item.scheduled_time || !item.start_date || !completedTime || !completedDate) return null
@@ -51,7 +52,7 @@ function combineDateTime(dateStr, timeStr) {
   return new Date(`${dateStr}T${timeStr}:00`).toISOString()
 }
 
-export function TodoItemModal({ item, notes = [], onClose, onUpdate, onDelete }) {
+export function TodoItemModal({ item, notes = [], fetchNote, onClose, onUpdate, onDelete }) {
   const [text, setText] = useState(item.text)
   const [priority, setPriority] = useState(item.priority ?? 1)
   const [date, setDate] = useState(item.start_date ?? todayStr())
@@ -60,6 +61,7 @@ export function TodoItemModal({ item, notes = [], onClose, onUpdate, onDelete })
   const [recurrence, setRecurrence] = useState(item.recurrence ?? 'none')
   const [tags, setTags] = useState((item.tags ?? []).join(', '))
   const [memo, setMemo] = useState(item.memo ?? '')
+  const [previewNote, setPreviewNote] = useState(null)
   const [noteIds, setNoteIds] = useState(() => {
     if (item.note_ids?.length) return item.note_ids
     if (item.note_id) return [item.note_id]
@@ -310,6 +312,7 @@ export function TodoItemModal({ item, notes = [], onClose, onUpdate, onDelete })
             notes={notes}
             selectedNoteIds={noteIds}
             onChange={setNoteIds}
+            onPreview={fetchNote ? (note) => setPreviewNote(note) : undefined}
           />
         </div>
 
@@ -340,6 +343,14 @@ export function TodoItemModal({ item, notes = [], onClose, onUpdate, onDelete })
           </div>
         </div>
       </div>
+
+      {previewNote && fetchNote && (
+        <NotePreviewPanel
+          note={previewNote}
+          fetchNote={fetchNote}
+          onClose={() => setPreviewNote(null)}
+        />
+      )}
     </div>
   )
 }

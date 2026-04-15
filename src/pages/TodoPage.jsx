@@ -15,7 +15,7 @@ export function TodoPage({ user }) {
     createItem, updateItem, deleteItem, reorderItems,
     getItemsByList,
   } = useTodos(user)
-  const { notes } = useNotes(user)
+  const { notes, fetchNote } = useNotes(user)
 
   const { supported, subscribed, loading: pushLoading, subscribe, unsubscribe } = usePush(user)
 
@@ -96,6 +96,7 @@ export function TodoPage({ user }) {
             list={selectedList}
             items={items}
             notes={notes}
+            fetchNote={fetchNote}
             onCreateItem={createItem}
             onUpdateItem={updateItem}
             onDeleteItem={deleteItem}

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
-import { FileText, Search, X, Plus, Link } from 'lucide-react'
+import { FileText, Search, X, Plus, Link, Eye } from 'lucide-react'
 
-export function NoteLinkPicker({ notes, selectedNoteIds = [], onChange }) {
+export function NoteLinkPicker({ notes, selectedNoteIds = [], onChange, onPreview }) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
 
@@ -47,6 +47,16 @@ export function NoteLinkPicker({ notes, selectedNoteIds = [], onChange }) {
               <span className="flex-1 truncate text-[13px]" style={{ color: '#79c0ff' }}>
                 {note.title || '제목 없음'}
               </span>
+              {onPreview && (
+                <button
+                  onClick={() => onPreview(note)}
+                  className="p-0.5 rounded transition-colors hover:opacity-80"
+                  style={{ color: '#484f58' }}
+                  title="미리보기"
+                >
+                  <Eye size={13} />
+                </button>
+              )}
               <button onClick={() => handleRemove(note.id)} style={{ color: '#484f58' }}>
                 <X size={13} />
               </button>

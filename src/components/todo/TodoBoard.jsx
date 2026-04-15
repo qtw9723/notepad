@@ -53,7 +53,7 @@ function sortItems(items, sort) {
   return arr.sort((a, b) => a.order_index - b.order_index)
 }
 
-export function TodoBoard({ list, items, notes = [], onCreateItem, onUpdateItem, onDeleteItem }) {
+export function TodoBoard({ list, items, notes = [], fetchNote, onCreateItem, onUpdateItem, onDeleteItem }) {
   const [sort, setSort] = useState('time')
   const [filter, setFilter] = useState('active')
   const [editingItem, setEditingItem] = useState(null)
@@ -266,6 +266,7 @@ export function TodoBoard({ list, items, notes = [], onCreateItem, onUpdateItem,
         <TodoItemModal
           item={editingItem}
           notes={notes}
+          fetchNote={fetchNote}
           onClose={() => setEditingItem(null)}
           onUpdate={onUpdateItem}
           onDelete={onDeleteItem}
@@ -283,6 +284,7 @@ export function TodoBoard({ list, items, notes = [], onCreateItem, onUpdateItem,
       {previewNote && (
         <NotePreviewPanel
           note={previewNote}
+          fetchNote={fetchNote}
           onClose={() => setPreviewNote(null)}
         />
       )}

@@ -1,21 +1,36 @@
-import { useEffect } from 'react'
-import { X, ExternalLink } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { X, ExternalLink, Loader } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-export function NotePreviewPanel({ note, onClose }) {
+export function NotePreviewPanel({ note, fetchNote, onClose }) {
   const navigate = useNavigate()
+  const [fullNote, setFullNote] = useState(note.content ? note : null)
+  const [loading, setLoading] = useState(!note.content)
 
-  // ESC 키로 닫기
+  useEffect(() => {
+    if (note.content) {
+      setFullNote(note)
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    fetchNote(note.id)
+      .then(data => { if (data) setFullNote(data) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [note.id])
+
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [onClose])
 
-  const isMarkdown = note.content_type === 'markdown'
-  const isHtml = note.content_type === 'html'
+  const displayNote = fullNote ?? note
+  const isMarkdown = displayNote.content_type === 'markdown'
+  const isHtml = displayNote.content_type === 'html'
 
   return (
     <>
@@ -34,7 +49,7 @@ export function NotePreviewPanel({ note, onClose }) {
           background: '#0d1117',
           borderLeft: '1px solid #21262d',
           boxShadow: '-8px 0 32px rgba(0,0,0,0.4)',
-          animation: 'slideInRight 0.2s ease',
+          animation: 'slideInRight 0.18s ease',
         }}
       >
         {/* header */}
@@ -46,12 +61,12 @@ export function NotePreviewPanel({ note, onClose }) {
             className="flex-1 pr-3 text-[16px] font-semibold leading-snug"
             style={{ color: '#e6edf3', letterSpacing: '-0.01em' }}
           >
-            {note.title || '제목 없음'}
+            {displayNote.title || '제목 없음'}
           </h2>
           <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
             <button
               onClick={() => { onClose(); navigate(`/?note=${note.id}`) }}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] transition-colors hover:opacity-80"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] transition-colors hover:bg-white/5"
               style={{ color: '#8b949e', background: '#161b22' }}
               title="노트패드에서 열기"
             >
@@ -70,26 +85,31 @@ export function NotePreviewPanel({ note, onClose }) {
 
         {/* body */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
-          {!note.content ? (
+          {loading ? (
+            <div className="flex items-center justify-center h-32 gap-2" style={{ color: '#484f58' }}>
+              <Loader size={16} className="animate-spin" />
+              <span className="text-[13px]">불러오는 중...</span>
+            </div>
+          ) : !displayNote.content ? (
             <p style={{ color: '#484f58' }} className="text-[13px]">내용 없음</p>
           ) : isMarkdown ? (
             <div className="markdown-body" style={{ fontSize: '14px' }}>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {note.content}
+                {displayNote.content}
               </ReactMarkdown>
             </div>
           ) : isHtml ? (
             <div
               className="markdown-body"
               style={{ fontSize: '14px' }}
-              dangerouslySetInnerHTML={{ __html: note.content }}
+              dangerouslySetInnerHTML={{ __html: displayNote.content }}
             />
           ) : (
             <pre
               className="whitespace-pre-wrap text-[13px] leading-relaxed"
               style={{ color: '#cdd9e5', fontFamily: 'inherit' }}
             >
-              {note.content}
+              {displayNote.content}
             </pre>
           )}
         </div>
