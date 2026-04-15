@@ -9,6 +9,11 @@ export function useTodos(user) {
 
   const load = useCallback(async () => {
     if (!user) { setLoading(false); return }
+    if (!import.meta.env.VITE_TODOS_URL) {
+      setError('VITE_TODOS_URL 환경변수가 설정되지 않았습니다')
+      setLoading(false)
+      return
+    }
     try {
       setLoading(true)
       const [listsData, itemsData] = await Promise.all([
