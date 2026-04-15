@@ -124,6 +124,10 @@ export function useTodos(user) {
       .sort((a, b) => a.order_index - b.order_index)
   }, [items])
 
+  const getAllVisibleItems = useCallback(() => {
+    return items.filter(isRecurringVisible)
+  }, [items])
+
   return {
     lists,
     items,
@@ -138,5 +142,6 @@ export function useTodos(user) {
     deleteItem,
     reorderItems,
     getItemsByList,
+    getAllVisibleItems,
   }
 }

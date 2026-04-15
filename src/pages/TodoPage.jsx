@@ -1,19 +1,21 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Bell, BellOff } from 'lucide-react'
+import { ArrowLeft, Bell, BellOff, LayoutList, CalendarDays } from 'lucide-react'
 import { useTodos } from '../hooks/useTodos'
 import { usePush } from '../hooks/usePush'
 import { useNotes } from '../hooks/useNotes'
 import { TodoSidebar } from '../components/todo/TodoSidebar'
 import { TodoBoard } from '../components/todo/TodoBoard'
+import { TodoCalendar } from '../components/todo/TodoCalendar'
 
 export function TodoPage({ user }) {
   const [selectedListId, setSelectedListId] = useState(null)
+  const [view, setView] = useState('list') // 'list' | 'calendar'
   const {
     lists, loading, error,
     createList, updateList, deleteList,
     createItem, updateItem, deleteItem, reorderItems,
-    getItemsByList,
+    getItemsByList, getAllVisibleItems,
   } = useTodos(user)
   const { notes, fetchNote } = useNotes(user)
 
@@ -53,6 +55,26 @@ export function TodoPage({ user }) {
           <span className="text-[13px] font-medium" style={{ color: '#cdd9e5' }}>Todo</span>
         </div>
 
+        {/* view toggle */}
+        <div className="flex items-center gap-1 p-0.5 rounded-lg" style={{ background: '#161b22', border: '1px solid #21262d' }}>
+          <button
+            onClick={() => setView('list')}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] transition-colors"
+            style={{ background: view === 'list' ? '#21262d' : 'transparent', color: view === 'list' ? '#cdd9e5' : '#606070' }}
+          >
+            <LayoutList size={13} />
+            목록
+          </button>
+          <button
+            onClick={() => setView('calendar')}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] transition-colors"
+            style={{ background: view === 'calendar' ? '#21262d' : 'transparent', color: view === 'calendar' ? '#cdd9e5' : '#606070' }}
+          >
+            <CalendarDays size={13} />
+            달력
+          </button>
+        </div>
+
         {/* push toggle */}
         {supported && (
           <button
@@ -84,23 +106,37 @@ export function TodoPage({ user }) {
         </div>
       ) : (
         <div className="flex flex-1 min-h-0">
-          <TodoSidebar
-            lists={lists}
-            selectedListId={selectedListId}
-            onSelectList={setSelectedListId}
-            onCreateList={createList}
-            onDeleteList={deleteList}
-            user={user}
-          />
-          <TodoBoard
-            list={selectedList}
-            items={items}
-            notes={notes}
-            fetchNote={fetchNote}
-            onCreateItem={createItem}
-            onUpdateItem={updateItem}
-            onDeleteItem={deleteItem}
-          />
+          {view === 'list' && (
+            <>
+              <TodoSidebar
+                lists={lists}
+                selectedListId={selectedListId}
+                onSelectList={setSelectedListId}
+                onCreateList={createList}
+                onDeleteList={deleteList}
+                user={user}
+              />
+              <TodoBoard
+                list={selectedList}
+                items={items}
+                notes={notes}
+                fetchNote={fetchNote}
+                onCreateItem={createItem}
+                onUpdateItem={updateItem}
+                onDeleteItem={deleteItem}
+              />
+            </>
+          )}
+          {view === 'calendar' && (
+            <TodoCalendar
+              lists={lists}
+              allItems={getAllVisibleItems()}
+              notes={notes}
+              fetchNote={fetchNote}
+              onUpdateItem={updateItem}
+              onDeleteItem={deleteItem}
+            />
+          )}
         </div>
       )}
     </div>
