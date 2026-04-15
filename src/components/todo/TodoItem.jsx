@@ -1,24 +1,33 @@
 import { useState } from 'react'
-import { Trash2, Calendar, Flag, ChevronRight } from 'lucide-react'
+import { Trash2, Calendar, Flag, Clock, RefreshCw, ChevronRight } from 'lucide-react'
 
 const PRIORITY_COLOR = { 1: '#606070', 2: '#e3b341', 3: '#f78166' }
 const PRIORITY_LABEL = { 1: '낮음', 2: '보통', 3: '높음' }
+const RECURRENCE_LABEL = { daily: '매일', weekdays: '주중', weekly: '매주', monthly: '매달' }
 
 function formatDate(dateStr) {
   if (!dateStr) return null
-  const d = new Date(dateStr)
+  const d = new Date(dateStr + 'T00:00:00')
   const now = new Date()
+  now.setHours(0, 0, 0, 0)
   const diff = Math.floor((d - now) / 86400000)
   const mm = String(d.getMonth() + 1).padStart(2, '0')
   const dd = String(d.getDate()).padStart(2, '0')
-  return { label: `${mm}/${dd}`, overdue: diff < 0 }
+  return { label: `${mm}/${dd}`, overdue: diff < 0, today: diff === 0 }
+}
+
+function formatTime(timeStr) {
+  if (!timeStr) return null
+  return timeStr.slice(0, 5) // HH:MM
 }
 
 export function TodoItem({ item, onUpdate, onDelete, onClick }) {
   const [hovering, setHovering] = useState(false)
 
   const due = formatDate(item.due_date)
+  const time = formatTime(item.scheduled_time)
   const priorityColor = PRIORITY_COLOR[item.priority ?? 1]
+  const recurrenceLabel = RECURRENCE_LABEL[item.recurrence]
 
   return (
     <div
@@ -26,7 +35,7 @@ export function TodoItem({ item, onUpdate, onDelete, onClick }) {
       style={{
         background: hovering ? 'rgba(255,255,255,0.02)' : 'transparent',
         borderBottom: '1px solid rgba(33,38,45,0.5)',
-        opacity: item.done ? 0.5 : 1,
+        opacity: item.done ? 0.45 : 1,
       }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
@@ -60,7 +69,16 @@ export function TodoItem({ item, onUpdate, onDelete, onClick }) {
         >
           {item.text}
         </p>
-        <div className="flex items-center gap-3 mt-1">
+
+        {/* meta row */}
+        <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mt-1">
+          {/* time */}
+          {time && (
+            <span className="flex items-center gap-0.5 text-[11px]" style={{ color: '#9d8ffc' }}>
+              <Clock size={10} />
+              {time}
+            </span>
+          )}
           {/* priority */}
           {item.priority > 1 && (
             <span className="flex items-center gap-0.5 text-[11px]" style={{ color: priorityColor }}>
@@ -72,11 +90,18 @@ export function TodoItem({ item, onUpdate, onDelete, onClick }) {
           {due && (
             <span
               className="flex items-center gap-0.5 text-[11px]"
-              style={{ color: due.overdue ? 'rgb(248,113,113)' : '#8b949e' }}
+              style={{ color: due.overdue ? 'rgb(248,113,113)' : due.today ? '#56d364' : '#8b949e' }}
             >
               <Calendar size={10} />
-              {due.label}
+              {due.today ? '오늘' : due.label}
               {due.overdue && ' 지남'}
+            </span>
+          )}
+          {/* recurrence */}
+          {recurrenceLabel && (
+            <span className="flex items-center gap-0.5 text-[11px]" style={{ color: '#58a6ff' }}>
+              <RefreshCw size={9} />
+              {recurrenceLabel}
             </span>
           )}
           {/* tags */}
@@ -90,6 +115,11 @@ export function TodoItem({ item, onUpdate, onDelete, onClick }) {
             </span>
           ))}
         </div>
+
+        {/* memo preview */}
+        {item.memo && !item.done && (
+          <p className="mt-1 text-[12px] truncate" style={{ color: '#484f58' }}>{item.memo}</p>
+        )}
       </div>
 
       {/* actions */}
