@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
-import { Plus, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, Lock, ChevronUp, Check } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Plus, Tag, FileText, Trash2, X, LogOut, PanelLeftClose, PanelLeftOpen, Lock, ChevronUp, Check, ListTodo } from 'lucide-react'
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core'
@@ -417,11 +418,21 @@ export default function Sidebar({
           {!isMobile && <div className="sidebar-resize-handle" onMouseDown={startResize} />}
           <div className="sidebar-header">
             <span className="sidebar-header-title">메모</span>
-            {!isMobile && (
-              <button onClick={toggleSidebar} className="sidebar-toggle-btn" title="사이드바 닫기">
-                <PanelLeftClose size={15} />
-              </button>
-            )}
+            <div className="flex items-center gap-1">
+              <Link
+                to="/todos"
+                className="sidebar-toggle-btn"
+                title="Todo"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <ListTodo size={15} />
+              </Link>
+              {!isMobile && (
+                <button onClick={toggleSidebar} className="sidebar-toggle-btn" title="사이드바 닫기">
+                  <PanelLeftClose size={15} />
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="sidebar-search">
