@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useMemo } from 'react'
 import { Trash2, Calendar, Flag, Clock, RefreshCw, Play, FileText, ChevronRight, Timer } from 'lucide-react'
 import { TodoCompleteModal } from './TodoCompleteModal'
 
@@ -46,17 +45,23 @@ function nowTimeStr() {
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
 }
 
-export function TodoItem({ item, notes = [], onUpdate, onDelete, onClick }) {
+export function TodoItem({ item, notes = [], onUpdate, onDelete, onClick, onNoteClick }) {
   const [hovering, setHovering] = useState(false)
   const [showCompleteModal, setShowCompleteModal] = useState(false)
-  const navigate = useNavigate()
 
   const date = formatDate(item.start_date)
   const time = formatTime(item.scheduled_time)
   const completedTime = item.done ? formatCompletedAt(item.completed_at) : null
   const duration = item.done ? calcDuration(item) : null
   const recurrenceLabel = RECURRENCE_LABEL[item.recurrence]
-  const linkedNote = item.note_id ? notes.find(n => n.id === item.note_id) : null
+
+  // note_ids (다중) 우선, 없으면 note_id (레거시) 폴백
+  const noteIds = useMemo(() => {
+    if (item.note_ids?.length) return item.note_ids
+    if (item.note_id) return [item.note_id]
+    return []
+  }, [item.note_ids, item.note_id])
+  const linkedNotes = useMemo(() => noteIds.map(id => notes.find(n => n.id === id)).filter(Boolean), [noteIds, notes])
 
   const handleCheckClick = (e) => {
     e.stopPropagation()
@@ -77,11 +82,6 @@ export function TodoItem({ item, notes = [], onUpdate, onDelete, onClick }) {
   const handleStartNow = (e) => {
     e.stopPropagation()
     onUpdate(item.id, { scheduled_time: nowTimeStr() })
-  }
-
-  const handleNoteClick = (e) => {
-    e.stopPropagation()
-    navigate(`/?note=${item.note_id}`)
   }
 
   return (
@@ -187,16 +187,21 @@ export function TodoItem({ item, notes = [], onUpdate, onDelete, onClick }) {
             <p className="mt-1 text-[12px] line-clamp-1" style={{ color: '#484f58' }}>{item.memo}</p>
           )}
 
-          {/* linked note */}
-          {linkedNote && (
-            <button
-              onClick={handleNoteClick}
-              className="mt-1.5 flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-md transition-colors hover:opacity-80"
-              style={{ background: 'rgba(88,166,255,0.07)', color: '#58a6ff', border: '1px solid rgba(88,166,255,0.15)' }}
-            >
-              <FileText size={10} />
-              <span className="truncate max-w-[160px]">{linkedNote.title || '제목 없음'}</span>
-            </button>
+          {/* linked notes */}
+          {linkedNotes.length > 0 && (
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {linkedNotes.map(note => (
+                <button
+                  key={note.id}
+                  onClick={e => { e.stopPropagation(); onNoteClick?.(note) }}
+                  className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md transition-colors hover:opacity-80"
+                  style={{ background: 'rgba(88,166,255,0.07)', color: '#58a6ff', border: '1px solid rgba(88,166,255,0.15)' }}
+                >
+                  <FileText size={10} />
+                  <span className="truncate max-w-[140px]">{note.title || '제목 없음'}</span>
+                </button>
+              ))}
+            </div>
           )}
         </div>
 

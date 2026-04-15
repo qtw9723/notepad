@@ -60,7 +60,11 @@ export function TodoItemModal({ item, notes = [], onClose, onUpdate, onDelete })
   const [recurrence, setRecurrence] = useState(item.recurrence ?? 'none')
   const [tags, setTags] = useState((item.tags ?? []).join(', '))
   const [memo, setMemo] = useState(item.memo ?? '')
-  const [noteId, setNoteId] = useState(item.note_id ?? null)
+  const [noteIds, setNoteIds] = useState(() => {
+    if (item.note_ids?.length) return item.note_ids
+    if (item.note_id) return [item.note_id]
+    return []
+  })
   // 완료 시간
   const [completedTime, setCompletedTime] = useState(
     item.done && item.completed_at ? toTimeInput(item.completed_at) : nowTimeStr()
@@ -83,7 +87,7 @@ export function TodoItemModal({ item, notes = [], onClose, onUpdate, onDelete })
       recurrence,
       tags: tagArr,
       memo: memo.trim() || null,
-      note_id: noteId || null,
+      note_ids: noteIds,
     }
     if (item.done) {
       changes.completed_at = combineDateTime(completedDate, completedTime)
@@ -304,8 +308,8 @@ export function TodoItemModal({ item, notes = [], onClose, onUpdate, onDelete })
           {/* 노트 연결 */}
           <NoteLinkPicker
             notes={notes}
-            selectedNoteId={noteId}
-            onChange={setNoteId}
+            selectedNoteIds={noteIds}
+            onChange={setNoteIds}
           />
         </div>
 

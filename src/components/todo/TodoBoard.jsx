@@ -3,6 +3,7 @@ import { Plus, Filter, SortAsc, Sun } from 'lucide-react'
 import { TodoItem } from './TodoItem'
 import { TodoItemModal } from './TodoItemModal'
 import { TodoAddModal } from './TodoAddModal'
+import { NotePreviewPanel } from './NotePreviewPanel'
 
 const SORT_OPTIONS = [
   { value: 'order',    label: '기본' },
@@ -59,9 +60,9 @@ export function TodoBoard({ list, items, notes = [], onCreateItem, onUpdateItem,
   const [showAddModal, setShowAddModal] = useState(false)
   const [showSortMenu, setShowSortMenu] = useState(false)
   const [showFilterMenu, setShowFilterMenu] = useState(false)
-  // 당일 빠른 추가
   const [quickText, setQuickText] = useState('')
   const [showQuick, setShowQuick] = useState(false)
+  const [previewNote, setPreviewNote] = useState(null)
 
   const handleAdd = async (data) => {
     if (!list) return
@@ -255,6 +256,7 @@ export function TodoBoard({ list, items, notes = [], onCreateItem, onUpdateItem,
               onUpdate={onUpdateItem}
               onDelete={onDeleteItem}
               onClick={setEditingItem}
+              onNoteClick={setPreviewNote}
             />
           ))
         )}
@@ -275,6 +277,13 @@ export function TodoBoard({ list, items, notes = [], onCreateItem, onUpdateItem,
           notes={notes}
           onClose={() => setShowAddModal(false)}
           onSubmit={handleAdd}
+        />
+      )}
+
+      {previewNote && (
+        <NotePreviewPanel
+          note={previewNote}
+          onClose={() => setPreviewNote(null)}
         />
       )}
     </div>

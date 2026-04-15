@@ -34,7 +34,7 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
   const [recurrence, setRecurrence] = useState('none')
   const [priority, setPriority] = useState(1)
   const [memo, setMemo] = useState('')
-  const [noteId, setNoteId] = useState(null)
+  const [noteIds, setNoteIds] = useState([])
 
   const handleSubmit = () => {
     if (!text.trim()) return
@@ -45,7 +45,7 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
       scheduled_time: (!isAllDay && startTime) ? startTime : null,
       recurrence,
       memo: memo.trim() || null,
-      note_id: noteId || null,
+      note_ids: noteIds,
     })
     onClose()
   }
@@ -217,8 +217,8 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
           {/* 노트 연결 */}
           <NoteLinkPicker
             notes={notes}
-            selectedNoteId={noteId}
-            onChange={setNoteId}
+            selectedNoteIds={noteIds}
+            onChange={setNoteIds}
           />
         </div>
 
