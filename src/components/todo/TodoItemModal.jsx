@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Flag, Calendar, Clock, RefreshCw, Tag, AlignLeft } from 'lucide-react'
+import { X, Flag, Calendar, Clock, RefreshCw, Tag, AlignLeft, Play } from 'lucide-react'
 
 const PRIORITY_OPTIONS = [
   { value: 1, label: '낮음', color: '#606070' },
@@ -15,28 +15,64 @@ const RECURRENCE_OPTIONS = [
   { value: 'monthly',  label: '매달' },
 ]
 
+function nowTimeStr() {
+  const d = new Date()
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+}
+
+function todayStr() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+}
+
+// ISO → HH:MM
+function toTimeInput(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+}
+
+// date str + HH:MM → ISO string
+function combineDateTime(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return null
+  return new Date(`${dateStr}T${timeStr}:00`).toISOString()
+}
+
 export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
   const [text, setText] = useState(item.text)
   const [priority, setPriority] = useState(item.priority ?? 1)
-  const [startDate, setStartDate] = useState(item.start_date ?? '')
-  const [dueDate, setDueDate] = useState(item.due_date ? item.due_date.split('T')[0] : '')
-  const [scheduledTime, setScheduledTime] = useState(item.scheduled_time ? item.scheduled_time.slice(0,5) : '')
+  const [date, setDate] = useState(item.start_date ?? todayStr())
+  const [isAllDay, setIsAllDay] = useState(!item.scheduled_time)
+  const [startTime, setStartTime] = useState(item.scheduled_time ? item.scheduled_time.slice(0,5) : '')
   const [recurrence, setRecurrence] = useState(item.recurrence ?? 'none')
   const [tags, setTags] = useState((item.tags ?? []).join(', '))
   const [memo, setMemo] = useState(item.memo ?? '')
+  // 완료 시간
+  const [completedTime, setCompletedTime] = useState(
+    item.done && item.completed_at ? toTimeInput(item.completed_at) : nowTimeStr()
+  )
+  const [completedDate, setCompletedDate] = useState(
+    item.done && item.completed_at
+      ? new Date(item.completed_at).toISOString().split('T')[0]
+      : todayStr()
+  )
 
   const handleSave = () => {
     const tagArr = tags.split(',').map(t => t.trim()).filter(Boolean)
-    onUpdate(item.id, {
+    const changes = {
       text: text.trim() || item.text,
       priority,
-      start_date: startDate || null,
-      due_date: dueDate || null,
-      scheduled_time: scheduledTime || null,
+      start_date: date || null,
+      scheduled_time: (!isAllDay && startTime) ? startTime : null,
       recurrence,
       tags: tagArr,
       memo: memo.trim() || null,
-    })
+    }
+    // 완료 항목이면 completed_at 반영
+    if (item.done) {
+      changes.completed_at = combineDateTime(completedDate, completedTime)
+    }
+    onUpdate(item.id, changes)
     onClose()
   }
 
@@ -44,11 +80,11 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
     <div
       className="fixed inset-0 flex items-center justify-center z-50"
       style={{ background: 'rgba(0,0,0,0.6)' }}
-      onClick={e => { if (e.target === e.currentTarget) { handleSave() } }}
+      onClick={e => { if (e.target === e.currentTarget) handleSave() }}
     >
       <div
         className="w-full max-w-md rounded-2xl flex flex-col"
-        style={{ background: '#0d1117', border: '1px solid #21262d', maxHeight: '85vh' }}
+        style={{ background: '#0d1117', border: '1px solid #21262d', maxHeight: '90vh' }}
       >
         {/* header */}
         <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #21262d' }}>
@@ -57,6 +93,7 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+
           {/* text */}
           <textarea
             value={text}
@@ -66,66 +103,125 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
             style={{ background: '#161b22', color: '#e6edf3', border: '1px solid #21262d', lineHeight: 1.6 }}
           />
 
-          {/* dates */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
-                <Calendar size={11} /> 시작일
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                className="w-full px-2.5 py-2 rounded-lg text-[12px] outline-none"
-                style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid #21262d', colorScheme: 'dark' }}
-              />
+          {/* 날짜 + 하루종일 */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
+                  <Calendar size={11} /> 날짜
+                </label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={e => setDate(e.target.value)}
+                  className="w-full px-2.5 py-2 rounded-lg text-[12px] outline-none"
+                  style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid #21262d', colorScheme: 'dark' }}
+                />
+              </div>
+              <div className="flex flex-col items-center gap-1 pt-5">
+                <button
+                  onClick={() => setIsAllDay(v => !v)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
+                  style={{
+                    background: isAllDay ? 'rgba(157,143,252,0.1)' : '#161b22',
+                    border: `1px solid ${isAllDay ? 'rgba(157,143,252,0.35)' : '#21262d'}`,
+                  }}
+                >
+                  <div
+                    className="w-3.5 h-3.5 rounded flex items-center justify-center"
+                    style={{
+                      background: isAllDay ? '#7c6af5' : 'transparent',
+                      border: `2px solid ${isAllDay ? '#7c6af5' : '#484f58'}`,
+                    }}
+                  >
+                    {isAllDay && (
+                      <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                        <path d="M1 3L2.8 5L7 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="text-[12px]" style={{ color: isAllDay ? '#9d8ffc' : '#8b949e' }}>하루종일</span>
+                </button>
+              </div>
             </div>
+
+            {/* 시작 시간 */}
+            {!isAllDay && (
+              <div>
+                <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
+                  <Clock size={11} /> 시작 시간
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="time"
+                    value={startTime}
+                    onChange={e => setStartTime(e.target.value)}
+                    className="flex-1 px-2.5 py-2 rounded-lg text-[12px] outline-none"
+                    style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid #21262d', colorScheme: 'dark' }}
+                  />
+                  <button
+                    onClick={() => setStartTime(nowTimeStr())}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px]"
+                    style={{ background: 'rgba(86,211,100,0.1)', color: '#56d364', border: '1px solid rgba(86,211,100,0.2)' }}
+                    title="현재 시간으로"
+                  >
+                    <Play size={11} />
+                    지금
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 완료 시간 (done 항목만) */}
+          {item.done && (
             <div>
-              <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
-                <Calendar size={11} /> 마감일
+              <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#56d364' }}>
+                <Clock size={11} /> 완료 시간
               </label>
-              <input
-                type="date"
-                value={dueDate}
-                onChange={e => setDueDate(e.target.value)}
-                className="w-full px-2.5 py-2 rounded-lg text-[12px] outline-none"
-                style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid #21262d', colorScheme: 'dark' }}
-              />
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  value={completedDate}
+                  onChange={e => setCompletedDate(e.target.value)}
+                  className="px-2.5 py-2 rounded-lg text-[12px] outline-none"
+                  style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid rgba(86,211,100,0.2)', colorScheme: 'dark' }}
+                />
+                <input
+                  type="time"
+                  value={completedTime}
+                  onChange={e => setCompletedTime(e.target.value)}
+                  className="flex-1 px-2.5 py-2 rounded-lg text-[12px] outline-none"
+                  style={{ background: '#161b22', color: '#56d364', border: '1px solid rgba(86,211,100,0.2)', colorScheme: 'dark' }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* 주기 */}
+          <div>
+            <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
+              <RefreshCw size={11} /> 주기
+            </label>
+            <div className="flex gap-1.5">
+              {RECURRENCE_OPTIONS.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setRecurrence(opt.value)}
+                  className="flex-1 py-1.5 rounded-lg text-[12px] transition-colors"
+                  style={{
+                    background: recurrence === opt.value ? 'rgba(88,166,255,0.12)' : '#161b22',
+                    border: `1px solid ${recurrence === opt.value ? '#58a6ff' : '#21262d'}`,
+                    color: recurrence === opt.value ? '#58a6ff' : '#606070',
+                  }}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* time + recurrence */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
-                <Clock size={11} /> 시간
-              </label>
-              <input
-                type="time"
-                value={scheduledTime}
-                onChange={e => setScheduledTime(e.target.value)}
-                className="w-full px-2.5 py-2 rounded-lg text-[12px] outline-none"
-                style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid #21262d', colorScheme: 'dark' }}
-              />
-            </div>
-            <div>
-              <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
-                <RefreshCw size={11} /> 주기
-              </label>
-              <select
-                value={recurrence}
-                onChange={e => setRecurrence(e.target.value)}
-                className="w-full px-2.5 py-2 rounded-lg text-[12px] outline-none"
-                style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid #21262d', colorScheme: 'dark' }}
-              >
-                {RECURRENCE_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* priority */}
+          {/* 우선순위 */}
           <div>
             <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
               <Flag size={11} /> 우선순위
@@ -148,7 +244,7 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
             </div>
           </div>
 
-          {/* tags */}
+          {/* 태그 */}
           <div>
             <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
               <Tag size={11} /> 태그
@@ -162,7 +258,7 @@ export function TodoItemModal({ item, onClose, onUpdate, onDelete }) {
             />
           </div>
 
-          {/* memo */}
+          {/* 메모 */}
           <div>
             <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
               <AlignLeft size={11} /> 메모

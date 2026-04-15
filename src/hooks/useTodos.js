@@ -96,6 +96,10 @@ export function useTodos(user) {
   }, [])
 
   const updateItem = useCallback(async (id, changes) => {
+    // 완료 체크 시 현재 시간을 completed_at 기본값으로 설정
+    if (changes.done === true && !changes.completed_at) {
+      changes = { ...changes, completed_at: new Date().toISOString() }
+    }
     const updated = await todoApi.updateItem(id, changes)
     setItems(prev => prev.map(i => i.id === id ? updated : i))
     return updated

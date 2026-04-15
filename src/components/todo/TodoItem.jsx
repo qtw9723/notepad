@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Trash2, Calendar, Flag, Clock, RefreshCw, ChevronRight } from 'lucide-react'
+import { Trash2, Calendar, Flag, Clock, RefreshCw, Play, ChevronRight } from 'lucide-react'
 
 const PRIORITY_COLOR = { 1: '#606070', 2: '#e3b341', 3: '#f78166' }
 const PRIORITY_LABEL = { 1: '낮음', 2: '보통', 3: '높음' }
@@ -18,16 +18,34 @@ function formatDate(dateStr) {
 
 function formatTime(timeStr) {
   if (!timeStr) return null
-  return timeStr.slice(0, 5) // HH:MM
+  return timeStr.slice(0, 5)
+}
+
+function formatCompletedAt(iso) {
+  if (!iso) return null
+  const d = new Date(iso)
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  return `${hh}:${mm}`
+}
+
+function nowTimeStr() {
+  const d = new Date()
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
 }
 
 export function TodoItem({ item, onUpdate, onDelete, onClick }) {
   const [hovering, setHovering] = useState(false)
 
-  const due = formatDate(item.due_date)
+  const date = formatDate(item.start_date)
   const time = formatTime(item.scheduled_time)
-  const priorityColor = PRIORITY_COLOR[item.priority ?? 1]
+  const completedTime = item.done ? formatCompletedAt(item.completed_at) : null
   const recurrenceLabel = RECURRENCE_LABEL[item.recurrence]
+
+  const handleStartNow = (e) => {
+    e.stopPropagation()
+    onUpdate(item.id, { scheduled_time: nowTimeStr() })
+  }
 
   return (
     <div
@@ -43,7 +61,10 @@ export function TodoItem({ item, onUpdate, onDelete, onClick }) {
     >
       {/* checkbox */}
       <button
-        onClick={e => { e.stopPropagation(); onUpdate(item.id, { done: !item.done }) }}
+        onClick={e => {
+          e.stopPropagation()
+          onUpdate(item.id, { done: !item.done })
+        }}
         className="flex-shrink-0 mt-0.5 w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center transition-colors"
         style={{
           borderColor: item.done ? '#7c6af5' : '#484f58',
@@ -70,31 +91,38 @@ export function TodoItem({ item, onUpdate, onDelete, onClick }) {
           {item.text}
         </p>
 
-        {/* meta row */}
+        {/* meta */}
         <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mt-1">
-          {/* time */}
+          {/* date */}
+          {date && (
+            <span
+              className="flex items-center gap-0.5 text-[11px]"
+              style={{ color: date.overdue ? 'rgb(248,113,113)' : date.today ? '#56d364' : '#8b949e' }}
+            >
+              <Calendar size={10} />
+              {date.today ? '오늘' : date.label}
+              {date.overdue && !item.done && ' 지남'}
+            </span>
+          )}
+          {/* start time */}
           {time && (
             <span className="flex items-center gap-0.5 text-[11px]" style={{ color: '#9d8ffc' }}>
               <Clock size={10} />
               {time}
             </span>
           )}
-          {/* priority */}
-          {item.priority > 1 && (
-            <span className="flex items-center gap-0.5 text-[11px]" style={{ color: priorityColor }}>
-              <Flag size={10} />
-              {PRIORITY_LABEL[item.priority]}
+          {/* completed time */}
+          {completedTime && (
+            <span className="flex items-center gap-0.5 text-[11px]" style={{ color: '#56d364' }}>
+              <Clock size={10} />
+              완료 {completedTime}
             </span>
           )}
-          {/* due date */}
-          {due && (
-            <span
-              className="flex items-center gap-0.5 text-[11px]"
-              style={{ color: due.overdue ? 'rgb(248,113,113)' : due.today ? '#56d364' : '#8b949e' }}
-            >
-              <Calendar size={10} />
-              {due.today ? '오늘' : due.label}
-              {due.overdue && ' 지남'}
+          {/* priority */}
+          {(item.priority ?? 1) > 1 && (
+            <span className="flex items-center gap-0.5 text-[11px]" style={{ color: PRIORITY_COLOR[item.priority] }}>
+              <Flag size={10} />
+              {PRIORITY_LABEL[item.priority]}
             </span>
           )}
           {/* recurrence */}
@@ -106,11 +134,7 @@ export function TodoItem({ item, onUpdate, onDelete, onClick }) {
           )}
           {/* tags */}
           {item.tags?.map(tag => (
-            <span
-              key={tag}
-              className="text-[10px] px-1.5 py-0.5 rounded-full"
-              style={{ background: '#21262d', color: '#8b949e' }}
-            >
+            <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: '#21262d', color: '#8b949e' }}>
               {tag}
             </span>
           ))}
@@ -122,12 +146,24 @@ export function TodoItem({ item, onUpdate, onDelete, onClick }) {
         )}
       </div>
 
-      {/* actions */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <ChevronRight size={14} style={{ color: '#484f58' }} />
+      {/* hover actions */}
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+        {/* 지금 시작 */}
+        {!item.done && (
+          <button
+            onClick={handleStartNow}
+            className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] transition-colors"
+            style={{ background: 'rgba(86,211,100,0.1)', color: '#56d364' }}
+            title="지금 시작"
+          >
+            <Play size={10} />
+            시작
+          </button>
+        )}
+        <ChevronRight size={13} style={{ color: '#484f58' }} />
         <button
           onClick={e => { e.stopPropagation(); onDelete(item.id) }}
-          className="p-1 rounded transition-colors hover:text-red-400"
+          className="p-1 rounded hover:text-red-400 transition-colors"
           style={{ color: '#484f58' }}
         >
           <Trash2 size={13} />
