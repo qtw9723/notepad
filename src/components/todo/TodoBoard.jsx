@@ -26,10 +26,9 @@ function todayStr() {
 
 function isItemDueToday(item) {
   const today = todayStr()
-  const due = item.due_date?.split('T')[0]
   const start = item.start_date
-  if (due === today) return true
-  if (!due && start === today) return true
+  // start_date가 오늘 이하인 미완료 항목 (오늘 + 미완료 이전 항목)
+  if (start && start <= today) return true
   return false
 }
 
