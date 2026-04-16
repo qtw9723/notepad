@@ -77,7 +77,7 @@ export function TodoBoard({ list, items, notes = [], fetchNote, onCreateItem, on
   }
 
   const filtered = items.filter(i => {
-    if (filter === 'today') return isItemDueToday(i) && !i.done
+    if (filter === 'today') return isItemDueToday(i)
     if (filter === 'active') return !i.done
     if (filter === 'done') return i.done
     return true
