@@ -2,605 +2,482 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8"/>
-<title>거래소 기획서 Preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>취소 확인 모달 디자인 시안</title>
 <style>
-  body { background:#0d1117; color:#cdd9e5; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; padding:2rem; }
-  .preview { max-width:760px; margin:0 auto; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #09090e;
+    color: #cdd9e5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Noto Sans KR', 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 3rem 2rem;
+    min-height: 100vh;
+  }
+  .page { max-width: 900px; margin: 0 auto; }
+
+  /* 헤더 */
+  .page-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #9d8ffc;
+    margin-bottom: 0.75rem;
+  }
+  .page-subtitle {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #e6edf3;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+  }
+  .page-desc {
+    font-size: 13px;
+    color: #606070;
+    margin-bottom: 3rem;
+  }
+
+  /* 시안 그리드 */
+  .designs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  .design-card {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 200ms;
+    cursor: pointer;
+  }
+  .design-card:hover { border-color: rgba(157,143,252,0.3); }
+  .design-card.selected { border-color: #7c6af5; box-shadow: 0 0 0 1px #7c6af5; }
+
+  .card-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #21262d;
+  }
+  .card-label-text {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #484f58;
+  }
+  .badge-recommend {
+    font-size: 10px;
+    font-weight: 700;
+    color: #7c6af5;
+    background: rgba(124,106,245,0.12);
+    border: 1px solid rgba(124,106,245,0.25);
+    border-radius: 100px;
+    padding: 2px 8px;
+    letter-spacing: 0.04em;
+  }
+  .preview-area {
+    padding: 2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    background: #0a0a12;
+  }
+
+  /* ───── Option A: 심플 센터 ───── */
+  .modal-a {
+    width: 100%;
+    max-width: 280px;
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .modal-a-body {
+    padding: 28px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal-a-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #e6edf3;
+    letter-spacing: -0.02em;
+    word-break: keep-all;
+  }
+  .modal-a-desc {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+  .modal-a-actions {
+    padding: 0 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .btn-danger-full {
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(248,113,113,0.1);
+    color: rgb(248,113,113);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    word-break: keep-all;
+  }
+  .btn-secondary-full {
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    border: 1px solid #21262d;
+    background: transparent;
+    color: #8b949e;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    word-break: keep-all;
+  }
+
+  /* ───── Option B: 아이콘 강조형 ───── */
+  .modal-b {
+    width: 100%;
+    max-width: 280px;
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .modal-b-top {
+    padding: 32px 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .modal-b-texts { display: flex; flex-direction: column; gap: 6px; }
+  .modal-b-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #e6edf3;
+    letter-spacing: -0.02em;
+    word-break: keep-all;
+  }
+  .modal-b-desc {
+    font-size: 12px;
+    color: #8b949e;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+  .modal-b-divider { height: 1px; background: #21262d; }
+  .modal-b-actions {
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .btn-b-cancel {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #21262d;
+    background: transparent;
+    color: #8b949e;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    word-break: keep-all;
+  }
+  .btn-b-confirm {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(248,113,113,0.25);
+    background: rgba(248,113,113,0.1);
+    color: rgb(248,113,113);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    word-break: keep-all;
+  }
+
+  /* ───── Option C: 헤더 구분선형 ───── */
+  .modal-c {
+    width: 100%;
+    max-width: 280px;
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .modal-c-header {
+    padding: 20px 22px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #21262d;
+  }
+  .icon-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(248,113,113,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .modal-c-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #e6edf3;
+    letter-spacing: -0.01em;
+    word-break: keep-all;
+  }
+  .modal-c-body {
+    padding: 18px 22px 20px;
+  }
+  .modal-c-desc {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.75;
+    word-break: keep-all;
+  }
+  .modal-c-footer {
+    padding: 0 16px 16px;
+    display: flex;
+    gap: 8px;
+  }
+  .btn-c-back {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #21262d;
+    background: #161b22;
+    color: #cdd9e5;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    word-break: keep-all;
+  }
+  .btn-c-discard {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(248,113,113,0.12);
+    color: rgb(248,113,113);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    word-break: keep-all;
+  }
+
+  /* 선택 배지 */
+  .select-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-top: 1px solid #21262d;
+  }
+  .select-indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #484f58;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .design-card.selected .select-indicator {
+    border-color: #7c6af5;
+    background: #7c6af5;
+  }
+  .design-card.selected .select-indicator::after {
+    content: '';
+    width: 7px;
+    height: 5px;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translateY(-1px);
+    display: block;
+  }
+  .select-text {
+    font-size: 12px;
+    color: #484f58;
+  }
+  .design-card.selected .select-text { color: #9d8ffc; }
+
+  /* 피드백 섹션 */
+  .feedback-section {
+    background: #0d1117;
+    border: 1px solid rgba(157,143,252,0.15);
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .feedback-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #7c6af5;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .feedback-text {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.7;
+    word-break: keep-all;
+  }
+  .feedback-text strong { color: #cdd9e5; }
 </style>
 </head>
-<body><div class="preview">
+<body>
+<div class="page">
 
-<!-- ===================== 여기서부터 복사 ===================== -->
-<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#cdd9e5;line-height:1.7;">
+  <p class="page-title">Todo — 취소 확인 모달</p>
+  <h1 class="page-subtitle">디자인 시안 3종</h1>
+  <p class="page-desc">원하는 시안을 클릭해서 선택해주세요.</p>
 
-<!-- ── 헤더 ── -->
-<div style="margin-bottom:2.5rem;">
-  <div style="display:inline-flex;align-items:center;gap:10px;background:#161b22;border:1px solid #21262d;border-radius:12px;padding:8px 14px;margin-bottom:1.25rem;">
-    <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9d8ffc;">MonsterCollector</span>
-    <span style="width:1px;height:12px;background:#21262d;"></span>
-    <span style="font-size:11px;color:#484f58;">거래소 기획서</span>
+  <div class="designs">
+
+    <!-- ── A: 심플 세로 버튼형 ── -->
+    <div class="design-card" id="card-a" onclick="select('a')">
+      <div class="card-label">
+        <span class="card-label-text">Option A</span>
+        <span style="font-size:11px;color:#484f58;">세로 버튼</span>
+      </div>
+      <div class="preview-area">
+        <div class="modal-a">
+          <div class="modal-a-body">
+            <p class="modal-a-title">작성을 취소할까요?</p>
+            <p class="modal-a-desc">입력한 내용은 저장되지 않고 사라집니다.</p>
+          </div>
+          <div class="modal-a-actions">
+            <button class="btn-danger-full">취소하기</button>
+            <button class="btn-secondary-full">계속 작성</button>
+          </div>
+        </div>
+      </div>
+      <div class="select-row">
+        <span class="select-text">선택</span>
+        <div class="select-indicator"></div>
+      </div>
+    </div>
+
+    <!-- ── B: 아이콘 + 가로 버튼형 ── -->
+    <div class="design-card" id="card-b" onclick="select('b')">
+      <div class="card-label">
+        <span class="card-label-text">Option B</span>
+        <span class="badge-recommend">추천</span>
+      </div>
+      <div class="preview-area">
+        <div class="modal-b">
+          <div class="modal-b-top">
+            <div class="icon-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgb(248,113,113)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"></path>
+                <path d="M10 11v6M14 11v6"></path>
+                <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"></path>
+              </svg>
+            </div>
+            <div class="modal-b-texts">
+              <p class="modal-b-title">작성 내용을 삭제할까요?</p>
+              <p class="modal-b-desc">지금 닫으면 입력한 내용이<br>모두 사라집니다.</p>
+            </div>
+          </div>
+          <div class="modal-b-divider"></div>
+          <div class="modal-b-actions">
+            <button class="btn-b-cancel">계속 작성</button>
+            <button class="btn-b-confirm">삭제하기</button>
+          </div>
+        </div>
+      </div>
+      <div class="select-row">
+        <span class="select-text">선택</span>
+        <div class="select-indicator"></div>
+      </div>
+    </div>
+
+    <!-- ── C: 헤더 구분선형 ── -->
+    <div class="design-card" id="card-c" onclick="select('c')">
+      <div class="card-label">
+        <span class="card-label-text">Option C</span>
+        <span style="font-size:11px;color:#484f58;">헤더 분리형</span>
+      </div>
+      <div class="preview-area">
+        <div class="modal-c">
+          <div class="modal-c-header">
+            <div class="icon-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(248,113,113)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <p class="modal-c-title">작성 취소</p>
+          </div>
+          <div class="modal-c-body">
+            <p class="modal-c-desc">입력한 내용이 저장되지 않습니다.<br>정말 닫으시겠어요?</p>
+          </div>
+          <div class="modal-c-footer">
+            <button class="btn-c-back">계속 작성</button>
+            <button class="btn-c-discard">닫기</button>
+          </div>
+        </div>
+      </div>
+      <div class="select-row">
+        <span class="select-text">선택</span>
+        <div class="select-indicator"></div>
+      </div>
+    </div>
+
   </div>
-  <h1 style="font-size:2rem;font-weight:700;color:#e6edf3;margin:0 0 .75rem;letter-spacing:-.03em;">거래소 기획서</h1>
-  <p style="font-size:.95rem;color:#8b949e;margin:0;line-height:1.8;">MonsterCollector의 거래소는 등록된 회원 간 아이템을 사고팔 수 있는 기능입니다.<br>싱글게임 기반의 특성을 고려하여, 서버는 거래소에 등록된 아이템만 관리하며 사용자의 전체 인벤토리는 서버에 저장하지 않습니다.</p>
+
+  <div class="feedback-section">
+    <div class="feedback-dot"></div>
+    <p class="feedback-text">
+      <strong>추천: Option B</strong> — 아이콘으로 시각적 맥락을 주면서 여백이 충분하고, 버튼이 동등한 크기로 나란히 배치되어 선택이 자연스럽습니다.<br>
+      마음에 드는 시안이나 수정하고 싶은 부분 알려주세요.
+    </p>
+  </div>
+
 </div>
 
-<!-- ── 기본 원칙 ── -->
-<section style="margin-bottom:2.5rem;">
-  <h2 style="font-size:1.05rem;font-weight:700;color:#e6edf3;margin:0 0 1rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;letter-spacing:-.01em;">기본 원칙</h2>
-  <div style="display:flex;flex-direction:column;gap:8px;">
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:#161b22;border:1px solid #21262d;border-radius:8px;font-size:.875rem;">
-      <span style="color:#9d8ffc;margin-top:1px;flex-shrink:0;">•</span><span>등록된 회원만 거래 참여 가능</span>
-    </div>
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:#161b22;border:1px solid #21262d;border-radius:8px;font-size:.875rem;">
-      <span style="color:#9d8ffc;margin-top:1px;flex-shrink:0;">•</span><span>아이템은 거래소에 등록하는 시점에만 서버에 기록됨</span>
-    </div>
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:#161b22;border:1px solid #21262d;border-radius:8px;font-size:.875rem;">
-      <span style="color:#9d8ffc;margin-top:1px;flex-shrink:0;">•</span><span>거래 대금은 서버에서 관리하는 예치 화폐로만 진행</span>
-    </div>
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:#161b22;border:1px solid #21262d;border-radius:8px;font-size:.875rem;">
-      <span style="color:#9d8ffc;margin-top:1px;flex-shrink:0;">•</span><span>자신이 등록한 아이템은 본인이 구매 불가 (조회는 허용, 서버에서 구매 차단)</span>
-    </div>
-  </div>
-</section>
-
-<!-- ── DB 설계 ── -->
-<section style="margin-bottom:2.5rem;">
-  <h2 style="font-size:1.05rem;font-weight:700;color:#e6edf3;margin:0 0 1.25rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">DB 설계</h2>
-
-  <!-- item_master -->
-  <div style="margin-bottom:16px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <code style="background:#161b22;border:1px solid #21262d;color:#79c0ff;font-size:.8rem;padding:3px 10px;border-radius:6px;font-family:'Fira Code','D2Coding',monospace;">item_master</code>
-      <span style="font-size:.8rem;color:#8b949e;">아이템 마스터 데이터</span>
-    </div>
-    <table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-bottom:8px;">
-      <thead><tr style="background:#161b22;border-bottom:1px solid #21262d;">
-        <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">컬럼</th>
-        <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">타입</th>
-        <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">설명</th>
-      </tr></thead>
-      <tbody>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">item_id</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">PK, 클라이언트 아이템 ID와 일치</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">name</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">아이템 이름</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">grade</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">등급 (N / R / SR / SSR 등)</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">type</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">아이템 종류 (weapon / armor / accessory 등)</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">job_class</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">착용 가능 직업 (warrior / mage / all 등)</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">element</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">속성 (fire / water / none 등)</td></tr>
-        <tr><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">description</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">아이템 설명 (optional)</td></tr>
-      </tbody>
-    </table>
-    <div style="background:rgba(56,139,253,.06);border:1px solid rgba(56,139,253,.2);border-radius:8px;padding:9px 13px;font-size:.8rem;color:#8b949e;">
-      <span style="color:#58a6ff;margin-right:6px;">ℹ</span>필터 속성이 추가되더라도 listings 구조 변경 없이 이 테이블에만 컬럼 추가
-    </div>
-  </div>
-
-  <!-- listings -->
-  <div style="margin-bottom:16px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <code style="background:#161b22;border:1px solid #21262d;color:#79c0ff;font-size:.8rem;padding:3px 10px;border-radius:6px;font-family:'Fira Code','D2Coding',monospace;">listings</code>
-      <span style="font-size:.8rem;color:#8b949e;">거래 원장 (source of truth)</span>
-    </div>
-    <table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-bottom:8px;">
-      <thead><tr style="background:#161b22;border-bottom:1px solid #21262d;">
-        <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">컬럼</th>
-        <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">타입</th>
-        <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">설명</th>
-      </tr></thead>
-      <tbody>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">listing_id</code></td><td style="padding:7px 12px;color:#8b949e;">UUID</td><td style="padding:7px 12px;color:#8b949e;">PK</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">seller_id</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">FK → members.user_id</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">item_id</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">FK → item_master.item_id</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">item_instance_id</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">로컬 아이템 고유 ID (GUID), 이중 등록 방지</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">item_name</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">아이템 이름 (등록 시점 반정규화)</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">item_grade</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">아이템 등급 (등록 시점 반정규화)</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">price</code></td><td style="padding:7px 12px;color:#8b949e;">INTEGER</td><td style="padding:7px 12px;color:#8b949e;">등록 가격</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">status</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;"><code style="font-size:.75rem;color:#9d8ffc;">active</code> / <code style="font-size:.75rem;color:#9d8ffc;">cancelled</code> / <code style="font-size:.75rem;color:#9d8ffc;">retrieved</code> / <code style="font-size:.75rem;color:#9d8ffc;">sold</code></td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">expired_at</code></td><td style="padding:7px 12px;color:#8b949e;">TIMESTAMPTZ</td><td style="padding:7px 12px;color:#8b949e;">등록 만료 시각 (created_at + 3일)</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">sold_at</code></td><td style="padding:7px 12px;color:#8b949e;">TIMESTAMPTZ</td><td style="padding:7px 12px;color:#8b949e;">판매 완료 시각</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">retrieved_at</code></td><td style="padding:7px 12px;color:#8b949e;">TIMESTAMPTZ</td><td style="padding:7px 12px;color:#8b949e;">판매자 회수 완료 시각</td></tr>
-        <tr><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">created_at</code></td><td style="padding:7px 12px;color:#8b949e;">TIMESTAMPTZ</td><td style="padding:7px 12px;color:#8b949e;">등록 시각</td></tr>
-      </tbody>
-    </table>
-    <div style="background:rgba(56,139,253,.06);border:1px solid rgba(56,139,253,.2);border-radius:8px;padding:9px 13px;font-size:.8rem;color:#8b949e;">
-      <span style="color:#58a6ff;margin-right:6px;">ℹ</span>item_name, item_grade는 등록 시점 반정규화 — item_master 수정 후에도 등록 당시 값 유지
-    </div>
-  </div>
-
-  <!-- exchange_cache -->
-  <div style="margin-bottom:16px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <code style="background:#161b22;border:1px solid #21262d;color:#79c0ff;font-size:.8rem;padding:3px 10px;border-radius:6px;font-family:'Fira Code','D2Coding',monospace;">exchange_cache</code>
-      <span style="font-size:.8rem;color:#8b949e;">거래소 조회/거래용 테이블</span>
-    </div>
-    <table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-bottom:8px;">
-      <thead><tr style="background:#161b22;border-bottom:1px solid #21262d;">
-        <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">컬럼</th>
-        <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">타입</th>
-        <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">설명</th>
-      </tr></thead>
-      <tbody>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">listing_id</code></td><td style="padding:7px 12px;color:#8b949e;">UUID</td><td style="padding:7px 12px;color:#8b949e;">PK, FK → listings.listing_id</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">seller_id</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">FK → members.user_id</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">item_id</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">item_master 참조용 (필터 JOIN 키)</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">item_name</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">반정규화 (기본 목록 표시용, JOIN 불필요)</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">item_grade</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;">반정규화 (기본 목록 표시용, JOIN 불필요)</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">price</code></td><td style="padding:7px 12px;color:#8b949e;">INTEGER</td><td style="padding:7px 12px;color:#8b949e;">등록 가격</td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">status</code></td><td style="padding:7px 12px;color:#8b949e;">TEXT</td><td style="padding:7px 12px;color:#8b949e;"><code style="font-size:.75rem;color:#9d8ffc;">active</code> / <code style="font-size:.75rem;color:#9d8ffc;">cancelled</code> / <code style="font-size:.75rem;color:#9d8ffc;">sold</code></td></tr>
-        <tr style="border-bottom:1px solid #21262d;"><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">expired_at</code></td><td style="padding:7px 12px;color:#8b949e;">TIMESTAMPTZ</td><td style="padding:7px 12px;color:#8b949e;">등록 만료 시각</td></tr>
-        <tr><td style="padding:7px 12px;"><code style="color:#79c0ff;font-size:.78rem;">created_at</code></td><td style="padding:7px 12px;color:#8b949e;">TIMESTAMPTZ</td><td style="padding:7px 12px;color:#8b949e;">등록 시각</td></tr>
-      </tbody>
-    </table>
-    <div style="display:flex;flex-direction:column;gap:6px;font-size:.8rem;color:#8b949e;">
-      <div style="background:rgba(56,139,253,.06);border:1px solid rgba(56,139,253,.15);border-radius:7px;padding:7px 12px;"><span style="color:#58a6ff;margin-right:6px;">ℹ</span><strong style="color:#cdd9e5;">기본 목록 조회:</strong> exchange_cache 단독 (JOIN 없음)</div>
-      <div style="background:rgba(56,139,253,.06);border:1px solid rgba(56,139,253,.15);border-radius:7px;padding:7px 12px;"><span style="color:#58a6ff;margin-right:6px;">ℹ</span><strong style="color:#cdd9e5;">필터 조회:</strong> exchange_cache JOIN item_master</div>
-      <div style="background:rgba(56,139,253,.06);border:1px solid rgba(56,139,253,.15);border-radius:7px;padding:7px 12px;"><span style="color:#58a6ff;margin-right:6px;">ℹ</span><strong style="color:#cdd9e5;">구매/취소/만료:</strong> exchange_cache status 직접 업데이트 (실시간)</div>
-    </div>
-  </div>
-
-  <!-- wallets / transactions 나란히 -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-    <div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <code style="background:#161b22;border:1px solid #21262d;color:#79c0ff;font-size:.8rem;padding:3px 10px;border-radius:6px;font-family:'Fira Code','D2Coding',monospace;">wallets</code>
-        <span style="font-size:.75rem;color:#8b949e;">예치 화폐</span>
-      </div>
-      <table style="width:100%;border-collapse:collapse;font-size:.8rem;">
-        <thead><tr style="background:#161b22;border-bottom:1px solid #21262d;">
-          <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">컬럼</th>
-          <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">설명</th>
-        </tr></thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.75rem;">user_id</code></td><td style="padding:6px 10px;color:#8b949e;font-size:.78rem;">PK, FK → members</td></tr>
-          <tr><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.75rem;">balance</code></td><td style="padding:6px 10px;color:#8b949e;font-size:.78rem;">현재 잔액 (INTEGER)</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <code style="background:#161b22;border:1px solid #21262d;color:#79c0ff;font-size:.8rem;padding:3px 10px;border-radius:6px;font-family:'Fira Code','D2Coding',monospace;">transactions</code>
-        <span style="font-size:.75rem;color:#8b949e;">거래 내역</span>
-      </div>
-      <table style="width:100%;border-collapse:collapse;font-size:.8rem;">
-        <thead><tr style="background:#161b22;border-bottom:1px solid #21262d;">
-          <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">컬럼</th>
-          <th style="text-align:left;padding:7px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">설명</th>
-        </tr></thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.75rem;">tx_id</code></td><td style="padding:6px 10px;color:#8b949e;font-size:.78rem;">PK (UUID)</td></tr>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.75rem;">listing_id</code></td><td style="padding:6px 10px;color:#8b949e;font-size:.78rem;">FK → listings</td></tr>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.75rem;">buyer_id</code></td><td style="padding:6px 10px;color:#8b949e;font-size:.78rem;">FK → members</td></tr>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.75rem;">seller_id</code></td><td style="padding:6px 10px;color:#8b949e;font-size:.78rem;">FK → members</td></tr>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.75rem;">price</code></td><td style="padding:6px 10px;color:#8b949e;font-size:.78rem;">실제 거래 가격</td></tr>
-          <tr><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.75rem;">created_at</code></td><td style="padding:6px 10px;color:#8b949e;font-size:.78rem;">거래 시각</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- listings_archive -->
-  <div style="background:rgba(157,143,252,.04);border:1px solid rgba(157,143,252,.15);border-radius:10px;padding:14px 16px;font-size:.85rem;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-      <code style="background:#0d1117;border:1px solid #21262d;color:#79c0ff;font-size:.78rem;padding:3px 10px;border-radius:6px;font-family:'Fira Code','D2Coding',monospace;">listings_archive</code>
-      <span style="font-size:.8rem;color:#8b949e;">거래 이력 아카이브</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.8rem;">
-      <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:7px;padding:8px 12px;">
-        <span style="color:#58a6ff;font-size:.72rem;font-weight:700;display:block;margin-bottom:4px;">SOLD → 이관</span>
-        <span style="color:#8b949e;">거래 완료 후 14일 경과 시 자동 이관</span>
-      </div>
-      <div style="background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:7px;padding:8px 12px;">
-        <span style="color:#58a6ff;font-size:.72rem;font-weight:700;display:block;margin-bottom:4px;">RETRIEVED → 이관</span>
-        <span style="color:#8b949e;">다음 cron 실행 시 즉시 이관</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── API 설계 ── -->
-<section style="margin-bottom:2.5rem;">
-  <h2 style="font-size:1.05rem;font-weight:700;color:#e6edf3;margin:0 0 1.25rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">API 설계</h2>
-
-  <!-- 목록 조회 / 내 목록 -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-    <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;">
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #21262d;">
-        <span style="background:#388bfd;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;">GET</span>
-        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#e6edf3;">/exchange</code>
-      </div>
-      <div style="padding:10px 14px;font-size:.8rem;color:#8b949e;">전체 active listing 반환. 판매자 본인 목록도 포함 (구매 버튼은 클라이언트에서 비활성화)</div>
-    </div>
-    <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;">
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #21262d;">
-        <span style="background:#388bfd;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;">GET</span>
-        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#e6edf3;">/exchange/my/<span style="color:#9d8ffc;">{user_id}</span></code>
-      </div>
-      <div style="padding:10px 14px;font-size:.8rem;color:#8b949e;">본인이 등록한 listing 반환 (전체 status 포함)</div>
-    </div>
-  </div>
-
-  <!-- 잔액 조회 -->
-  <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;margin-bottom:10px;">
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #21262d;">
-      <span style="background:#388bfd;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">GET</span>
-      <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#e6edf3;">/exchange/wallet/<span style="color:#9d8ffc;">{user_id}</span></code>
-      <span style="margin-left:auto;font-size:.78rem;color:#8b949e;">잔액 조회</span>
-    </div>
-    <div style="padding:10px 14px;display:flex;gap:16px;font-size:.8rem;">
-      <span><code style="color:#79c0ff;">user_id</code> <span style="color:#8b949e;">유저 ID</span></span>
-      <span><code style="color:#79c0ff;">balance</code> <span style="color:#8b949e;">현재 잔액</span></span>
-    </div>
-  </div>
-
-  <!-- 화폐 예치 -->
-  <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;margin-bottom:10px;">
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #21262d;">
-      <span style="background:#7c6af5;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">POST</span>
-      <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#e6edf3;">/exchange/wallet/deposit</code>
-      <span style="margin-left:auto;font-size:.78rem;color:#8b949e;">화폐 예치</span>
-    </div>
-    <div style="padding:14px;">
-      <table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:12px;">
-        <thead><tr style="border-bottom:1px solid #21262d;">
-          <th style="text-align:left;padding:6px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">필드</th>
-          <th style="text-align:left;padding:6px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">설명</th>
-        </tr></thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">user_id</code></td><td style="padding:6px 10px;color:#8b949e;">예치 요청자</td></tr>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">resource_type</code></td><td style="padding:6px 10px;color:#8b949e;">사용할 인게임 재화 종류</td></tr>
-          <tr><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">resource_amount</code></td><td style="padding:6px 10px;color:#8b949e;">소모할 수량</td></tr>
-        </tbody>
-      </table>
-      <div style="font-size:.78rem;color:#8b949e;display:flex;flex-direction:column;gap:4px;">
-        <div>1. members 검증 → 2. resource 유효성 확인 → 3. 전환 비율 계산 → 4. wallets 잔액 증가</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 화폐 환전 -->
-  <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;margin-bottom:10px;">
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #21262d;">
-      <span style="background:#7c6af5;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">POST</span>
-      <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#e6edf3;">/exchange/wallet/withdraw</code>
-      <span style="margin-left:auto;font-size:.78rem;color:#8b949e;">화폐 환전</span>
-    </div>
-    <div style="padding:14px;">
-      <table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:12px;">
-        <thead><tr style="border-bottom:1px solid #21262d;">
-          <th style="text-align:left;padding:6px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">필드</th>
-          <th style="text-align:left;padding:6px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">설명</th>
-        </tr></thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">user_id</code></td><td style="padding:6px 10px;color:#8b949e;">환전 요청자</td></tr>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">amount</code></td><td style="padding:6px 10px;color:#8b949e;">환전할 거래소 화폐 금액</td></tr>
-          <tr><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">resource_type</code></td><td style="padding:6px 10px;color:#8b949e;">받을 인게임 재화 종류</td></tr>
-        </tbody>
-      </table>
-      <p style="font-size:.78rem;color:#606070;margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Response 200</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:.78rem;">
-        <span><code style="color:#79c0ff;">resource_type</code> <span style="color:#8b949e;">지급된 재화 종류</span></span>
-        <span><code style="color:#79c0ff;">resource_amount</code> <span style="color:#8b949e;">지급된 수량</span></span>
-        <span><code style="color:#79c0ff;">remaining_balance</code> <span style="color:#8b949e;">남은 잔액</span></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 아이템 등록 -->
-  <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;margin-bottom:10px;">
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #21262d;">
-      <span style="background:#7c6af5;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">POST</span>
-      <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#e6edf3;">/exchange</code>
-      <span style="margin-left:auto;font-size:.78rem;color:#8b949e;">아이템 등록</span>
-    </div>
-    <div style="padding:14px;">
-      <table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:12px;">
-        <thead><tr style="border-bottom:1px solid #21262d;">
-          <th style="text-align:left;padding:6px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">필드</th>
-          <th style="text-align:left;padding:6px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">설명</th>
-        </tr></thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">seller_id</code></td><td style="padding:6px 10px;color:#8b949e;">판매자 user_id</td></tr>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">item_id</code></td><td style="padding:6px 10px;color:#8b949e;">item_master의 item_id</td></tr>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">item_instance_id</code></td><td style="padding:6px 10px;color:#8b949e;">로컬 아이템 GUID</td></tr>
-          <tr><td style="padding:6px 10px;"><code style="color:#79c0ff;font-size:.78rem;">price</code></td><td style="padding:6px 10px;color:#8b949e;">등록 가격</td></tr>
-        </tbody>
-      </table>
-      <div style="font-size:.78rem;color:#8b949e;">members 검증 → 이중 등록 확인 → item_master 조회 → listings + exchange_cache INSERT (expired_at = now + 3일)</div>
-    </div>
-  </div>
-
-  <!-- 구매 / 취소 / 회수 -->
-  <div style="display:flex;flex-direction:column;gap:10px;">
-
-    <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;">
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #21262d;">
-        <span style="background:#7c6af5;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">POST</span>
-        <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.8rem;color:#e6edf3;">/exchange/listing/<span style="color:#9d8ffc;">{listing_id}</span>/buy</code>
-        <span style="margin-left:auto;font-size:.78rem;color:#8b949e;">아이템 구매</span>
-      </div>
-      <div style="padding:14px;">
-        <div style="background:rgba(157,143,252,.06);border:1px solid rgba(157,143,252,.2);border-radius:7px;padding:8px 12px;font-size:.78rem;color:#8b949e;margin-bottom:10px;">
-          <span style="color:#9d8ffc;margin-right:6px;">⚠</span>모든 처리는 Postgres RPC로 원자적 실행 — 중간 실패 방지
-        </div>
-        <div style="font-size:.78rem;color:#8b949e;margin-bottom:10px;">
-          buyer 검증 → 본인 구매 차단 → active 확인 → 잔액 확인 → <strong style="color:#cdd9e5;">잔액 차감/증가 + status 업데이트 + transactions 기록</strong> (단일 트랜잭션)
-        </div>
-        <p style="font-size:.72rem;color:#606070;margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Response 200</p>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:.78rem;">
-          <code style="color:#79c0ff;">tx_id</code>
-          <code style="color:#79c0ff;">item_id</code>
-          <code style="color:#79c0ff;">item_instance_id</code>
-          <code style="color:#79c0ff;">item_name</code>
-          <code style="color:#79c0ff;">item_grade</code>
-          <code style="color:#79c0ff;">price</code>
-          <code style="color:#79c0ff;">remaining_balance</code>
-        </div>
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;">
-        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #21262d;">
-          <span style="background:#7c6af5;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">POST</span>
-          <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.75rem;color:#e6edf3;">/…/<span style="color:#9d8ffc;">{id}</span>/cancel</code>
-        </div>
-        <div style="padding:12px 14px;font-size:.78rem;color:#8b949e;">
-          active 상태만 취소 허용. listings → cancelled, exchange_cache 삭제.<br>
-          <span style="color:#606070;">Response: item_id, item_instance_id, item_name, item_grade</span>
-        </div>
-      </div>
-      <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;">
-        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #21262d;">
-          <span style="background:#7c6af5;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;">POST</span>
-          <code style="font-family:'Fira Code','D2Coding',monospace;font-size:.75rem;color:#e6edf3;">/…/<span style="color:#9d8ffc;">{id}</span>/retrieve</code>
-        </div>
-        <div style="padding:12px 14px;font-size:.78rem;color:#8b949e;">
-          cancelled 상태만 회수 허용. listings → retrieved, retrieved_at 기록.<br>
-          <span style="color:#606070;">Response: item_id, item_instance_id, item_name, item_grade</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ── 상태 머신 ── -->
-<section style="margin-bottom:2.5rem;">
-  <h2 style="font-size:1.05rem;font-weight:700;color:#e6edf3;margin:0 0 1.25rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">등록 수명 &amp; 상태 머신</h2>
-  <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;padding:20px;margin-bottom:14px;">
-    <div style="display:flex;flex-direction:column;gap:12px;font-size:.85rem;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="background:rgba(56,139,253,.15);border:1px solid rgba(56,139,253,.3);color:#58a6ff;font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:6px;min-width:90px;text-align:center;">active</span>
-        <span style="color:#21262d;">────────────</span>
-        <span style="color:#8b949e;font-size:.78rem;">거래소 표시 중 (exchange_cache ✅)</span>
-      </div>
-      <div style="padding-left:20px;display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="color:#484f58;font-size:.78rem;min-width:120px;">구매 발생</span>
-          <span style="color:#484f58;">→</span>
-          <span style="background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.25);color:#58a6ff;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:5px;">sold</span>
-          <span style="color:#484f58;font-size:.75rem;">→ 14일 후 archive 이관</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="color:#484f58;font-size:.78rem;min-width:120px;">3일 만료 / 수동 취소</span>
-          <span style="color:#484f58;">→</span>
-          <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:rgb(248,113,113);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:5px;">cancelled</span>
-          <span style="color:#484f58;font-size:.75rem;">→ 판매자 회수 대기</span>
-        </div>
-        <div style="padding-left:120px;display:flex;align-items:center;gap:10px;">
-          <span style="color:#484f58;font-size:.78rem;min-width:80px;">판매자 회수</span>
-          <span style="color:#484f58;">→</span>
-          <span style="background:rgba(157,143,252,.08);border:1px solid rgba(157,143,252,.2);color:#9d8ffc;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:5px;">retrieved</span>
-          <span style="color:#484f58;font-size:.75rem;">→ 다음 cron → archive 이관</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <table style="width:100%;border-collapse:collapse;font-size:.82rem;">
-    <thead><tr style="background:#161b22;border-bottom:1px solid #21262d;">
-      <th style="text-align:left;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">상태</th>
-      <th style="text-align:center;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">exchange_cache</th>
-      <th style="text-align:center;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">판매자</th>
-      <th style="text-align:center;padding:8px 12px;color:#8b949e;font-weight:600;font-size:.75rem;">구매자</th>
-    </tr></thead>
-    <tbody>
-      <tr style="border-bottom:1px solid #21262d;"><td style="padding:8px 12px;"><span style="background:rgba(56,139,253,.12);color:#58a6ff;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">active</span></td><td style="padding:8px 12px;text-align:center;color:#58a6ff;">✅</td><td style="padding:8px 12px;text-align:center;color:#58a6ff;">✅</td><td style="padding:8px 12px;text-align:center;color:#58a6ff;">✅</td></tr>
-      <tr style="border-bottom:1px solid #21262d;"><td style="padding:8px 12px;"><span style="background:rgba(248,113,113,.08);color:rgb(248,113,113);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">cancelled</span></td><td style="padding:8px 12px;text-align:center;color:#484f58;">❌</td><td style="padding:8px 12px;text-align:center;color:#58a6ff;font-size:.75rem;">✅ (회수 필요)</td><td style="padding:8px 12px;text-align:center;color:#484f58;">❌</td></tr>
-      <tr style="border-bottom:1px solid #21262d;"><td style="padding:8px 12px;"><span style="background:rgba(157,143,252,.08);color:#9d8ffc;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">retrieved</span></td><td style="padding:8px 12px;text-align:center;color:#484f58;">❌</td><td style="padding:8px 12px;text-align:center;color:#484f58;">❌</td><td style="padding:8px 12px;text-align:center;color:#484f58;">❌</td></tr>
-      <tr><td style="padding:8px 12px;"><span style="background:rgba(88,166,255,.1);color:#58a6ff;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">sold</span></td><td style="padding:8px 12px;text-align:center;color:#484f58;">❌</td><td style="padding:8px 12px;text-align:center;color:#8b949e;font-size:.75rem;">✅ (14일간)</td><td style="padding:8px 12px;text-align:center;color:#8b949e;font-size:.75rem;">✅ (14일간)</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- ── 보안 / 자동화 나란히 ── -->
-<section style="margin-bottom:2.5rem;">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-    <div>
-      <h2 style="font-size:1.05rem;font-weight:700;color:#e6edf3;margin:0 0 1rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">보안 고려사항</h2>
-      <div style="display:flex;flex-direction:column;gap:7px;">
-        <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 13px;font-size:.8rem;">
-          <div style="color:#cdd9e5;margin-bottom:3px;">비회원 거래 시도</div>
-          <div style="color:#8b949e;">모든 API에서 members 검증</div>
-        </div>
-        <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 13px;font-size:.8rem;">
-          <div style="color:#cdd9e5;margin-bottom:3px;">이중 등록</div>
-          <div style="color:#8b949e;">item_instance_id + active 중복 체크</div>
-        </div>
-        <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 13px;font-size:.8rem;">
-          <div style="color:#cdd9e5;margin-bottom:3px;">본인 구매</div>
-          <div style="color:#8b949e;">buyer_id == seller_id 서버 차단</div>
-        </div>
-        <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 13px;font-size:.8rem;">
-          <div style="color:#cdd9e5;margin-bottom:3px;">동시 구매 경쟁</div>
-          <div style="color:#8b949e;">Postgres 트랜잭션 원자적 처리</div>
-        </div>
-        <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 13px;font-size:.8rem;">
-          <div style="color:#cdd9e5;margin-bottom:3px;">가격 조작</div>
-          <div style="color:#8b949e;">등록 시 최소/최대 가격 제한 (→ 논의 5)</div>
-        </div>
-      </div>
-    </div>
-    <div>
-      <h2 style="font-size:1.05rem;font-weight:700;color:#e6edf3;margin:0 0 1rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">자동화 (cron)</h2>
-      <div style="display:flex;flex-direction:column;gap:7px;">
-        <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 13px;font-size:.8rem;">
-          <div style="color:#cdd9e5;margin-bottom:3px;">만료 처리</div>
-          <div style="color:#8b949e;">expired_at 지난 active → cancelled, exchange_cache 삭제</div>
-        </div>
-        <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 13px;font-size:.8rem;">
-          <div style="color:#cdd9e5;margin-bottom:3px;">거래 내역 이관</div>
-          <div style="color:#8b949e;">sold 14일 경과 → archive 이관 후 listings 삭제</div>
-        </div>
-        <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 13px;font-size:.8rem;">
-          <div style="color:#cdd9e5;margin-bottom:3px;">회수 완료 이관</div>
-          <div style="color:#8b949e;">retrieved → archive 이관 후 listings 삭제</div>
-        </div>
-        <div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 13px;font-size:.8rem;">
-          <div style="color:#cdd9e5;margin-bottom:3px;">exchange_cache sync</div>
-          <div style="color:#8b949e;">item_master 변경 시 반영 (10분 주기, 실질적으로 거의 미동작)</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── 화폐 구조 ── -->
-<section style="margin-bottom:2.5rem;">
-  <h2 style="font-size:1.05rem;font-weight:700;color:#e6edf3;margin:0 0 1.25rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">화폐 예치 &amp; 환전 구조</h2>
-  <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;padding:20px;margin-bottom:14px;">
-    <div style="display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;font-size:.85rem;text-align:center;">
-      <div style="background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:10px 20px;">
-        <div style="color:#8b949e;font-size:.75rem;margin-bottom:4px;">인게임 재화/재료</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;margin:0 10px;gap:2px;">
-        <span style="font-size:.72rem;color:#9d8ffc;">deposit ↓</span>
-        <span style="font-size:.72rem;color:#484f58;">↑ withdraw</span>
-      </div>
-      <div style="background:#0d1117;border:1px solid rgba(157,143,252,.3);border-radius:10px;padding:10px 20px;">
-        <div style="color:#9d8ffc;font-size:.75rem;margin-bottom:4px;">거래소 화폐</div>
-        <div style="color:#484f58;font-size:.7rem;">balance</div>
-      </div>
-      <div style="display:flex;align-items:center;margin:0 10px;">
-        <span style="font-size:.72rem;color:#388bfd;">→ 구매</span>
-      </div>
-      <div style="background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:10px 20px;">
-        <div style="color:#8b949e;font-size:.75rem;margin-bottom:4px;">아이템 획득</div>
-      </div>
-    </div>
-  </div>
-  <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:12px 16px;font-size:.82rem;color:#8b949e;">
-    <span style="color:rgb(248,113,113);margin-right:6px;">⚠</span>재화 종류와 전환 비율 미확정 — 조건 없는 자유 예치 허용 시 화폐 인플레이션 발생 가능. 구현 전 반드시 확정 필요.
-  </div>
-</section>
-
-<!-- ── 클라이언트 수정 사항 ── -->
-<section style="margin-bottom:2.5rem;">
-  <h2 style="font-size:1.05rem;font-weight:700;color:#e6edf3;margin:0 0 1.25rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">클라이언트 수정 필요 사항 <span style="font-size:.75rem;color:#484f58;font-weight:400;margin-left:6px;">Unity</span></h2>
-  <div style="display:flex;flex-direction:column;gap:7px;">
-    <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 14px;font-size:.82rem;">
-      <span style="color:#9d8ffc;font-weight:700;font-size:.75rem;padding-top:1px;">01</span>
-      <div><strong style="color:#cdd9e5;">아이템 등록</strong> — POST /exchange 호출, 성공 시 로컬에서 해당 아이템 비활성화</div>
-    </div>
-    <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 14px;font-size:.82rem;">
-      <span style="color:#9d8ffc;font-weight:700;font-size:.75rem;padding-top:1px;">02</span>
-      <div><strong style="color:#cdd9e5;">아이템 구매</strong> — POST /…/buy 호출, 응답 item 정보를 로컬 인벤토리에 추가</div>
-    </div>
-    <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 14px;font-size:.82rem;">
-      <span style="color:#9d8ffc;font-weight:700;font-size:.75rem;padding-top:1px;">03</span>
-      <div><strong style="color:#cdd9e5;">등록 취소</strong> — POST /…/cancel 호출, 성공 시 로컬에서 해당 아이템 재활성화</div>
-    </div>
-    <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 14px;font-size:.82rem;">
-      <span style="color:#9d8ffc;font-weight:700;font-size:.75rem;padding-top:1px;">04</span>
-      <div><strong style="color:#cdd9e5;">거래소 방문 시 동기화</strong> — GET /exchange/my/{user_id} 호출, sold/cancelled 항목 확인 및 UI 반영</div>
-    </div>
-    <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 14px;font-size:.82rem;">
-      <span style="color:#9d8ffc;font-weight:700;font-size:.75rem;padding-top:1px;">05</span>
-      <div><strong style="color:#cdd9e5;">아이템 회수</strong> — POST /…/retrieve 호출, 응답 item을 로컬 인벤토리에 추가</div>
-    </div>
-    <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 14px;font-size:.82rem;">
-      <span style="color:#9d8ffc;font-weight:700;font-size:.75rem;padding-top:1px;">06~08</span>
-      <div><strong style="color:#cdd9e5;">화폐 UI</strong> — 예치(deposit) / 환전(withdraw) UI 구현, GET /…/wallet/{id}로 잔액 표시</div>
-    </div>
-  </div>
-</section>
-
-<!-- ── 논의 필요 사항 ── -->
-<section>
-  <h2 style="font-size:1.05rem;font-weight:700;color:#e6edf3;margin:0 0 1.25rem;padding-bottom:.5rem;border-bottom:1px solid #21262d;">논의 필요 사항</h2>
-  <div style="display:flex;flex-direction:column;gap:8px;">
-    <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.18);border-radius:10px;padding:14px 16px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <span style="background:rgba(248,113,113,.15);color:rgb(248,113,113);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;">1</span>
-        <span style="font-size:.875rem;font-weight:600;color:#e6edf3;">예치 가능한 인게임 재화 종류</span>
-      </div>
-      <p style="margin:0;font-size:.8rem;color:#8b949e;">게임 점수, 게임 재료 등 어떤 재화를 거래소 화폐로 전환할 수 있는지. GDD 골드/재화 경제 설계(미결 High)와 함께 결정 필요.</p>
-    </div>
-    <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.18);border-radius:10px;padding:14px 16px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <span style="background:rgba(248,113,113,.15);color:rgb(248,113,113);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;">2</span>
-        <span style="font-size:.875rem;font-weight:600;color:#e6edf3;">전환 비율</span>
-      </div>
-      <p style="margin:0;font-size:.8rem;color:#8b949e;">인게임 재화 N → 거래소 화폐 M 비율. 환전 시 수수료 차감 여부 및 비율. 게임 밸런스에 직접적 영향.</p>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.18);border-radius:10px;padding:14px 16px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="background:rgba(248,113,113,.15);color:rgb(248,113,113);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;">3</span>
-          <span style="font-size:.82rem;font-weight:600;color:#e6edf3;">일일 예치 한도</span>
-        </div>
-        <p style="margin:0;font-size:.78rem;color:#8b949e;">화폐 인플레이션 방지 목적. 전환 비율과 함께 결정 권장.</p>
-      </div>
-      <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.18);border-radius:10px;padding:14px 16px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="background:rgba(248,113,113,.15);color:rgb(248,113,113);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;">4</span>
-          <span style="font-size:.82rem;font-weight:600;color:#e6edf3;">거래 수수료</span>
-        </div>
-        <p style="margin:0;font-size:.78rem;color:#8b949e;">아이템 거래 시 수수료 차감 여부 및 비율. 판매자/구매자 부담 방식 결정.</p>
-      </div>
-      <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.18);border-radius:10px;padding:14px 16px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="background:rgba(248,113,113,.15);color:rgb(248,113,113);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;">5</span>
-          <span style="font-size:.82rem;font-weight:600;color:#e6edf3;">가격 범위 제한</span>
-        </div>
-        <p style="margin:0;font-size:.78rem;color:#8b949e;">아이템 등록 시 최소/최대 가격. 등급별 다른 범위 적용 여부.</p>
-      </div>
-      <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.18);border-radius:10px;padding:14px 16px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="background:rgba(248,113,113,.15);color:rgb(248,113,113);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;">6</span>
-          <span style="font-size:.82rem;font-weight:600;color:#e6edf3;">item_master 속성</span>
-        </div>
-        <p style="margin:0;font-size:.78rem;color:#8b949e;">type, job_class, element 외 추가 필터 속성 여부. 각 속성 허용 값 목록 확정.</p>
-      </div>
-    </div>
-    <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.18);border-radius:10px;padding:14px 16px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <span style="background:rgba(248,113,113,.15);color:rgb(248,113,113);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;">7</span>
-        <span style="font-size:.875rem;font-weight:600;color:#e6edf3;">cron 실행 주기</span>
-      </div>
-      <p style="margin:0;font-size:.8rem;color:#8b949e;">만료 처리 / 거래 내역 이관 / 회수 완료 이관 각각의 주기 결정. 너무 짧으면 불필요한 실행, 너무 길면 데이터 누적.</p>
-    </div>
-    <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.18);border-radius:10px;padding:14px 16px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <span style="background:rgba(248,113,113,.15);color:rgb(248,113,113);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;">8</span>
-        <span style="font-size:.875rem;font-weight:600;color:#e6edf3;">거래 알림 방식</span>
-      </div>
-      <table style="width:100%;border-collapse:collapse;font-size:.78rem;">
-        <thead><tr style="border-bottom:1px solid #21262d;">
-          <th style="text-align:left;padding:6px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">방식</th>
-          <th style="text-align:left;padding:6px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">설명</th>
-          <th style="text-align:left;padding:6px 10px;color:#8b949e;font-weight:600;font-size:.72rem;">비고</th>
-        </tr></thead>
-        <tbody>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;color:#cdd9e5;">폴링</td><td style="padding:6px 10px;color:#8b949e;">거래소 방문 시 sold 확인</td><td style="padding:6px 10px;color:#484f58;">구현 단순, 실시간 아님</td></tr>
-          <tr style="border-bottom:1px solid #21262d;"><td style="padding:6px 10px;color:#cdd9e5;">Supabase Realtime</td><td style="padding:6px 10px;color:#8b949e;">WebSocket 즉시 푸시</td><td style="padding:6px 10px;color:#484f58;">Unity SDK 없어 직접 구현 필요</td></tr>
-          <tr><td style="padding:6px 10px;color:#cdd9e5;">FCM</td><td style="padding:6px 10px;color:#8b949e;">앱 꺼져도 수신 가능한 푸시</td><td style="padding:6px 10px;color:#484f58;">Firebase 연동 필요, 구현 복잡</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-</div>
-<!-- ===================== 여기까지 복사 ===================== -->
-
-</div></body>
+<script>
+  function select(id) {
+    document.querySelectorAll('.design-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('card-' + id).classList.add('selected');
+  }
+</script>
+</body>
 </html>
