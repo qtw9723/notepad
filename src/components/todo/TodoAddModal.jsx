@@ -261,32 +261,57 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
     {showConfirm && (
       <div
         className="fixed inset-0 flex items-center justify-center z-[60]"
-        style={{ background: 'rgba(0,0,0,0.5)' }}
+        style={{ background: 'rgba(0,0,0,0.6)' }}
       >
         <div
           className="w-full max-w-xs rounded-2xl flex flex-col"
           style={{ background: '#0d1117', border: '1px solid #21262d' }}
         >
-          <div className="px-5 pt-5 pb-4">
-            <p className="text-[14px] font-semibold mb-1.5" style={{ color: '#e6edf3' }}>작성 취소</p>
-            <p className="text-[13px]" style={{ color: '#8b949e', lineHeight: 1.6 }}>
-              입력한 내용이 저장되지 않습니다.<br />정말 취소하시겠어요?
-            </p>
+          {/* 아이콘 + 텍스트 */}
+          <div className="px-6 pt-8 pb-5 flex flex-col gap-4">
+            <div
+              className="flex items-center justify-center rounded-xl flex-shrink-0"
+              style={{
+                width: 44, height: 44,
+                background: 'rgba(248,113,113,0.1)',
+                border: '1px solid rgba(248,113,113,0.2)',
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(248,113,113)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+              </svg>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="text-[15px] font-bold" style={{ color: '#e6edf3', letterSpacing: '-0.02em', wordBreak: 'keep-all' }}>
+                작성 내용을 삭제할까요?
+              </p>
+              <p className="text-[13px]" style={{ color: '#8b949e', lineHeight: 1.7, wordBreak: 'keep-all' }}>
+                지금 닫으면 입력한 내용이<br />모두 사라집니다.
+              </p>
+            </div>
           </div>
-          <div className="flex gap-2 px-5 pb-5">
+
+          {/* 구분선 */}
+          <div style={{ height: 1, background: '#21262d' }} />
+
+          {/* 버튼 */}
+          <div className="flex gap-2 px-4 py-4">
             <button
               onClick={() => setShowConfirm(false)}
-              className="flex-1 py-2 rounded-lg text-[13px] font-medium"
-              style={{ background: '#21262d', color: '#cdd9e5' }}
+              className="flex-1 py-2.5 rounded-xl text-[13px] font-medium transition-colors"
+              style={{ border: '1px solid #21262d', background: 'transparent', color: '#8b949e' }}
             >
               계속 작성
             </button>
             <button
               onClick={onClose}
-              className="flex-1 py-2 rounded-lg text-[13px] font-medium"
-              style={{ background: 'rgba(248,113,113,0.12)', color: 'rgb(248,113,113)', border: '1px solid rgba(248,113,113,0.25)' }}
+              className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-colors"
+              style={{ background: 'rgba(248,113,113,0.1)', color: 'rgb(248,113,113)', border: '1px solid rgba(248,113,113,0.25)' }}
             >
-              취소
+              삭제하기
             </button>
           </div>
         </div>
