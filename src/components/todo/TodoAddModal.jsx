@@ -35,6 +35,17 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
   const [priority, setPriority] = useState(1)
   const [memo, setMemo] = useState('')
   const [noteIds, setNoteIds] = useState([])
+  const [showConfirm, setShowConfirm] = useState(false)
+
+  const hasContent = text.trim() || memo.trim() || noteIds.length > 0
+
+  const handleCancel = () => {
+    if (hasContent) {
+      setShowConfirm(true)
+    } else {
+      onClose()
+    }
+  }
 
   const handleSubmit = () => {
     if (!text.trim()) return
@@ -51,10 +62,10 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
   }
 
   return (
+    <>
     <div
       className="fixed inset-0 flex items-center justify-center z-50"
       style={{ background: 'rgba(0,0,0,0.6)' }}
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
         className="w-full max-w-md rounded-2xl flex flex-col"
@@ -63,7 +74,7 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
         {/* header */}
         <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #21262d' }}>
           <span className="text-[14px] font-semibold" style={{ color: '#e6edf3' }}>새 항목 추가</span>
-          <button onClick={onClose} style={{ color: '#606070' }}><X size={16} /></button>
+          <button onClick={handleCancel} style={{ color: '#606070' }}><X size={16} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
@@ -225,7 +236,7 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
         {/* footer */}
         <div className="flex items-center justify-end gap-2 px-5 py-3" style={{ borderTop: '1px solid #21262d' }}>
           <button
-            onClick={onClose}
+            onClick={handleCancel}
             className="px-4 py-2 rounded-lg text-[13px]"
             style={{ background: '#21262d', color: '#8b949e' }}
           >
@@ -245,5 +256,42 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
         </div>
       </div>
     </div>
+
+    {/* 취소 확인 모달 */}
+    {showConfirm && (
+      <div
+        className="fixed inset-0 flex items-center justify-center z-[60]"
+        style={{ background: 'rgba(0,0,0,0.5)' }}
+      >
+        <div
+          className="w-full max-w-xs rounded-2xl flex flex-col"
+          style={{ background: '#0d1117', border: '1px solid #21262d' }}
+        >
+          <div className="px-5 pt-5 pb-4">
+            <p className="text-[14px] font-semibold mb-1.5" style={{ color: '#e6edf3' }}>작성 취소</p>
+            <p className="text-[13px]" style={{ color: '#8b949e', lineHeight: 1.6 }}>
+              입력한 내용이 저장되지 않습니다.<br />정말 취소하시겠어요?
+            </p>
+          </div>
+          <div className="flex gap-2 px-5 pb-5">
+            <button
+              onClick={() => setShowConfirm(false)}
+              className="flex-1 py-2 rounded-lg text-[13px] font-medium"
+              style={{ background: '#21262d', color: '#cdd9e5' }}
+            >
+              계속 작성
+            </button>
+            <button
+              onClick={onClose}
+              className="flex-1 py-2 rounded-lg text-[13px] font-medium"
+              style={{ background: 'rgba(248,113,113,0.12)', color: 'rgb(248,113,113)', border: '1px solid rgba(248,113,113,0.25)' }}
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
