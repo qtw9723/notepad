@@ -261,11 +261,17 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
     {showConfirm && (
       <div
         className="fixed inset-0 flex items-center justify-center z-[60]"
-        style={{ background: 'rgba(0,0,0,0.6)' }}
+        style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
       >
         <div
-          className="w-full max-w-xs rounded-2xl flex flex-col"
-          style={{ background: '#0d1117', border: '1px solid #21262d' }}
+          className="w-full flex flex-col"
+          style={{
+            maxWidth: 300,
+            background: '#0d1117',
+            border: '1px solid rgba(157,143,252,0.15)',
+            borderRadius: 20,
+            boxShadow: '0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03)',
+          }}
         >
           {/* 아이콘 + 텍스트 */}
           <div className="px-6 pt-8 pb-5 flex flex-col gap-4">
@@ -301,15 +307,15 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
           <div className="flex gap-2 px-4 py-4">
             <button
               onClick={() => setShowConfirm(false)}
-              className="flex-1 py-2.5 rounded-xl text-[13px] font-medium transition-colors"
-              style={{ border: '1px solid #21262d', background: 'transparent', color: '#8b949e' }}
+              className="flex-1 py-2.5 text-[13px] font-medium transition-colors"
+              style={{ borderRadius: 12, border: '1px solid #2d333b', background: '#161b22', color: '#8b949e' }}
             >
               계속 작성
             </button>
             <button
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-colors"
-              style={{ background: 'rgba(248,113,113,0.1)', color: 'rgb(248,113,113)', border: '1px solid rgba(248,113,113,0.25)' }}
+              className="flex-1 py-2.5 text-[13px] font-semibold transition-colors"
+              style={{ borderRadius: 12, background: 'rgba(248,113,113,0.1)', color: 'rgb(248,113,113)', border: '1px solid rgba(248,113,113,0.25)' }}
             >
               삭제하기
             </button>
