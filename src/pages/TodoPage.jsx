@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Bell, BellOff, LayoutList, CalendarDays } from 'lucide-react'
+import { ArrowLeft, Bell, BellOff, LayoutList, CalendarDays, AlignLeft } from 'lucide-react'
 import { useTodos } from '../hooks/useTodos'
 import { usePush } from '../hooks/usePush'
 import { useNotes } from '../hooks/useNotes'
 import { TodoSidebar } from '../components/todo/TodoSidebar'
 import { TodoBoard } from '../components/todo/TodoBoard'
 import { TodoCalendar } from '../components/todo/TodoCalendar'
+import { TodoTimeline } from '../components/todo/TodoTimeline'
 
 export function TodoPage({ user }) {
   const [selectedListId, setSelectedListId] = useState(null)
@@ -73,6 +74,14 @@ export function TodoPage({ user }) {
             <CalendarDays size={13} />
             달력
           </button>
+          <button
+            onClick={() => setView('timeline')}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] transition-colors"
+            style={{ background: view === 'timeline' ? '#21262d' : 'transparent', color: view === 'timeline' ? '#cdd9e5' : '#606070' }}
+          >
+            <AlignLeft size={13} />
+            타임라인
+          </button>
         </div>
 
         {/* push toggle */}
@@ -126,6 +135,16 @@ export function TodoPage({ user }) {
                 onDeleteItem={deleteItem}
               />
             </>
+          )}
+          {view === 'timeline' && (
+            <TodoTimeline
+              lists={lists}
+              allItems={getAllVisibleItems()}
+              notes={notes}
+              fetchNote={fetchNote}
+              onUpdateItem={updateItem}
+              onDeleteItem={deleteItem}
+            />
           )}
           {view === 'calendar' && (
             <TodoCalendar
