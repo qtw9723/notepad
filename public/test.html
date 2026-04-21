@@ -3,481 +3,506 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>취소 확인 모달 디자인 시안</title>
+<title>Todo 타임라인 뷰 목업</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: #09090e;
+    background: #0d1117;
     color: #cdd9e5;
     font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Noto Sans KR', 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
-    padding: 3rem 2rem;
-    min-height: 100vh;
-  }
-  .page { max-width: 900px; margin: 0 auto; }
-
-  /* 헤더 */
-  .page-title {
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #9d8ffc;
-    margin-bottom: 0.75rem;
-  }
-  .page-subtitle {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #e6edf3;
-    letter-spacing: -0.03em;
-    margin-bottom: 0.5rem;
-  }
-  .page-desc {
-    font-size: 13px;
-    color: #606070;
-    margin-bottom: 3rem;
-  }
-
-  /* 시안 그리드 */
-  .designs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-  }
-  .design-card {
-    background: #0d1117;
-    border: 1px solid #21262d;
-    border-radius: 16px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
-    transition: border-color 200ms;
-    cursor: pointer;
   }
-  .design-card:hover { border-color: rgba(157,143,252,0.3); }
-  .design-card.selected { border-color: #7c6af5; box-shadow: 0 0 0 1px #7c6af5; }
 
-  .card-label {
+  /* ── 상단 네비 ── */
+  .topbar {
+    height: 52px;
+    background: #0d0d14;
+    border-bottom: 1px solid #21262d;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
+    padding: 0 20px;
+    flex-shrink: 0;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .back-link { font-size: 12px; color: #606070; display: flex; align-items: center; gap: 5px; }
+  .divider-v { width: 1px; height: 16px; background: #21262d; }
+  .page-title { font-size: 13px; font-weight: 500; color: #cdd9e5; }
+
+  .view-toggle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 9px;
+  }
+  .view-btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: #606070;
+    font-family: inherit;
+  }
+  .view-btn.active { background: #21262d; color: #cdd9e5; }
+
+  /* ── 날짜 네비 ── */
+  .date-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
     border-bottom: 1px solid #21262d;
+    flex-shrink: 0;
+    background: #0d1117;
   }
-  .card-label-text {
+  .date-nav-center { display: flex; align-items: center; gap: 12px; }
+  .date-label { font-size: 14px; font-weight: 600; color: #e6edf3; letter-spacing: -0.02em; }
+  .date-sub { font-size: 11px; color: #606070; margin-top: 1px; }
+  .nav-btn {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: #161b22;
+    border: 1px solid #21262d;
+    color: #8b949e;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .today-btn {
+    padding: 4px 10px;
+    border-radius: 7px;
+    background: rgba(157,143,252,0.1);
+    border: 1px solid rgba(157,143,252,0.25);
+    color: #9d8ffc;
     font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #484f58;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
   }
-  .badge-recommend {
+
+  /* ── 종일 영역 ── */
+  .allday-zone {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid #21262d;
+    flex-shrink: 0;
+    min-height: 36px;
+  }
+  .allday-label {
+    width: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    font-size: 10px;
+    color: #484f58;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-right: 1px solid #21262d;
+  }
+  .allday-items {
+    flex: 1;
+    padding: 5px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+  .allday-chip {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* ── 타임라인 본체 ── */
+  .timeline-scroll {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+  }
+  .timeline-scroll::-webkit-scrollbar { width: 4px; }
+  .timeline-scroll::-webkit-scrollbar-track { background: transparent; }
+  .timeline-scroll::-webkit-scrollbar-thumb { background: #21262d; border-radius: 2px; }
+
+  .timeline-inner {
+    position: relative;
+    /* 24시간 × 60px = 1440px */
+    height: 1440px;
+    display: flex;
+  }
+
+  /* 시간 레이블 */
+  .time-labels {
+    width: 56px;
+    flex-shrink: 0;
+    position: relative;
+    border-right: 1px solid #21262d;
+  }
+  .time-label {
+    position: absolute;
+    right: 10px;
+    font-size: 10px;
+    color: #484f58;
+    font-weight: 500;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+
+  /* 이벤트 영역 */
+  .events-area {
+    flex: 1;
+    position: relative;
+  }
+
+  /* 가로 시간선 */
+  .hour-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: #161b22;
+    pointer-events: none;
+  }
+  .hour-line.half {
+    background: #0f1318;
+  }
+
+  /* 현재 시간선 */
+  .now-line {
+    position: absolute;
+    left: -56px; right: 0;
+    height: 2px;
+    background: #7c6af5;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .now-line::before {
+    content: '';
+    position: absolute;
+    left: 56px;
+    top: -4px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #7c6af5;
+  }
+  .now-time {
+    position: absolute;
+    left: 0;
+    top: -8px;
     font-size: 10px;
     font-weight: 700;
-    color: #7c6af5;
-    background: rgba(124,106,245,0.12);
-    border: 1px solid rgba(124,106,245,0.25);
-    border-radius: 100px;
-    padding: 2px 8px;
-    letter-spacing: 0.04em;
-  }
-  .preview-area {
-    padding: 2rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 280px;
-    background: #0a0a12;
+    color: #9d8ffc;
+    width: 50px;
+    text-align: right;
   }
 
-  /* ───── Option A: 심플 센터 ───── */
-  .modal-a {
-    width: 100%;
-    max-width: 280px;
-    background: #0d1117;
-    border: 1px solid #21262d;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-  .modal-a-body {
-    padding: 28px 24px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .modal-a-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #e6edf3;
-    letter-spacing: -0.02em;
-    word-break: keep-all;
-  }
-  .modal-a-desc {
-    font-size: 13px;
-    color: #8b949e;
-    line-height: 1.7;
-    word-break: keep-all;
-  }
-  .modal-a-actions {
-    padding: 0 24px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .btn-danger-full {
-    width: 100%;
-    padding: 11px;
-    border-radius: 10px;
-    border: none;
-    background: rgba(248,113,113,0.1);
-    color: rgb(248,113,113);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    word-break: keep-all;
-  }
-  .btn-secondary-full {
-    width: 100%;
-    padding: 11px;
-    border-radius: 10px;
-    border: 1px solid #21262d;
-    background: transparent;
-    color: #8b949e;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    word-break: keep-all;
-  }
-
-  /* ───── Option B: 아이콘 강조형 ───── */
-  .modal-b {
-    width: 100%;
-    max-width: 280px;
-    background: #0d1117;
-    border: 1px solid #21262d;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-  .modal-b-top {
-    padding: 32px 24px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-  .icon-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: rgba(248,113,113,0.1);
-    border: 1px solid rgba(248,113,113,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .modal-b-texts { display: flex; flex-direction: column; gap: 6px; }
-  .modal-b-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #e6edf3;
-    letter-spacing: -0.02em;
-    word-break: keep-all;
-  }
-  .modal-b-desc {
-    font-size: 12px;
-    color: #8b949e;
-    line-height: 1.7;
-    word-break: keep-all;
-  }
-  .modal-b-divider { height: 1px; background: #21262d; }
-  .modal-b-actions {
-    padding: 14px 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .btn-b-cancel {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #21262d;
-    background: transparent;
-    color: #8b949e;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    word-break: keep-all;
-  }
-  .btn-b-confirm {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(248,113,113,0.25);
-    background: rgba(248,113,113,0.1);
-    color: rgb(248,113,113);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    word-break: keep-all;
-  }
-
-  /* ───── Option C: 헤더 구분선형 ───── */
-  .modal-c {
-    width: 100%;
-    max-width: 280px;
-    background: #0d1117;
-    border: 1px solid #21262d;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-  .modal-c-header {
-    padding: 20px 22px 18px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid #21262d;
-  }
-  .icon-sm {
-    width: 32px;
-    height: 32px;
+  /* 이벤트 블록 */
+  .event {
+    position: absolute;
     border-radius: 8px;
-    background: rgba(248,113,113,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .modal-c-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #e6edf3;
-    letter-spacing: -0.01em;
-    word-break: keep-all;
-  }
-  .modal-c-body {
-    padding: 18px 22px 20px;
-  }
-  .modal-c-desc {
-    font-size: 13px;
-    color: #8b949e;
-    line-height: 1.75;
-    word-break: keep-all;
-  }
-  .modal-c-footer {
-    padding: 0 16px 16px;
-    display: flex;
-    gap: 8px;
-  }
-  .btn-c-back {
-    flex: 1;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #21262d;
-    background: #161b22;
-    color: #cdd9e5;
-    font-size: 13px;
-    font-weight: 500;
+    padding: 5px 8px;
+    overflow: hidden;
     cursor: pointer;
-    font-family: inherit;
-    word-break: keep-all;
+    transition: opacity 150ms, filter 150ms;
+    min-height: 24px;
   }
-  .btn-c-discard {
-    flex: 1;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    background: rgba(248,113,113,0.12);
-    color: rgb(248,113,113);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    word-break: keep-all;
-  }
-
-  /* 선택 배지 */
-  .select-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-top: 1px solid #21262d;
-  }
-  .select-indicator {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid #484f58;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .design-card.selected .select-indicator {
-    border-color: #7c6af5;
-    background: #7c6af5;
-  }
-  .design-card.selected .select-indicator::after {
-    content: '';
-    width: 7px;
-    height: 5px;
-    border-left: 2px solid #fff;
-    border-bottom: 2px solid #fff;
-    transform: rotate(-45deg) translateY(-1px);
-    display: block;
-  }
-  .select-text {
+  .event:hover { filter: brightness(1.15); }
+  .event-title {
     font-size: 12px;
-    color: #484f58;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .design-card.selected .select-text { color: #9d8ffc; }
+  .event-time {
+    font-size: 10px;
+    opacity: 0.75;
+    margin-top: 1px;
+    white-space: nowrap;
+  }
+  .event-list {
+    font-size: 10px;
+    opacity: 0.6;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-  /* 피드백 섹션 */
-  .feedback-section {
-    background: #0d1117;
-    border: 1px solid rgba(157,143,252,0.15);
-    border-radius: 14px;
-    padding: 20px 22px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
+  /* 완료된 이벤트 */
+  .event.done {
+    opacity: 0.45;
   }
-  .feedback-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #7c6af5;
-    margin-top: 6px;
-    flex-shrink: 0;
+  .event.done .event-title {
+    text-decoration: line-through;
   }
-  .feedback-text {
-    font-size: 13px;
-    color: #8b949e;
-    line-height: 1.7;
-    word-break: keep-all;
-  }
-  .feedback-text strong { color: #cdd9e5; }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <p class="page-title">Todo — 취소 확인 모달</p>
-  <h1 class="page-subtitle">디자인 시안 3종</h1>
-  <p class="page-desc">원하는 시안을 클릭해서 선택해주세요.</p>
-
-  <div class="designs">
-
-    <!-- ── A: 심플 세로 버튼형 ── -->
-    <div class="design-card" id="card-a" onclick="select('a')">
-      <div class="card-label">
-        <span class="card-label-text">Option A</span>
-        <span style="font-size:11px;color:#484f58;">세로 버튼</span>
-      </div>
-      <div class="preview-area">
-        <div class="modal-a">
-          <div class="modal-a-body">
-            <p class="modal-a-title">작성을 취소할까요?</p>
-            <p class="modal-a-desc">입력한 내용은 저장되지 않고 사라집니다.</p>
-          </div>
-          <div class="modal-a-actions">
-            <button class="btn-danger-full">취소하기</button>
-            <button class="btn-secondary-full">계속 작성</button>
-          </div>
-        </div>
-      </div>
-      <div class="select-row">
-        <span class="select-text">선택</span>
-        <div class="select-indicator"></div>
-      </div>
-    </div>
-
-    <!-- ── B: 아이콘 + 가로 버튼형 ── -->
-    <div class="design-card" id="card-b" onclick="select('b')">
-      <div class="card-label">
-        <span class="card-label-text">Option B</span>
-        <span class="badge-recommend">추천</span>
-      </div>
-      <div class="preview-area">
-        <div class="modal-b">
-          <div class="modal-b-top">
-            <div class="icon-circle">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgb(248,113,113)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"></path>
-                <path d="M10 11v6M14 11v6"></path>
-                <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"></path>
-              </svg>
-            </div>
-            <div class="modal-b-texts">
-              <p class="modal-b-title">작성 내용을 삭제할까요?</p>
-              <p class="modal-b-desc">지금 닫으면 입력한 내용이<br>모두 사라집니다.</p>
-            </div>
-          </div>
-          <div class="modal-b-divider"></div>
-          <div class="modal-b-actions">
-            <button class="btn-b-cancel">계속 작성</button>
-            <button class="btn-b-confirm">삭제하기</button>
-          </div>
-        </div>
-      </div>
-      <div class="select-row">
-        <span class="select-text">선택</span>
-        <div class="select-indicator"></div>
-      </div>
-    </div>
-
-    <!-- ── C: 헤더 구분선형 ── -->
-    <div class="design-card" id="card-c" onclick="select('c')">
-      <div class="card-label">
-        <span class="card-label-text">Option C</span>
-        <span style="font-size:11px;color:#484f58;">헤더 분리형</span>
-      </div>
-      <div class="preview-area">
-        <div class="modal-c">
-          <div class="modal-c-header">
-            <div class="icon-sm">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(248,113,113)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg>
-            </div>
-            <p class="modal-c-title">작성 취소</p>
-          </div>
-          <div class="modal-c-body">
-            <p class="modal-c-desc">입력한 내용이 저장되지 않습니다.<br>정말 닫으시겠어요?</p>
-          </div>
-          <div class="modal-c-footer">
-            <button class="btn-c-back">계속 작성</button>
-            <button class="btn-c-discard">닫기</button>
-          </div>
-        </div>
-      </div>
-      <div class="select-row">
-        <span class="select-text">선택</span>
-        <div class="select-indicator"></div>
-      </div>
-    </div>
-
+<!-- 상단 네비 -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="back-link">← 노트패드</span>
+    <div class="divider-v"></div>
+    <span class="page-title">Todo</span>
   </div>
-
-  <div class="feedback-section">
-    <div class="feedback-dot"></div>
-    <p class="feedback-text">
-      <strong>추천: Option B</strong> — 아이콘으로 시각적 맥락을 주면서 여백이 충분하고, 버튼이 동등한 크기로 나란히 배치되어 선택이 자연스럽습니다.<br>
-      마음에 드는 시안이나 수정하고 싶은 부분 알려주세요.
-    </p>
+  <div class="view-toggle">
+    <button class="view-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      목록
+    </button>
+    <button class="view-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      달력
+    </button>
+    <button class="view-btn active">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="3" x2="4" y2="21"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="17" y2="18"/></svg>
+      타임라인
+    </button>
   </div>
+  <div style="width:80px"></div>
+</div>
 
+<!-- 날짜 네비 -->
+<div class="date-nav">
+  <button class="nav-btn" onclick="changeDay(-1)">‹</button>
+  <div class="date-nav-center">
+    <div>
+      <div class="date-label" id="dateLabel">2026년 4월 21일</div>
+      <div class="date-sub" id="dateSub">월요일</div>
+    </div>
+    <button class="today-btn" onclick="goToday()">오늘</button>
+  </div>
+  <button class="nav-btn" onclick="changeDay(1)">›</button>
+</div>
+
+<!-- 종일 영역 -->
+<div class="allday-zone">
+  <div class="allday-label">종일</div>
+  <div class="allday-items" id="alldayItems">
+    <!-- JS로 채움 -->
+  </div>
+</div>
+
+<!-- 타임라인 -->
+<div class="timeline-scroll" id="timelineScroll">
+  <div class="timeline-inner" id="timelineInner">
+    <div class="time-labels" id="timeLabels"></div>
+    <div class="events-area" id="eventsArea"></div>
+  </div>
 </div>
 
 <script>
-  function select(id) {
-    document.querySelectorAll('.design-card').forEach(c => c.classList.remove('selected'));
-    document.getElementById('card-' + id).classList.add('selected');
+const PX_PER_MIN = 1 // 60px per hour
+
+// 샘플 데이터 (이번 주 위주)
+const SAMPLE = [
+  { id:1, text:'팀 미팅', list:'업무', color:'#7c6af5', bg:'rgba(124,106,245,0.18)', date:'2026-04-21', time:'09:00', duration:60 },
+  { id:2, text:'디자인 리뷰', list:'업무', color:'#58a6ff', bg:'rgba(88,166,255,0.18)', date:'2026-04-21', time:'09:30', duration:90 },
+  { id:3, text:'점심 약속', list:'개인', color:'#56d364', bg:'rgba(86,211,100,0.15)', date:'2026-04-21', time:'12:00', duration:60 },
+  { id:4, text:'코드 리뷰', list:'업무', color:'#7c6af5', bg:'rgba(124,106,245,0.18)', date:'2026-04-21', time:'14:00', duration:45 },
+  { id:5, text:'운동', list:'개인', color:'#56d364', bg:'rgba(86,211,100,0.15)', date:'2026-04-21', time:'18:30', duration:60 },
+  { id:6, text:'저녁 독서', list:'개인', color:'#e3b341', bg:'rgba(227,179,65,0.15)', date:'2026-04-21', time:'21:00', duration:60, done:true },
+  { id:7, text:'기획 문서 작성', list:'업무', color:'#58a6ff', bg:'rgba(88,166,255,0.18)', date:'2026-04-21', time:'14:00', duration:120 },
+  { id:8, text:'주간 보고', list:'업무', color:'#f78166', bg:'rgba(247,129,102,0.15)', date:'2026-04-21', time:'16:30', duration:30 },
+  // 종일
+  { id:9, text:'프로젝트 마감', list:'업무', color:'#f78166', bg:'rgba(247,129,102,0.18)', date:'2026-04-21', time:null },
+  { id:10, text:'생일', list:'개인', color:'#e3b341', bg:'rgba(227,179,65,0.18)', date:'2026-04-21', time:null },
+]
+
+let currentDate = new Date(2026, 3, 21) // 2026-04-21
+
+const DAY_KO = ['일','월','화','수','목','금','토']
+const MONTH_KO = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+
+function dateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+}
+
+function changeDay(delta) {
+  currentDate = new Date(currentDate.getTime() + delta * 86400000)
+  render()
+}
+function goToday() {
+  currentDate = new Date(2026, 3, 21)
+  render()
+}
+
+function timeToMin(t) {
+  const [h, m] = t.split(':').map(Number)
+  return h * 60 + m
+}
+
+function minToStr(m) {
+  return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`
+}
+
+// 겹침 계산
+function calcColumns(events) {
+  // events sorted by start time
+  const sorted = [...events].sort((a,b) => timeToMin(a.time) - timeToMin(b.time))
+  const cols = [] // each: { event, col, totalCols }
+  const colEnds = [] // track end time of last event in each column
+
+  for (const ev of sorted) {
+    const start = timeToMin(ev.time)
+    const end = start + (ev.duration || 60)
+    let placed = false
+    for (let c = 0; c < colEnds.length; c++) {
+      if (colEnds[c] <= start) {
+        cols.push({ event: ev, col: c })
+        colEnds[c] = end
+        placed = true
+        break
+      }
+    }
+    if (!placed) {
+      cols.push({ event: ev, col: colEnds.length })
+      colEnds.push(end)
+    }
   }
+
+  // figure out totalCols per event (max col overlap)
+  const result = cols.map(({ event, col }) => {
+    const start = timeToMin(event.time)
+    const end = start + (event.duration || 60)
+    // find max col index among overlapping events
+    const overlapping = cols.filter(({ event: e2, col: c2 }) => {
+      const s2 = timeToMin(e2.time)
+      const e2end = s2 + (e2.duration || 60)
+      return s2 < end && e2end > start
+    })
+    const totalCols = Math.max(...overlapping.map(o => o.col)) + 1
+    return { event, col, totalCols }
+  })
+  return result
+}
+
+function render() {
+  const ds = dateStr(currentDate)
+  const dayLabel = `${currentDate.getFullYear()}년 ${MONTH_KO[currentDate.getMonth()]} ${currentDate.getDate()}일`
+  const dayOfWeek = DAY_KO[currentDate.getDay()] + '요일'
+  document.getElementById('dateLabel').textContent = dayLabel
+  document.getElementById('dateSub').textContent = dayOfWeek
+
+  const todayDs = '2026-04-21'
+  const isToday = ds === todayDs
+
+  const dayEvents = SAMPLE.filter(e => e.date === ds)
+  const alldayEvents = dayEvents.filter(e => !e.time)
+  const timedEvents = dayEvents.filter(e => !!e.time)
+
+  // 종일 영역
+  const alldayEl = document.getElementById('alldayItems')
+  if (alldayEvents.length === 0) {
+    alldayEl.innerHTML = '<span style="font-size:11px;color:#484f58;">없음</span>'
+  } else {
+    alldayEl.innerHTML = alldayEvents.map(e =>
+      `<div class="allday-chip" style="background:${e.bg};color:${e.color};border:1px solid ${e.color}40;">${e.text}</div>`
+    ).join('')
+  }
+
+  // 시간 레이블
+  const labelsEl = document.getElementById('timeLabels')
+  labelsEl.innerHTML = ''
+  for (let h = 0; h <= 24; h++) {
+    const top = h * 60 * PX_PER_MIN
+    const el = document.createElement('div')
+    el.className = 'time-label'
+    el.style.top = top + 'px'
+    el.textContent = h === 24 ? '' : `${String(h).padStart(2,'0')}:00`
+    labelsEl.appendChild(el)
+  }
+
+  // 이벤트 영역
+  const areaEl = document.getElementById('eventsArea')
+  areaEl.innerHTML = ''
+
+  // 시간선
+  for (let h = 0; h <= 24; h++) {
+    const line = document.createElement('div')
+    line.className = 'hour-line'
+    line.style.top = (h * 60 * PX_PER_MIN) + 'px'
+    areaEl.appendChild(line)
+    if (h < 24) {
+      const half = document.createElement('div')
+      half.className = 'hour-line half'
+      half.style.top = ((h * 60 + 30) * PX_PER_MIN) + 'px'
+      areaEl.appendChild(half)
+    }
+  }
+
+  // 현재 시간선 (오늘만)
+  if (isToday) {
+    const nowMin = 10 * 60 + 25 // 10:25 로 시뮬레이션
+    const nowLine = document.createElement('div')
+    nowLine.className = 'now-line'
+    nowLine.style.top = (nowMin * PX_PER_MIN) + 'px'
+    const nowTimeEl = document.createElement('div')
+    nowTimeEl.className = 'now-time'
+    nowTimeEl.textContent = minToStr(nowMin)
+    nowLine.appendChild(nowTimeEl)
+    areaEl.appendChild(nowLine)
+  }
+
+  // 이벤트 블록
+  const PADDING = 3
+  const placed = calcColumns(timedEvents)
+  for (const { event: ev, col, totalCols } of placed) {
+    const startMin = timeToMin(ev.time)
+    const dur = ev.duration || 60
+    const topPx = startMin * PX_PER_MIN
+    const heightPx = Math.max(dur * PX_PER_MIN - 2, 22)
+
+    const widthPct = 100 / totalCols
+    const leftPct = col * widthPct
+
+    const el = document.createElement('div')
+    el.className = 'event' + (ev.done ? ' done' : '')
+    el.style.cssText = `
+      top: ${topPx + 1}px;
+      height: ${heightPx}px;
+      left: calc(${leftPct}% + ${PADDING}px);
+      width: calc(${widthPct}% - ${PADDING * 2}px);
+      background: ${ev.bg};
+      border-left: 3px solid ${ev.color};
+      color: ${ev.color};
+    `
+    const endMin = startMin + dur
+    el.innerHTML = `
+      <div class="event-title">${ev.text}</div>
+      ${heightPx > 36 ? `<div class="event-time">${ev.time} – ${minToStr(endMin)}</div>` : ''}
+      ${heightPx > 52 ? `<div class="event-list">${ev.list}</div>` : ''}
+    `
+    areaEl.appendChild(el)
+  }
+}
+
+render()
+
+// 현재 시간(10:25)으로 스크롤
+window.addEventListener('load', () => {
+  const scroll = document.getElementById('timelineScroll')
+  const targetMin = 10 * 60 + 25
+  const scrollTo = Math.max(0, targetMin * PX_PER_MIN - 120)
+  scroll.scrollTop = scrollTo
+})
 </script>
 </body>
 </html>
