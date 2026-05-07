@@ -5,9 +5,11 @@ function todayStr() {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
 }
-function nowTimeStr() {
+function roundedNowTimeStr() {
   const d = new Date()
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+  const m = Math.round(d.getMinutes() / 10) * 10
+  const h = (d.getHours() + (m === 60 ? 1 : 0)) % 24
+  return `${String(h).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`
 }
 function calcDuration(item, completedDate, completedTime) {
   if (!item.scheduled_time || !item.start_date || !completedTime || !completedDate) return null
@@ -23,7 +25,9 @@ function calcDuration(item, completedDate, completedTime) {
 
 export function TodoCompleteModal({ item, onConfirm, onCancel }) {
   const [completedDate, setCompletedDate] = useState(todayStr())
-  const [completedTime, setCompletedTime] = useState(nowTimeStr())
+  const [completedTime, setCompletedTime] = useState(
+    item.end_time ? item.end_time.slice(0, 5) : roundedNowTimeStr()
+  )
   const [memo, setMemo] = useState(item.memo ?? '')
 
   const duration = calcDuration(item, completedDate, completedTime)
@@ -63,35 +67,50 @@ export function TodoCompleteModal({ item, onConfirm, onCancel }) {
           </p>
 
           {/* 완료 시간 */}
-          <div>
-            <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
-              <Clock size={11} /> 완료 시간
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="date"
-                value={completedDate}
-                onChange={e => setCompletedDate(e.target.value)}
-                className="px-2.5 py-2 rounded-lg text-[12px] outline-none"
-                style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid rgba(86,211,100,0.2)', colorScheme: 'dark' }}
-              />
-              <input
-                type="time"
-                value={completedTime}
-                onChange={e => setCompletedTime(e.target.value)}
-                className="flex-1 px-2.5 py-2 rounded-lg text-[12px] outline-none"
-                style={{ background: '#161b22', color: '#56d364', border: '1px solid rgba(86,211,100,0.2)', colorScheme: 'dark' }}
-              />
-              <button
-                onClick={() => { setCompletedDate(todayStr()); setCompletedTime(nowTimeStr()) }}
-                className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-[12px]"
-                style={{ background: 'rgba(86,211,100,0.1)', color: '#56d364', border: '1px solid rgba(86,211,100,0.2)' }}
-                title="현재 시간"
-              >
-                <Play size={10} />
-              </button>
-            </div>
-          </div>
+          {(() => {
+            const cH = completedTime ? parseInt(completedTime.split(':')[0]) : 0
+            const cM = completedTime ? parseInt(completedTime.split(':')[1]) : 0
+            const setCH = h => setCompletedTime(`${String(h).padStart(2,'0')}:${String(cM).padStart(2,'0')}`)
+            const setCM = m => setCompletedTime(`${String(cH).padStart(2,'0')}:${String(m).padStart(2,'0')}`)
+            const minBtn = (active) => ({
+              background: active ? 'rgba(86,211,100,0.12)' : '#161b22',
+              border: `1px solid ${active ? 'rgba(86,211,100,0.35)' : '#21262d'}`,
+              color: active ? '#56d364' : '#606070',
+            })
+            return (
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="flex items-center gap-1 text-[11px]" style={{ color: '#606070' }}>
+                    <Clock size={11} /> 완료 시간
+                  </label>
+                  <button onClick={() => { setCompletedDate(todayStr()); setCompletedTime(roundedNowTimeStr()) }} className="flex items-center gap-1 text-[11px]" style={{ color: '#56d364' }}>
+                    <Play size={10} /> 지금
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="date"
+                    value={completedDate}
+                    onChange={e => setCompletedDate(e.target.value)}
+                    className="px-2.5 py-2 rounded-lg text-[12px] outline-none"
+                    style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid rgba(86,211,100,0.2)', colorScheme: 'dark' }}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <select value={cH} onChange={e => setCH(Number(e.target.value))} className="px-2 py-2 rounded-lg text-[13px] outline-none" style={{ background: '#161b22', color: '#56d364', border: '1px solid rgba(86,211,100,0.25)', colorScheme: 'dark', minWidth: 64 }}>
+                    {Array.from({ length: 24 }, (_, i) => <option key={i} value={i}>{String(i).padStart(2,'0')}시</option>)}
+                  </select>
+                  <div className="flex gap-1 flex-1">
+                    {[0,10,20,30,40,50].map(m => (
+                      <button key={m} onClick={() => setCM(m)} className="flex-1 py-2 rounded-lg text-[12px] transition-colors" style={minBtn(cM === m)}>
+                        {String(m).padStart(2,'0')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
 
           {/* 수행 시간 표시 */}
           {duration && (
