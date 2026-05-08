@@ -39,6 +39,7 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
   const [date, setDate] = useState(todayStr())
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
+  const [endDate, setEndDate] = useState(todayStr())
   const [recurrence, setRecurrence] = useState('none')
   const [priority, setPriority] = useState(1)
   const [memo, setMemo] = useState('')
@@ -63,6 +64,7 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
       start_date: date || null,
       scheduled_time: (!isAllDay && startTime) ? startTime : null,
       end_time: (!isAllDay && endTime) ? endTime : null,
+      end_date: (!isAllDay && endDate) ? endDate : null,
       recurrence,
       memo: memo.trim() || null,
       note_ids: noteIds,
@@ -127,6 +129,7 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
                       const now = roundedNowTimeStr()
                       setStartTime(now)
                       if (!endTime) setEndTime(addHour(now))
+                      if (!endDate) setEndDate(date)
                     }
                   }}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
@@ -194,11 +197,18 @@ export function TodoAddModal({ notes = [], onClose, onSubmit }) {
                       </div>
                     </div>
                   </div>
-                  {/* 종료 시간 */}
+                  {/* 종료 일시 */}
                   <div>
                     <label className="flex items-center gap-1 text-[11px] mb-1.5" style={{ color: '#606070' }}>
-                      <Clock size={11} /> 종료 시간
+                      <Clock size={11} /> 종료 일시
                     </label>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={e => setEndDate(e.target.value)}
+                      className="w-full px-2.5 py-2 rounded-lg text-[12px] outline-none mb-2"
+                      style={{ background: '#161b22', color: '#cdd9e5', border: '1px solid #21262d', colorScheme: 'dark' }}
+                    />
                     <div className="flex items-center gap-2">
                       <select value={eH} onChange={e => setEndH(Number(e.target.value))} className="px-2 py-2 rounded-lg text-[13px] outline-none" style={selectStyle}>
                         {Array.from({ length: 24 }, (_, i) => <option key={i} value={i}>{String(i).padStart(2,'0')}시</option>)}

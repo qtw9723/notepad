@@ -24,7 +24,7 @@ function calcDuration(item, completedDate, completedTime) {
 }
 
 export function TodoCompleteModal({ item, onConfirm, onCancel }) {
-  const [completedDate, setCompletedDate] = useState(todayStr())
+  const [completedDate, setCompletedDate] = useState(item.end_date ?? todayStr())
   const [completedTime, setCompletedTime] = useState(
     item.end_time ? item.end_time.slice(0, 5) : roundedNowTimeStr()
   )
