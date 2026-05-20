@@ -278,7 +278,7 @@ export default function Editor({
                 }
               </div>
             ) : note.content_type === 'html' ? (
-              <div className="text-[#cdd9e5] text-[1rem] leading-[2.0]"
+              <div className="text-[#cdd9e5] text-[1rem]"
                 dangerouslySetInnerHTML={{ __html: note.content || '' }} />
             ) : (
               <p className="text-[#cdd9e5] text-[1rem] leading-[2.0] whitespace-pre-wrap">{note.content}</p>
@@ -414,7 +414,7 @@ export default function Editor({
               </div>
             ) : note.content_type === 'html' ? (
               <div
-                className="text-[#cdd9e5] text-[1rem] leading-[2.0]"
+                className="text-[#cdd9e5] text-[1rem]"
                 dangerouslySetInnerHTML={{ __html: note.content || '' }}
               />
             ) : (
@@ -524,7 +524,14 @@ export default function Editor({
           <span className={`text-[12px] transition-all duration-300 ${
             saved ? 'text-[#58a6ff] opacity-100' : saving ? 'text-[#8b949e] opacity-100' : 'opacity-0'
           }`}>
-            {saved ? '저장됨' : '저장 중...'}
+            {saved ? '저장됨' : '저장 중...'}# 리포트 관련
+                                       1. 별점 노출 UI 이상한 부분 확인됨
+                                       ![](https://pub-cac5ca52922e46dab9e108ce6f42ec33.r2.dev/public/6f245f7b-98fb-4459-9ebc-1efcf40b4dd9/0a14d044-0787-424d-b89c-72b2e8fb044c.png)
+                                       2. Monthly 리포트 인도네시아 언어 locale 안된 부분
+                                       ![](https://pub-cac5ca52922e46dab9e108ce6f42ec33.r2.dev/public/6f245f7b-98fb-4459-9ebc-1efcf40b4dd9/71c8082a-5e95-4709-954c-d6cd183f9243.png)
+                                       3. Monthly 리포트 인도네시아 언어 기간 안나옴
+                                       ![](https://pub-cac5ca52922e46dab9e108ce6f42ec33.r2.dev/public/6f245f7b-98fb-4459-9ebc-1efcf40b4dd9/cca4d48b-bb48-4689-bc34-f81b06583cd8.png)
+                                       4. 리포트 설정시 기간 설정 가능하면 좋을 듯
           </span>
         ) : (
           <span className="text-[12px] text-[#484f58]">읽기 전용</span>
