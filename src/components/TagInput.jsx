@@ -1,18 +1,17 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
+import { addTag, removeTag } from '../lib/tags'
 
 export default function TagInput({ tags, onChange }) {
   const [input, setInput] = useState('')
 
   const add = () => {
-    const val = input.trim().toLowerCase()
-    if (val && !tags.includes(val)) {
-      onChange([...tags, val])
-    }
+    const next = addTag(tags, input)
+    if (next !== tags) onChange(next)
     setInput('')
   }
 
-  const remove = (tag) => onChange(tags.filter(t => t !== tag))
+  const remove = (tag) => onChange(removeTag(tags, tag))
 
   const onKeyDown = (e) => {
     if (e.isComposing) return

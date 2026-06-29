@@ -36,7 +36,9 @@ export default function FileViewerModal({ file, onClose }) {
   // 최신 pos/size를 이벤트 핸들러에서 stale closure 없이 참조
   const posRef = useRef(pos)
   const sizeRef = useRef(size)
+  // eslint-disable-next-line react-hooks/refs -- 핸들러의 stale closure 방지용 의도된 동기화
   posRef.current = pos
+  // eslint-disable-next-line react-hooks/refs -- 핸들러의 stale closure 방지용 의도된 동기화
   sizeRef.current = size
 
   const dragRef = useRef(null)

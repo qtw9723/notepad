@@ -19,6 +19,7 @@ export default function App() {
   useEffect(() => {
     const noteParam = searchParams.get('note')
     if (noteParam) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- 의도된 1회 동기화(쿼리 → 선택 노트)
       setSelectedId(noteParam)
       setSearchParams({}, { replace: true })
     }
@@ -33,11 +34,13 @@ export default function App() {
 
   // 로그인 성공 시 모달 닫기
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 로그인 성공 시 모달 닫기(의도된 동기화)
     if (user) setShowLoginModal(false)
   }, [user])
 
   // 데스크탑 전환 시 mobileView 리셋
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 데스크탑 전환 시 뷰 리셋(의도된 동기화)
     if (!isMobile) setMobileView('list')
   }, [isMobile])
 

@@ -7,6 +7,7 @@ import SharePage from './components/SharePage.jsx'
 import { TodoPage } from './pages/TodoPage.jsx'
 import { useAuth } from './hooks/useAuth.js'
 
+// eslint-disable-next-line react-refresh/only-export-components -- entry file, not a fast-refresh boundary
 function TodoRoute() {
   const { user } = useAuth()
   return <TodoPage user={user} />

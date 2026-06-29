@@ -11,6 +11,7 @@ export function NotePreviewPanel({ note, fetchNote, onClose }) {
 
   useEffect(() => {
     if (note.content) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop에 이미 내용 있으면 즉시 반영(의도된 동기화)
       setFullNote(note)
       setLoading(false)
       return

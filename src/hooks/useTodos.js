@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { todoApi } from '../lib/todoApi'
 
 // 주기 항목이 현재 노출되어야 하는지 판단

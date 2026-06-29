@@ -14,8 +14,8 @@ export function TodoPage({ user }) {
   const [view, setView] = useState('list') // 'list' | 'calendar'
   const {
     lists, loading, error,
-    createList, updateList, deleteList,
-    createItem, updateItem, deleteItem, reorderItems,
+    createList, deleteList,
+    createItem, updateItem, deleteItem,
     getItemsByList, getAllVisibleItems,
   } = useTodos(user)
   const { notes, fetchNote } = useNotes(user)

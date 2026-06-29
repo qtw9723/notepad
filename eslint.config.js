@@ -23,7 +23,13 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // 대문자 시작 식별자(컴포넌트 등)는 미사용 허용 — vars/args 동일 컨벤션.
+      // eslint-plugin-react(jsx-uses-vars) 미사용으로, JSX에서만 쓰인 컴포넌트
+      // 파라미터(예: HOF의 Tag)가 false-positive 나는 것을 방지한다.
+      'no-unused-vars': [
+        'error',
+        { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^[A-Z_]' },
+      ],
     },
   },
 ])
