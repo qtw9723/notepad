@@ -1,9 +1,14 @@
 // 태그 정규화/추가/삭제 순수 로직.
 // UI(TagInput)에서 분리해 단위 테스트 가능하게 함.
 
-/** 입력 문자열을 태그 표준형(trim + 소문자)으로 변환 */
+/** 입력 문자열을 태그 표준형으로 변환: trim → 선행 # 제거 → 재trim → 내부 공백 축약(-) → 소문자 */
 export function normalizeTag(raw) {
-  return String(raw ?? '').trim().toLowerCase()
+  return String(raw ?? '')
+    .trim()
+    .replace(/^#+/, '')
+    .trim()
+    .replace(/[ \t]+/g, '-')
+    .toLowerCase()
 }
 
 /**

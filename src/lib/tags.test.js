@@ -9,6 +9,21 @@ describe('normalizeTag', () => {
     expect(normalizeTag(undefined)).toBe('')
     expect(normalizeTag(null)).toBe('')
   })
+  it('strips leading #', () => {
+    expect(normalizeTag('#work')).toBe('work')
+    expect(normalizeTag('##tag')).toBe('tag')
+  })
+  it('collapses internal spaces to hyphen', () => {
+    expect(normalizeTag('Side Project')).toBe('side-project')
+    expect(normalizeTag('a   b')).toBe('a-b')
+  })
+  it('handles # followed by space and surrounding whitespace', () => {
+    expect(normalizeTag('  #Side Project  ')).toBe('side-project')
+    expect(normalizeTag('# tag')).toBe('tag')
+  })
+  it('collapses internal tabs to hyphen', () => {
+    expect(normalizeTag('a\tb')).toBe('a-b')
+  })
 })
 
 describe('addTag', () => {
